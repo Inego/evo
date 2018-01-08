@@ -6,7 +6,28 @@ class GameState() {
 
     var deck: MutableList<Card> = mutableListOf()
 
+    val players: MutableList<PlayerState> = mutableListOf()
+
+    lateinit var firstPlayer: PlayerState
+
+    lateinit var currentPlayer: PlayerState
+
+    var phase: GamePhase = GamePhase.DEVELOPMENT
+
     constructor(src: GameState) : this() {
+
+        when (phase) {
+
+            GamePhase.DEVELOPMENT -> {
+
+            }
+
+            GamePhase.FEEDING -> TODO()
+        }
+
+    }
+
+    fun next() {
 
     }
 
@@ -47,4 +68,9 @@ class GameState() {
 
     }
 
+}
+
+enum class GamePhase {
+    DEVELOPMENT,
+    FEEDING
 }
