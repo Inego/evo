@@ -1,2 +1,2 @@
 # evo
-Evolution board game playing engine (genetic programming / reinforcement learning)
+An engine to play Evolution board game by Dmitry Knorre. It uses genetic programming and reinforcement learning.
