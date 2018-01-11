@@ -12,4 +12,7 @@ class Animal {
     var foodRequirement = 1
     var baseFood = 0
     var additionalFood = 0
+
+    val starves: Boolean
+        inline get() = foodRequirement < baseFood + additionalFood
 }

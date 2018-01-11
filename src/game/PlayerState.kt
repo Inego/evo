@@ -12,4 +12,7 @@ class PlayerState {
 
     val connections: MutableList<Connection> = mutableListOf()
 
+    val cardsToHandOut
+        inline get() = if (hand.isEmpty() and animals.isEmpty()) 6 else animals.size + 1
+
 }
