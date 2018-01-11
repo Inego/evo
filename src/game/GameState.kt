@@ -41,7 +41,7 @@ class GameState() {
     }
 
     private fun performDevelopment() {
-        // TODO
+        // TODO collect actions
 
         val nextDevelopingPlayer = this.getNextDevelopingPlayer()
 
@@ -50,7 +50,21 @@ class GameState() {
 
     private fun getNextDevelopingPlayer(): Int? {
         var cur = currentPlayerIdx
-        // TODO
+
+        while (true) {
+            cur++
+            if (cur == players.size) {
+                cur = 0
+            }
+            else if (cur == currentPlayerIdx) {
+                break
+            }
+            val p = players[cur]
+            if (p.passed || p.hand.isEmpty()) {
+                continue
+            }
+            return cur
+        }
         return null
     }
 
