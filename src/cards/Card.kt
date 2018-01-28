@@ -10,15 +10,15 @@ sealed class Card {
     abstract val name: String
 }
 
-abstract class SingleCard(private val property: AnimalProperty) : Card() {
+abstract class SingleCard(val property: AnimalProperty<*, *>) : Card() {
 
     override val name: String
         get() = property.name
 }
 
 abstract class DoubleCard(
-        private val firstProperty: AnimalProperty,
-        private val secondProperty: AnimalProperty
+        private val firstProperty: AnimalProperty<*, *>,
+        private val secondProperty: AnimalProperty<*, *>
 ) : Card() {
 
     override val name: String

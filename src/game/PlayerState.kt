@@ -1,6 +1,7 @@
 package game
 
 import cards.Card
+import properties.PairedProperty
 
 class PlayerState {
 
@@ -10,9 +11,15 @@ class PlayerState {
 
     val animals: MutableList<Animal> = mutableListOf()
 
-    val connections: MutableList<Connection> = mutableListOf()
+    private val connections: MutableList<Connection> = mutableListOf()
 
     val cardsToHandOut
         inline get() = if (hand.isEmpty() and animals.isEmpty()) 6 else animals.size + 1
 
+    fun addConnection(pairedProperty: PairedProperty, firstAnimal: Animal, secondAnimal: Animal) {
+        val connection = Connection(pairedProperty, firstAnimal, secondAnimal)
+        connections.add(connection)
+        firstAnimal.connections.add(ConnectionMembership(connection, true))
+        secondAnimal.connections.add(ConnectionMembership(connection, false))
+    }
 }

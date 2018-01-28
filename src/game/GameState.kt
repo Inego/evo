@@ -1,6 +1,12 @@
 package game
 
 import cards.*
+import each
+import game.moves.CreateAnimal
+import game.moves.DevelopmentPass
+import game.moves.Move
+import properties.AnimalProperty
+import properties.IndividualProperty
 import java.util.concurrent.ThreadLocalRandom
 
 class GameState() {
@@ -13,6 +19,8 @@ class GameState() {
 
     var currentPlayerIdx = 0
 
+    var computeNextPlayer = false
+
     val currentPlayer
         get() = players[currentPlayerIdx]
 
@@ -23,7 +31,12 @@ class GameState() {
     constructor(src: GameState) : this() {
     }
 
+    fun next(move: Move) {
+        move.applyTo(this)
+    }
+
     fun next() {
+
         when (phase) {
 
             GamePhase.DEVELOPMENT -> this.performDevelopment()
@@ -41,12 +54,43 @@ class GameState() {
     }
 
     private fun performDevelopment() {
-        // TODO collect actions
 
-        val nextDevelopingPlayer = this.getNextDevelopingPlayer()
+        if (computeNextPlayer) {
+            val nextDevelopingPlayer = this.getNextDevelopingPlayer()
 
-        phase = GamePhase.FEEDING_BASE_DETERMINATION
+            if (nextDevelopingPlayer == null) {
+                phase = GamePhase.FEEDING_BASE_DETERMINATION
+                return
+            }
+            currentPlayerIdx = nextDevelopingPlayer
+        } else {
+            computeNextPlayer = true
+        }
+
+        val player = currentPlayer
+
+
+
+        // Gather development moves (pass is always an option)
+        val moves : MutableList<Move> = mutableListOf(DevelopmentPass)
+
+        fun addCardPropertyTargets(card: Card, property: AnimalProperty<*>) {
+            if (property is IndividualProperty) {
+                moves.addAll(property.getTargets(this))
+
+            }
+        }
+
+        for (card in player.hand.toSet()) {
+            moves.add(CreateAnimal(card))
+            if (card is SingleCard){
+                val property = card.property
+
+            }
+        }
     }
+
+
 
     private fun getNextDevelopingPlayer(): Int? {
         var cur = currentPlayerIdx
@@ -55,8 +99,7 @@ class GameState() {
             cur++
             if (cur == players.size) {
                 cur = 0
-            }
-            else if (cur == currentPlayerIdx) {
+            } else if (cur == currentPlayerIdx) {
                 break
             }
             val p = players[cur]
@@ -94,9 +137,9 @@ class GameState() {
             player.animals.removeIf { it.starves }
 
             // Clean the state of player's animals
-            for (animal in player.animals) {
-                animal.baseFood = 0
-                animal.additionalFood = 0
+            player.animals.each {
+                baseFood = 0
+                additionalFood = 0
             }
         }
 
@@ -190,9 +233,7 @@ class GameState() {
                 deck.shuffle()
             }
         }
-
     }
-
 }
 
 enum class GamePhase {

@@ -1,6 +1,6 @@
 package properties.individual
 
-import properties.IndividualProperty
+import properties.MutuallyExclusiveIndividualProperty
 
-object ScavengerProperty : IndividualProperty("Scavenger") {
+object ScavengerProperty : MutuallyExclusiveIndividualProperty("Scavenger", CarnivorousProperty) {
 }

@@ -3,8 +3,8 @@ package game
 import properties.IndividualProperty
 
 class Animal {
-    val individualProperties: MutableList<IndividualProperty>? = null
-    val connections: MutableList<ConnectionMembership>? = null
+    private val individualProperties: MutableList<IndividualProperty> = mutableListOf()
+    val connections: MutableList<ConnectionMembership> = mutableListOf()
 
     var fatCapacity = 0
     var fat = 0
@@ -15,4 +15,12 @@ class Animal {
 
     val starves: Boolean
         inline get() = foodRequirement < baseFood + additionalFood
+
+    fun has(individualProperty: IndividualProperty): Boolean =
+            individualProperties.contains(individualProperty)
+
+    fun addProperty(individualProperty: IndividualProperty) {
+        // Thread-unsafe, but any game state is supposed to be modified from a single thread
+        individualProperties.add(individualProperty)
+    }
 }
