@@ -42,19 +42,10 @@ abstract class PairedProperty(name: String) : AnimalProperty<PairedProperty, Pai
 }
 
 
-sealed class PropertyTarget<T: PropertyTarget<T, P>, P: AnimalProperty<P, T>> {
-    abstract fun applyWith(property: P, gameState: GameState)
-}
+sealed class PropertyTarget<T: PropertyTarget<T, P>, P: AnimalProperty<P, T>>
 
-data class SingleTarget(val animal: Animal) : PropertyTarget<SingleTarget, IndividualProperty>() {
-    override fun applyWith(property: IndividualProperty, gameState: GameState) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
 
-}
+data class SingleTarget(val animal: Animal) : PropertyTarget<SingleTarget, IndividualProperty>()
 
-data class PairedTarget(val firstAnimal: Animal, val secondAnimal: Animal) : PropertyTarget<PairedTarget, PairedProperty>() {
-    override fun applyWith(property: PairedProperty, gameState: GameState) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-}
+
+data class PairedTarget(val firstAnimal: Animal, val secondAnimal: Animal) : PropertyTarget<PairedTarget, PairedProperty>()

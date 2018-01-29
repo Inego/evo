@@ -74,10 +74,9 @@ class GameState() {
         // Gather development moves (pass is always an option)
         val moves : MutableList<Move> = mutableListOf(DevelopmentPass)
 
-        fun addCardPropertyTargets(card: Card, property: AnimalProperty<*>) {
+        fun addCardPropertyTargets(card: Card, property: AnimalProperty<*, *>) {
             if (property is IndividualProperty) {
                 moves.addAll(property.getTargets(this))
-
             }
         }
 
