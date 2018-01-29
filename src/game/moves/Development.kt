@@ -3,9 +3,7 @@ package game.moves
 import cards.Card
 import game.Animal
 import game.GameState
-import properties.AnimalProperty
-import properties.IndividualProperty
-import properties.PropertyTarget
+import properties.*
 
 class CreateAnimal(private val card: Card) : Move() {
     override fun GameState.applyMove() {
@@ -20,13 +18,19 @@ object DevelopmentPass : Move() {
     }
 }
 
-class DevelopmentAddProperty<P: AnimalProperty<P, T>, T: PropertyTarget<T, P>>(
+abstract class DevelopmentAddProperty<P : AnimalProperty<P, T>, T : PropertyTarget<T, P>>(
         private val card: Card,
         private val property: P,
         private val target: T
-): Move() {
+) : Move() {
     override fun GameState.applyMove() {
         currentPlayer.hand.remove(card)
         property.applyTo(target, this)
     }
 }
+
+class DevelopmentAddIndividualProperty(card: Card, property: IndividualProperty, target: SingleTarget)
+    : DevelopmentAddProperty<IndividualProperty, SingleTarget>(card, property, target)
+
+class DevelopmentAddPairedProperty(card: Card, property: PairedProperty, target: PairedTarget)
+    : DevelopmentAddProperty<PairedProperty, PairedTarget>(card, property, target)

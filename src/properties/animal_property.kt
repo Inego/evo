@@ -1,11 +1,22 @@
 package properties
 
+import cards.Card
 import game.Animal
-import game.Connection
 import game.GameState
+import game.moves.DevelopmentAddIndividualProperty
+import game.moves.DevelopmentAddPairedProperty
+import game.moves.Move
 
-sealed class AnimalProperty<P: AnimalProperty<P, T>, T: PropertyTarget<T, P>>(val name: String) {
+sealed class AnimalProperty<P : AnimalProperty<P, T>, T : PropertyTarget<T, P>>(val name: String) {
+
+    fun getDevelopmentMoves(gameState: GameState, card: Card): List<Move> {
+        return getTargets(gameState).map { createDevelopmentMove(card, it) }
+    }
+
     abstract fun getTargets(gameState: GameState): List<T>
+
+    protected abstract fun createDevelopmentMove(card: Card, target: T): Move
+
     abstract fun applyTo(target: T, gameState: GameState)
 }
 
@@ -18,6 +29,10 @@ abstract class IndividualProperty(name: String) : AnimalProperty<IndividualPrope
 
     override fun applyTo(target: SingleTarget, gameState: GameState) {
         target.animal.addProperty(this)
+    }
+
+    override fun createDevelopmentMove(card: Card, target: SingleTarget): Move {
+        return DevelopmentAddIndividualProperty(card, this, target)
     }
 }
 
@@ -39,10 +54,14 @@ abstract class PairedProperty(name: String) : AnimalProperty<PairedProperty, Pai
         val player = gameState.currentPlayer
         player.addConnection(this, target.firstAnimal, target.secondAnimal)
     }
+
+    override fun createDevelopmentMove(card: Card, target: PairedTarget): Move {
+        return DevelopmentAddPairedProperty(card, this, target)
+    }
 }
 
 
-sealed class PropertyTarget<T: PropertyTarget<T, P>, P: AnimalProperty<P, T>>
+sealed class PropertyTarget<T : PropertyTarget<T, P>, P : AnimalProperty<P, T>>
 
 
 data class SingleTarget(val animal: Animal) : PropertyTarget<SingleTarget, IndividualProperty>()

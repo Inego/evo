@@ -6,7 +6,6 @@ import game.moves.CreateAnimal
 import game.moves.DevelopmentPass
 import game.moves.Move
 import properties.AnimalProperty
-import properties.IndividualProperty
 import java.util.concurrent.ThreadLocalRandom
 
 class GameState() {
@@ -70,25 +69,26 @@ class GameState() {
         val player = currentPlayer
 
 
-
         // Gather development moves (pass is always an option)
-        val moves : MutableList<Move> = mutableListOf(DevelopmentPass)
+        val moves: MutableList<Move> = mutableListOf(DevelopmentPass)
 
         fun addCardPropertyTargets(card: Card, property: AnimalProperty<*, *>) {
-            if (property is IndividualProperty) {
-                moves.addAll(property.getTargets(this))
-            }
+            moves += property.getDevelopmentMoves(this, card)
         }
 
         for (card in player.hand.toSet()) {
             moves.add(CreateAnimal(card))
-            if (card is SingleCard){
-                val property = card.property
-
+            when (card) {
+                is SingleCard -> {
+                    addCardPropertyTargets(card, card.property)
+                }
+                is DoubleCard -> {
+                    addCardPropertyTargets(card, card.firstProperty)
+                    addCardPropertyTargets(card, card.secondProperty)
+                }
             }
         }
     }
-
 
 
     private fun getNextDevelopingPlayer(): Int? {

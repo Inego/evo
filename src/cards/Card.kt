@@ -17,8 +17,8 @@ abstract class SingleCard(val property: AnimalProperty<*, *>) : Card() {
 }
 
 abstract class DoubleCard(
-        private val firstProperty: AnimalProperty<*, *>,
-        private val secondProperty: AnimalProperty<*, *>
+        val firstProperty: AnimalProperty<*, *>,
+        val secondProperty: AnimalProperty<*, *>
 ) : Card() {
 
     override val name: String
