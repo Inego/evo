@@ -22,4 +22,11 @@ class PlayerState {
         firstAnimal.connections.add(ConnectionMembership(connection, true))
         secondAnimal.connections.add(ConnectionMembership(connection, false))
     }
+
+    fun clearAnimals() {
+        animals.clear()
+        connections.clear()
+    }
+
+    fun newAnimal() = Animal().also { animals.add(it) }
 }

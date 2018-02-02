@@ -6,7 +6,7 @@ class GameStateTests {
 
     @Test
     fun `New game deck size`() {
-        val gs = GameState.new()
+        val gs = GameState.new(0)
         Assertions.assertEquals(84, gs.deck.size)
     }
 

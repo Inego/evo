@@ -36,18 +36,38 @@ abstract class IndividualProperty(name: String) : AnimalProperty<IndividualPrope
     }
 }
 
-abstract class MutuallyExclusiveIndividualProperty(
-        name: String,
-        private val otherProperty: IndividualProperty
-) : IndividualProperty(name) {
-    override fun mayAttachTo(animal: Animal): Boolean {
-        return super.mayAttachTo(animal) && !animal.has(otherProperty)
-    }
-}
 
 abstract class PairedProperty(name: String) : AnimalProperty<PairedProperty, PairedTarget>(name) {
+
+    abstract val isDirected: Boolean
+
     override fun getTargets(gameState: GameState): List<PairedTarget> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
+        val result = mutableListOf<PairedTarget>()
+
+        val player = gameState.currentPlayer
+        val animals = player.animals
+        for (i in 0 until animals.size - 1) {
+            val animal1 = animals[i]
+            for (j in i + 1 until animals.size) {
+                val animal2 = animals[j]
+
+                // animal1 and animal2 may NOT have this property,
+                // if they are already connected by it (regardless of direction)
+                if (animal1.connections.filter {
+                            it.property == this
+                            && it.other == animal2
+                        }.none()) {
+
+                    result.add(PairedTarget(animal1, animal2))
+
+                    if (isDirected)
+                        result.add(PairedTarget(animal2, animal1))
+                }
+            }
+        }
+
+        return result
     }
 
     override fun applyTo(target: PairedTarget, gameState: GameState) {

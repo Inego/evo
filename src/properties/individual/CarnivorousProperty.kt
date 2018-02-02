@@ -1,6 +1,12 @@
 package properties.individual
 
-import properties.MutuallyExclusiveIndividualProperty
+import game.Animal
+import properties.IndividualProperty
 
-object CarnivorousProperty : MutuallyExclusiveIndividualProperty("Carnivorous", ScavengerProperty) {
+object CarnivorousProperty : IndividualProperty("Carnivorous") {
+
+    override fun mayAttachTo(animal: Animal): Boolean {
+        return super.mayAttachTo(animal) && !animal.has(ScavengerProperty)
+    }
+
 }

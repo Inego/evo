@@ -7,11 +7,11 @@ import game.moves.DevelopmentPass
 import game.moves.Move
 import java.util.concurrent.ThreadLocalRandom
 
-class GameState() {
+class GameState(val numberOfPlayers: Int) {
 
     var deck: MutableList<Card> = mutableListOf()
 
-    val players: MutableList<PlayerState> = mutableListOf()
+    val players: List<PlayerState> = List(numberOfPlayers) { PlayerState() }
 
     var firstPlayerIdx = 0
 
@@ -26,7 +26,7 @@ class GameState() {
 
     var foodBase = 0
 
-    constructor(src: GameState) : this() {
+    constructor(src: GameState) : this(src.numberOfPlayers) {
     }
 
     fun next(move: Move) {
@@ -198,9 +198,9 @@ class GameState() {
 
     companion object {
 
-        fun new(): GameState {
+        fun new(numberOfPlayers: Int): GameState {
 
-            return GameState().apply {
+            return GameState(numberOfPlayers).apply {
                 addCards(
                         CamouflageCard,
                         BurrowingCard,

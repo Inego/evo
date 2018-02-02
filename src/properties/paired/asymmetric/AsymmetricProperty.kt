@@ -9,5 +9,5 @@ abstract class AsymmetricProperty(
         val guest: PairedPropertySide
 ) : PairedProperty(name) {
 
-
+    override val isDirected: Boolean = true
 }
