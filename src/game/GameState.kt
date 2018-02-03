@@ -5,13 +5,16 @@ import each
 import game.moves.CreateAnimal
 import game.moves.DevelopmentPass
 import game.moves.Move
+import removeLast
 import java.util.concurrent.ThreadLocalRandom
 
-class GameState(val numberOfPlayers: Int) {
+class GameState(private val numberOfPlayers: Int) {
 
     var deck: MutableList<Card> = mutableListOf()
 
     val players: List<PlayerState> = List(numberOfPlayers) { PlayerState() }
+
+    private val moves: MutableList<Move> = mutableListOf()
 
     var firstPlayerIdx = 0
 
@@ -19,36 +22,53 @@ class GameState(val numberOfPlayers: Int) {
 
     var computeNextPlayer = false
 
-    val currentPlayer
+    inline val currentPlayer
         get() = players[currentPlayerIdx]
 
     var phase: GamePhase = GamePhase.DEVELOPMENT
 
     var foodBase = 0
 
+
     constructor(src: GameState) : this(src.numberOfPlayers) {
+        // TODO
     }
 
-    fun next(move: Move) {
-        move.applyTo(this)
-    }
+    fun next(move: Move): List<Move> {
 
-    fun next() {
+        applyMove(move)
 
-        when (phase) {
+        do {
 
-            GamePhase.DEVELOPMENT -> this.performDevelopment()
+            when (phase) {
 
-            GamePhase.FEEDING_BASE_DETERMINATION -> this.performFeedingBaseDetermination()
+                GamePhase.DEVELOPMENT -> this.performDevelopment()
 
-            GamePhase.FEEDING -> this.performFeeding()
+                GamePhase.FEEDING_BASE_DETERMINATION -> this.performFeedingBaseDetermination()
+
+                GamePhase.FEEDING -> this.performFeeding()
 
 
-            GamePhase.EXTINCTION -> this.processExtinction()
-            GamePhase.END -> {
-                // Do nothing
+                GamePhase.EXTINCTION -> this.processExtinction()
+                GamePhase.END -> {
+                    // Do nothing
+                }
             }
-        }
+
+            if (moves.size == 1) {
+                applyMove(moves[0])
+            }
+
+        } while (moves.isEmpty() && phase != GamePhase.END)
+
+        return moves
+
+    }
+
+    private fun applyMove(move: Move) {
+        move.applyTo(this)
+
+        moves.clear()
     }
 
     private fun performDevelopment() {
@@ -68,7 +88,7 @@ class GameState(val numberOfPlayers: Int) {
         val player = currentPlayer
 
         // Gather development moves (pass is always an option)
-        val moves: MutableList<Move> = mutableListOf(DevelopmentPass)
+        moves.add(DevelopmentPass)
 
         for (card in player.hand.toSet()) {
             moves.add(CreateAnimal(card))
@@ -83,7 +103,6 @@ class GameState(val numberOfPlayers: Int) {
             }
         }
     }
-
 
     private fun getNextDevelopingPlayer(): Int? {
         var cur = currentPlayerIdx
@@ -147,7 +166,7 @@ class GameState(val numberOfPlayers: Int) {
             loop@ while (true) {
                 val newToHandOut: MutableList<Pair<PlayerState, Int>> = mutableListOf()
                 for (pair in toHandOut) {
-                    val card = deck.removeAt(0)
+                    val card = deck.removeLast()
                     pair.first.hand.add(card)
                     if (deck.isEmpty()) {
                         break@loop
@@ -227,6 +246,8 @@ class GameState(val numberOfPlayers: Int) {
             }
         }
     }
+
+
 }
 
 enum class GamePhase {

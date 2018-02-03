@@ -10,12 +10,16 @@ class CreateAnimal(private val card: Card) : Move() {
         currentPlayer.hand.remove(card)
         currentPlayer.animals.add(Animal())
     }
+
+    override fun toString() = "Create animal from $card"
 }
 
 object DevelopmentPass : Move() {
     override fun GameState.applyMove() {
         currentPlayer.passed = true
     }
+
+    override fun toString() = "Pass from development"
 }
 
 abstract class DevelopmentAddProperty<P : AnimalProperty<P, T>, T : PropertyTarget<T, P>>(

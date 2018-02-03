@@ -8,6 +8,7 @@ import properties.paired.symmetric.CooperationProperty
 
 sealed class Card {
     abstract val name: String
+    override fun toString() = name
 }
 
 abstract class SingleCard(val property: AnimalProperty<*, *>) : Card() {
