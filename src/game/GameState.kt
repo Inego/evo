@@ -8,11 +8,11 @@ import game.moves.Move
 import removeLast
 import java.util.concurrent.ThreadLocalRandom
 
-class GameState(private val numberOfPlayers: Int) {
+class GameState private constructor(val numberOfPlayers: Int) {
 
     var deck: MutableList<Card> = mutableListOf()
 
-    val players: List<PlayerState> = List(numberOfPlayers) { PlayerState() }
+    val players: List<PlayerState> = List(numberOfPlayers) { index -> PlayerState("p${index + 1}") }
 
     private val moves: MutableList<Move> = mutableListOf()
 

@@ -3,7 +3,7 @@ package game
 import cards.Card
 import properties.PairedProperty
 
-class PlayerState {
+class PlayerState(val name: String) {
 
     var passed = false
 
@@ -29,4 +29,6 @@ class PlayerState {
     }
 
     fun newAnimal() = Animal().also { animals.add(it) }
+
+    override fun toString() = name
 }

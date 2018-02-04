@@ -9,7 +9,7 @@ import kotlin.test.assertEquals
 
 internal class PairedPropertyTest {
 
-    private val gameState = GameState(1)
+    private val gameState = GameState.new(1)
 
     private val p = gameState.players[0]
 

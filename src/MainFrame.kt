@@ -1,9 +1,66 @@
+import game.Animal
+import game.GameState
+import game.moves.GameStartMove
+import game.moves.Move
 import java.awt.*
-import javax.swing.JButton
-import javax.swing.JFrame
-import javax.swing.SwingUtilities
+import javax.swing.*
+
+
+class GameBoardComponent(var gameState: GameState) : JPanel() {
+    companion object {
+        const val SPACER_HEIGHT = 2
+        const val PREFERRED_ROW_HEIGHT = 30
+    }
+
+    override fun paintComponent(g: Graphics) {
+        super.paintComponent(g)
+        val g2 = g as Graphics2D
+
+        val metrics = g2.fontMetrics
+        val fontHeight = metrics.ascent + metrics.descent
+
+        val numberOfPlayers = gameState.numberOfPlayers
+
+        val playerHeight = height / numberOfPlayers
+
+        for ((playerIndex, player) in gameState.players.withIndex()) {
+
+            /* The structure of the player's space:
+
+            Info row
+            <spacer>
+            Hand
+            <spacer>
+            Animals w/ their properties
+
+            */
+
+            val playerSpaceStart = height * playerIndex / numberOfPlayers
+
+            val playerRows = 2 * SPACER_HEIGHT + 3 + (player.animals.map { it.propertyCount }.max() ?: 0)
+            val rowHeight = Math.min(playerHeight / playerRows, PREFERRED_ROW_HEIGHT)
+
+            val rowTextBase = rowHeight * metrics.ascent / fontHeight
+
+            g2.drawString(player.name, 0, playerSpaceStart + rowTextBase)
+
+        }
+
+    }
+}
 
 object GridBagLayoutDemo {
+
+    private val logList = JList<String>()
+    private val choicesList = JList<Move>()
+
+    private val gameState = GameState.new(2).apply {
+        next(GameStartMove)
+    }
+
+    private val gameBoard = GameBoardComponent(gameState).apply {
+        preferredSize = Dimension(800, 600)
+    }
 
     private fun addComponentsToPane(pane: Container) {
 
@@ -18,13 +75,13 @@ object GridBagLayoutDemo {
             }
         }
 
-        add(JButton("Game Area"), 0, 0) {
+        add(gameBoard, 0, 0) {
             weightx = 1.0
             fill = GridBagConstraints.BOTH
             gridheight = 3
         }
 
-        add(JButton("Log"), 1, 0) {
+        add(logList, 1, 0) {
             weightx = 0.2
             weighty = 0.5
             gridwidth = 2
@@ -41,7 +98,7 @@ object GridBagLayoutDemo {
             anchor = GridBagConstraints.CENTER
         }
 
-        add(JButton("Choices"), 1, 2) {
+        add(choicesList, 1, 2) {
             weighty = 0.5
             gridwidth = 2
             fill = GridBagConstraints.BOTH

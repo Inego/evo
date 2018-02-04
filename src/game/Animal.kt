@@ -3,7 +3,10 @@ package game
 import properties.IndividualProperty
 
 class Animal {
-    private val individualProperties: MutableList<IndividualProperty> = mutableListOf()
+    inline val propertyCount
+        get() = individualProperties.size + connections.size
+
+    val individualProperties: MutableList<IndividualProperty> = mutableListOf()
     val connections: MutableList<ConnectionMembership> = mutableListOf()
 
     var fatCapacity = 0
