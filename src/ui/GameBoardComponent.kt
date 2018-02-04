@@ -9,6 +9,11 @@ class GameBoardComponent(var gameState: GameState) : JPanel() {
     companion object {
         const val SPACER_HEIGHT = 2
         const val PREFERRED_ROW_HEIGHT = 30
+        const val HORIZONTAL_MARGIN = 10
+        const val CARD_SPACER_RATIO = 0.1
+        const val PREFERRED_CARD_WIDTH = 100
+        const val PREFERRED_CARD_SPACER = 10
+
     }
 
     override fun paintComponent(g: Graphics) {
@@ -39,9 +44,19 @@ class GameBoardComponent(var gameState: GameState) : JPanel() {
             val playerRows = 2 * SPACER_HEIGHT + 3 + (player.animals.map { it.propertyCount }.max() ?: 0)
             val rowHeight = Math.min(playerHeight / playerRows, PREFERRED_ROW_HEIGHT)
 
+            // Count card width (incl. spacing)
+
+            val cardColumns = Math.max(player.hand.size, player.animals.size)
+
+            val rawColumnWidth = (width - 2 * HORIZONTAL_MARGIN)
+
+            val cardWidth = Math.min((rawColumnWidth * (1.0 - CARD_SPACER_RATIO)).toInt(), PREFERRED_CARD_WIDTH)
+            val cardSpacer = Math.min((rawColumnWidth * CARD_SPACER_RATIO).toInt(), PREFERRED_CARD_SPACER)
+
+
             val rowTextBase = rowHeight * metrics.ascent / fontHeight
 
-            g2.drawString(player.name, 0, playerSpaceStart + rowTextBase)
+            g2.drawString(player.name, HORIZONTAL_MARGIN, playerSpaceStart + rowTextBase)
 
         }
 
