@@ -10,15 +10,43 @@ import javax.swing.*
 object MainFrame {
 
     private val logList = JList<String>()
-    private val choicesList = JList<Move>()
 
-    private val gameState = GameState.new(2).apply {
-        next(GameStartMove)
+    private val choicesListModel = DefaultListModel<Move>()
+
+    private val choicesList = JList<Move>(choicesListModel).apply {
+        selectionMode = ListSelectionModel.SINGLE_SELECTION
+    }
+
+    private fun setCurrentMoves(moves: List<Move>) {
+        choicesListModel.clear()
+        moves.forEach { choicesListModel.addElement(it) }
+        choicesList.selectedIndex = 0
+    }
+
+    private val gameState = GameState.new(2)
+
+    private fun handleNextMove(move: Move) {
+        val nextMoves = gameState.next(move)
+        setCurrentMoves(nextMoves)
+    }
+
+    init {
+        handleNextMove(GameStartMove)
     }
 
     private val gameBoard = GameBoardComponent(gameState).apply {
         preferredSize = Dimension(800, 600)
     }
+
+    private val nextButton = JButton("Next").apply {
+
+        addActionListener {
+            handleNextMove(choicesList.selectedValue)
+        }
+
+    }
+
+
 
     private fun addComponentsToPane(pane: Container) {
 
@@ -46,7 +74,7 @@ object MainFrame {
             fill = GridBagConstraints.BOTH
         }
 
-        add(JButton("Next"), 1, 1) {
+        add(nextButton, 1, 1) {
             weightx = 0.1
             anchor = GridBagConstraints.CENTER
         }
