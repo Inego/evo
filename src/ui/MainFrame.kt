@@ -9,6 +9,12 @@ import javax.swing.*
 
 object MainFrame {
 
+    private val gameState = GameState.new(2)
+
+    private val gameBoard = GameBoardComponent(gameState).apply {
+        preferredSize = Dimension(800, 600)
+    }
+
     private val logList = JList<String>()
 
     private val choicesListModel = DefaultListModel<Move>()
@@ -21,9 +27,10 @@ object MainFrame {
         choicesListModel.clear()
         moves.forEach { choicesListModel.addElement(it) }
         choicesList.selectedIndex = 0
+        gameBoard.repaint()
     }
 
-    private val gameState = GameState.new(2)
+
 
     private fun handleNextMove(move: Move) {
         val nextMoves = gameState.next(move)
@@ -34,10 +41,6 @@ object MainFrame {
         handleNextMove(GameStartMove)
     }
 
-    private val gameBoard = GameBoardComponent(gameState).apply {
-        preferredSize = Dimension(800, 600)
-    }
-
     private val nextButton = JButton("Next").apply {
 
         addActionListener {
@@ -45,8 +48,6 @@ object MainFrame {
         }
 
     }
-
-
 
     private fun addComponentsToPane(pane: Container) {
 

@@ -15,7 +15,6 @@ class GameBoardComponent(var gameState: GameState) : JPanel() {
         const val CARD_SPACER_RATIO = 0.1
         const val PREFERRED_CARD_WIDTH = 100.0
         const val PREFERRED_CARD_SPACER = 10.0
-
     }
 
     override fun paintComponent(g: Graphics) {
@@ -43,21 +42,24 @@ class GameBoardComponent(var gameState: GameState) : JPanel() {
 
             val playerSpaceStart = height.toDouble() * playerIndex / numberOfPlayers
 
-            val playerRows = 2 * SPACER_HEIGHT + 3 + (player.animals.map { it.propertyCount }.max() ?: 0)
+            val maxAnimalHeight = player.animals.map { it.propertyCount }.max() ?: 0
+            val playerRows = 2 * SPACER_HEIGHT + 3 + maxAnimalHeight
             val rowHeight = Math.min(playerHeight / playerRows, PREFERRED_ROW_HEIGHT)
 
             // Count card width (incl. spacing)
 
             val cardColumns = Math.max(player.hand.size, player.animals.size)
 
-            val rawColumnWidth = (width - 2 * HORIZONTAL_MARGIN)
+            val columnWidth = (width - 2 * HORIZONTAL_MARGIN).toDouble() / cardColumns
 
-            val cardWidth = Math.min((rawColumnWidth * (1.0 - CARD_SPACER_RATIO)), PREFERRED_CARD_WIDTH)
-            val cardSpacer = Math.min(rawColumnWidth * CARD_SPACER_RATIO, PREFERRED_CARD_SPACER)
+            val cardWidth = Math.min((columnWidth * (1.0 - CARD_SPACER_RATIO)), PREFERRED_CARD_WIDTH)
+            val cardSpacer = Math.min(columnWidth * CARD_SPACER_RATIO, PREFERRED_CARD_SPACER)
 
-            val cardColumnWidth = cardWidth + cardSpacer
+            val cardColumn = cardWidth + cardSpacer
 
-            fun cardIdxToScreenX(idx: Int): Int = (HORIZONTAL_MARGIN + cardColumnWidth * idx).toInt()
+            fun cardIdxToScreenX(idx: Int): Int = (HORIZONTAL_MARGIN + cardColumn * idx).toInt()
+
+            fun rowIdxToScreenY(idx: Int): Int = (playerSpaceStart + idx * rowHeight).toInt()
 
 
             val rowTextBase = rowHeight * metrics.ascent / fontHeight
@@ -68,7 +70,7 @@ class GameBoardComponent(var gameState: GameState) : JPanel() {
 
             // Draw hand
 
-            val handRowStart = playerSpaceStart + rowHeight * (1 + SPACER_HEIGHT)
+            val handRowStart = rowIdxToScreenY(1 + SPACER_HEIGHT)
             val handRowBase = (handRowStart + rowTextBase).toInt()
 
             for ((index, card) in player.hand.withIndex()) {
@@ -81,8 +83,20 @@ class GameBoardComponent(var gameState: GameState) : JPanel() {
                         g2.drawString(card.secondProperty.name, cardStartX, handRowBase + fontHeight)
                     }
                 }
+            }
 
+            // Draw animals w/ properties
 
+            val animalRow = playerRows - 1
+            val yStart = rowIdxToScreenY(animalRow)
+            val yEnd = yStart + rowHeight
+
+            player.animals.withIndex().forEach {
+                val idx = it.index
+                val animal = it.value
+                val xStart = cardIdxToScreenX(idx)
+
+                g2.drawRect(xStart, yStart, cardWidth.toInt(), rowHeight.toInt())
             }
 
         }
