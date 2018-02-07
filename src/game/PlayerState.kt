@@ -28,7 +28,7 @@ class PlayerState(val name: String) {
         connections.clear()
     }
 
-    fun newAnimal() = Animal().also { animals.add(it) }
+    fun newAnimal() = Animal(this).also { animals.add(it) }
 
     override fun toString() = name
 }

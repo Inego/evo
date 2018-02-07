@@ -2,7 +2,7 @@ package game
 
 import properties.IndividualProperty
 
-class Animal {
+class Animal(val owner: PlayerState) {
     inline val propertyCount
         get() = individualProperties.size + connections.size
 
@@ -25,5 +25,9 @@ class Animal {
     fun addProperty(individualProperty: IndividualProperty) {
         // Thread-unsafe, but any game state is supposed to be modified from a single thread
         individualProperties.add(individualProperty)
+    }
+
+    override fun toString(): String {
+        return owner.animals.indexOf(this).toString()
     }
 }

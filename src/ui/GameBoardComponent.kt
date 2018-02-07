@@ -28,6 +28,7 @@ class GameBoardComponent(var gameState: GameState) : JPanel() {
 
         val playerHeight = height.toDouble() / numberOfPlayers
 
+
         for ((playerIndex, player) in gameState.players.withIndex()) {
 
             /* The structure of the player's space:
@@ -39,6 +40,8 @@ class GameBoardComponent(var gameState: GameState) : JPanel() {
             Animals w/ their properties
 
             */
+
+
 
             val playerSpaceStart = height.toDouble() * playerIndex / numberOfPlayers
 
@@ -77,7 +80,8 @@ class GameBoardComponent(var gameState: GameState) : JPanel() {
                 val cardStartX = cardIdxToScreenX(index)
 
                 when (card) {
-                    is SingleCard -> g2.drawString(card.name, cardStartX, handRowBase)
+                    is SingleCard ->
+                        g2.drawString(card.name, cardStartX, handRowBase)
                     is DoubleCard -> {
                         g2.drawString(card.firstProperty.name, cardStartX, handRowBase)
                         g2.drawString(card.secondProperty.name, cardStartX, handRowBase + fontHeight)

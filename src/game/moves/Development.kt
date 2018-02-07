@@ -8,7 +8,7 @@ import properties.*
 class CreateAnimal(private val card: Card) : Move() {
     override fun GameState.applyMove() {
         currentPlayer.hand.remove(card)
-        currentPlayer.animals.add(Animal())
+        currentPlayer.newAnimal()
     }
 
     override fun toString() = "Create animal from $card"
