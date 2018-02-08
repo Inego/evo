@@ -99,6 +99,8 @@ class GameBoardComponent(var gameState: GameState) : JPanel() {
                 val xStart = cardIdxToScreenX(idx)
 
                 g2.drawRect(xStart, yStart, cardWidth.toInt(), rowHeight.toInt())
+                g2.drawString(idx.toString(), xStart, (yStart + rowTextBase).toInt())
+
             }
 
         }

@@ -31,4 +31,6 @@ class PlayerState(val name: String) {
     fun newAnimal() = Animal(this).also { animals.add(it) }
 
     override fun toString() = name
+
+    fun targetAnimalToString(targetAnimal: Animal) = if (targetAnimal.owner == this) targetAnimal.toString() else "${targetAnimal.owner}'s $targetAnimal"
 }

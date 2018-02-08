@@ -18,6 +18,8 @@ sealed class AnimalProperty<P : AnimalProperty<P, T>, T : PropertyTarget<T, P>>(
     protected abstract fun createDevelopmentMove(card: Card, target: T): Move
 
     abstract fun applyTo(target: T, gameState: GameState)
+
+    override fun toString() = name
 }
 
 abstract class IndividualProperty(name: String) : AnimalProperty<IndividualProperty, SingleTarget>(name) {

@@ -30,14 +30,18 @@ object MainFrame {
         gameBoard.repaint()
     }
 
-
-
     private fun handleNextMove(move: Move) {
         val nextMoves = gameState.next(move)
         setCurrentMoves(nextMoves)
     }
 
     init {
+
+        choicesList.cellRenderer = MoveListCellRenderer {
+            it.toString(gameState, gameState.currentPlayer)
+        }
+
+
         handleNextMove(GameStartMove)
     }
 
