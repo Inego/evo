@@ -4,6 +4,8 @@ import inego.evo.game.GameState
 import inego.evo.game.moves.GameStartMove
 import inego.evo.game.moves.Move
 import java.awt.*
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import javax.swing.*
 
 
@@ -41,6 +43,13 @@ object MainFrame {
             it.toString(gameState, gameState.currentPlayer)
         }
 
+        choicesList.addMouseListener(object : MouseAdapter() {
+            override fun mouseClicked(e: MouseEvent) {
+                if (e.clickCount == 2) {
+                    nextButton.doClick()
+                }
+            }
+        })
 
         handleNextMove(GameStartMove)
     }
