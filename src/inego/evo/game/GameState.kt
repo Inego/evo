@@ -202,11 +202,12 @@ class GameState private constructor(val numberOfPlayers: Int) {
         cards.forEach { addCard(it) }
     }
 
-    private fun fromFirstPlayer() = object : Iterator<PlayerState> {
+    fun fromFirstPlayer() = object : Iterator<PlayerState> {
         var idx = 0
 
         override fun next(): PlayerState {
             var collIdx = firstPlayerIdx + idx
+            idx++
             if (collIdx >= players.size)
                 collIdx -= players.size
             return players[collIdx]

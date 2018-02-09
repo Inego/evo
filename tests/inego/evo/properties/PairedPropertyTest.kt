@@ -5,7 +5,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import inego.evo.properties.paired.asymmetric.SymbiosisProperty
 import inego.evo.properties.paired.symmetric.CooperationProperty
-import kotlin.test.assertEquals
+import org.junit.jupiter.api.Assertions.assertEquals
 
 internal class PairedPropertyTest {
 
