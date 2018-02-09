@@ -111,7 +111,8 @@ class GameState private constructor(val numberOfPlayers: Int) {
             cur++
             if (cur == players.size) {
                 cur = 0
-            } else if (cur == currentPlayerIdx) {
+            }
+            if (cur == currentPlayerIdx) {
                 break
             }
             val p = players[cur]
@@ -213,7 +214,7 @@ class GameState private constructor(val numberOfPlayers: Int) {
             return players[collIdx]
         }
 
-        override fun hasNext() = idx < players.size - 1
+        override fun hasNext() = idx < players.size
     }
 
     companion object {

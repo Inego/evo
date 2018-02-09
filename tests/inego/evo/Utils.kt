@@ -1,7 +1,6 @@
 package inego.evo
 
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.*
 
 
 fun <T> Iterator<T>.assertNext(nextValue: T?) {
@@ -10,6 +9,7 @@ fun <T> Iterator<T>.assertNext(nextValue: T?) {
         assertFalse(hasNext())
     }
     else {
+        assertTrue(hasNext())
         assertEquals(nextValue, next())
     }
 }
