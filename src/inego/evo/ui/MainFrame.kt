@@ -14,15 +14,18 @@ object MainFrame {
     private val gameState = GameState.new(2)
 
     private val gameBoard = GameBoardComponent(gameState).apply {
-        preferredSize = Dimension(800, 600)
+        preferredSize = Dimension(0, 0)
     }
 
-    private val logList = JList<String>()
+    private val logList = JList<String>().apply {
+        preferredSize = Dimension(0, 0)
+    }
 
     private val choicesListModel = DefaultListModel<Move>()
 
     private val choicesList = JList<Move>(choicesListModel).apply {
         selectionMode = ListSelectionModel.SINGLE_SELECTION
+        preferredSize = Dimension(0, 0)
     }
 
     private fun setCurrentMoves(moves: List<Move>) {
@@ -76,7 +79,7 @@ object MainFrame {
         }
 
         add(gameBoard, 0, 0) {
-            weightx = 1.0
+            weightx = 0.9
             fill = GridBagConstraints.BOTH
             gridheight = 3
         }
