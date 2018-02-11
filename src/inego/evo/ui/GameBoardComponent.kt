@@ -4,6 +4,8 @@ import inego.evo.cards.DoubleCard
 import inego.evo.cards.SingleCard
 import inego.evo.game.Animal
 import inego.evo.game.GameState
+import inego.evo.properties.AsymmetricProperty
+import inego.evo.properties.SymmetricProperty
 import java.awt.Color
 import java.awt.Graphics
 import java.awt.Graphics2D
@@ -16,7 +18,7 @@ class GameBoardComponent(var gameState: GameState) : JPanel() {
         const val PREFERRED_ROW_HEIGHT = 30.0
         const val HORIZONTAL_MARGIN = 10
         const val CARD_SPACER_RATIO = 0.1
-        const val PREFERRED_CARD_WIDTH = 100.0
+        const val PREFERRED_CARD_WIDTH = 120.0
         const val PREFERRED_CARD_SPACER = 10.0
     }
 
@@ -127,19 +129,22 @@ class GameBoardComponent(var gameState: GameState) : JPanel() {
                         when (drawableProperty) {
                             is IndividualDrawableProperty ->
                                 g2.drawString(drawableProperty.individualProperty.name, textStartX, textStartY)
+                            is ConnectionMembershipDrawableProperty -> {
+                                val membership = drawableProperty.connectionMembership
+                                val property = membership.property
+                                val side = when (property) {
+                                    is SymmetricProperty -> property.side
+                                    is AsymmetricProperty -> if (membership.host) property.host else property.guest
+                                }
+                                g2.drawString("${side.name} to ${membership.other}", textStartX, textStartY)
+                            }
                             is FatTissueDrawableProperty ->
                                 g2.drawString("FAT ${drawableProperty.size}", textStartX, textStartY)
-
-
                         }
-
                     }
                 }
-
             }
-
         }
-
     }
 }
 

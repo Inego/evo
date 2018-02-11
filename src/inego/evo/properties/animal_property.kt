@@ -6,6 +6,7 @@ import inego.evo.game.GameState
 import inego.evo.game.moves.DevelopmentAddIndividualProperty
 import inego.evo.game.moves.DevelopmentAddPairedProperty
 import inego.evo.game.moves.Move
+import inego.evo.properties.paired.PairedPropertySide
 
 sealed class AnimalProperty<P : AnimalProperty<P, T>, T : PropertyTarget<T, P>>(val name: String) {
 
@@ -39,7 +40,7 @@ abstract class IndividualProperty(name: String) : AnimalProperty<IndividualPrope
 }
 
 
-abstract class PairedProperty(name: String) : AnimalProperty<PairedProperty, PairedTarget>(name) {
+sealed class PairedProperty(name: String) : AnimalProperty<PairedProperty, PairedTarget>(name) {
 
     abstract val isDirected: Boolean
 
@@ -80,6 +81,20 @@ abstract class PairedProperty(name: String) : AnimalProperty<PairedProperty, Pai
     override fun createDevelopmentMove(card: Card, target: PairedTarget): Move {
         return DevelopmentAddPairedProperty(card, this, target)
     }
+}
+
+abstract class SymmetricProperty(name: String, val side: PairedPropertySide) : PairedProperty(name)
+{
+    override val isDirected: Boolean = false
+}
+
+abstract class AsymmetricProperty(
+        name: String,
+        val host: PairedPropertySide,
+        val guest: PairedPropertySide
+) : PairedProperty(name) {
+
+    override val isDirected: Boolean = true
 }
 
 
