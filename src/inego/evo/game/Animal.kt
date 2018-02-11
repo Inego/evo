@@ -4,7 +4,7 @@ import inego.evo.properties.IndividualProperty
 
 class Animal(val owner: PlayerState) {
     inline val propertyCount
-        get() = individualProperties.size + connections.size
+        get() = individualProperties.size + connections.size + if (fatCapacity > 0) 1 else 0
 
     val individualProperties: MutableList<IndividualProperty> = mutableListOf()
     val connections: MutableList<ConnectionMembership> = mutableListOf()
@@ -28,6 +28,6 @@ class Animal(val owner: PlayerState) {
     }
 
     override fun toString(): String {
-        return owner.animals.indexOf(this).toString()
+        return (owner.animals.indexOf(this) + 1).toString()
     }
 }
