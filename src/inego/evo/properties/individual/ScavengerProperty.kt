@@ -9,4 +9,6 @@ object ScavengerProperty : IndividualProperty("Scavenger") {
         return super.mayAttachTo(animal) && !animal.has(CarnivorousProperty)
     }
 
+    // TODO find and feed one scavenger in the "attack succeeded" logic in GameState + "decide whom" choice
+
 }

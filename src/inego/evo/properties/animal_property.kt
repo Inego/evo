@@ -37,12 +37,14 @@ abstract class IndividualProperty(name: String) : AnimalProperty<IndividualPrope
     override fun createDevelopmentMove(card: Card, target: SingleTarget): Move {
         return DevelopmentAddIndividualProperty(card, this, target)
     }
+
+    open fun mayAttack(victim: Animal) = true
+
+    open fun mayBeAttackedBy(victim: Animal, attacker: Animal) = false
 }
 
 
 sealed class PairedProperty(name: String) : AnimalProperty<PairedProperty, PairedTarget>(name) {
-
-    abstract val isDirected: Boolean
 
     override fun getTargets(gameState: GameState): List<PairedTarget> {
 
@@ -64,8 +66,9 @@ sealed class PairedProperty(name: String) : AnimalProperty<PairedProperty, Paire
 
                     result.add(PairedTarget(animal1, animal2))
 
-                    if (isDirected)
+                    if (this is AsymmetricProperty) {
                         result.add(PairedTarget(animal2, animal1))
+                    }
                 }
             }
         }
@@ -84,18 +87,13 @@ sealed class PairedProperty(name: String) : AnimalProperty<PairedProperty, Paire
 }
 
 abstract class SymmetricProperty(name: String, val side: PairedPropertySide) : PairedProperty(name)
-{
-    override val isDirected: Boolean = false
-}
+
 
 abstract class AsymmetricProperty(
         name: String,
         val host: PairedPropertySide,
         val guest: PairedPropertySide
-) : PairedProperty(name) {
-
-    override val isDirected: Boolean = true
-}
+) : PairedProperty(name)
 
 
 sealed class PropertyTarget<T : PropertyTarget<T, P>, P : AnimalProperty<P, T>>

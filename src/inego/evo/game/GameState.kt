@@ -217,6 +217,28 @@ class GameState private constructor(val numberOfPlayers: Int) {
         override fun hasNext() = idx < players.size
     }
 
+    fun canAttack(attacker: Animal, victim: Animal): Boolean {
+
+        for (individualProperty in attacker.individualProperties) {
+            if (!individualProperty.mayAttack(victim))
+                return false
+        }
+
+        for (individualProperty in victim.individualProperties) {
+            if (!individualProperty.mayBeAttackedBy(victim, attacker)) {
+                return false
+            }
+        }
+
+        for (membership in victim.connections) {
+            if (!membership.sideProperty.mayBeAttackedBy(attacker, membership.other)) {
+                return false
+            }
+        }
+
+        return true
+    }
+
     companion object {
 
         fun new(numberOfPlayers: Int): GameState {

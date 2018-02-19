@@ -30,4 +30,7 @@ class Animal(val owner: PlayerState) {
     override fun toString(): String {
         return (owner.animals.indexOf(this) + 1).toString()
     }
+
+    val isFed: Boolean
+        inline get() = !starves && fatCapacity == fat
 }

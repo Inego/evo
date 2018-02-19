@@ -45,6 +45,6 @@ class DevelopmentAddPairedProperty(card: Card, property: PairedProperty, target:
     override fun toString(gameState: GameState, player: PlayerState): String {
         val first = player.targetAnimalToString(target.firstAnimal)
         val second = player.targetAnimalToString(target.secondAnimal)
-        return if (property.isDirected) "$first $property→ $second" else "$first ←$property→ $second"
+        return if (property is AsymmetricProperty) "$first $property→ $second" else "$first ←$property→ $second"
     }
 }
