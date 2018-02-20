@@ -1,6 +1,7 @@
 package inego.evo.game
 
 import inego.evo.properties.IndividualProperty
+import inego.evo.properties.StatModifier
 
 class Animal(val owner: PlayerState) {
     inline val propertyCount
@@ -25,6 +26,10 @@ class Animal(val owner: PlayerState) {
     fun addProperty(individualProperty: IndividualProperty) {
         // Thread-unsafe, but any game state is supposed to be modified from a single thread
         individualProperties.add(individualProperty)
+
+        if (individualProperty is StatModifier) {
+            individualProperty.onAttach(this)
+        }
     }
 
     override fun toString(): String {

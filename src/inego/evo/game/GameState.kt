@@ -31,7 +31,7 @@ class GameState private constructor(val numberOfPlayers: Int) {
 
 
     constructor(src: GameState) : this(src.numberOfPlayers) {
-        // TODO
+        // TODO copy constructor
     }
 
     fun next(move: Move): List<Move> {
@@ -138,7 +138,7 @@ class GameState private constructor(val numberOfPlayers: Int) {
     }
 
     private fun performFeeding() {
-        // TODO
+        // TODO perform feeding
         phase = GamePhase.EXTINCTION
     }
 

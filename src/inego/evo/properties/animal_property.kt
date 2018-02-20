@@ -41,6 +41,7 @@ abstract class IndividualProperty(name: String) : AnimalProperty<IndividualPrope
     open fun mayAttack(victim: Animal) = true
 
     open fun mayBeAttackedBy(victim: Animal, attacker: Animal) = false
+
 }
 
 
