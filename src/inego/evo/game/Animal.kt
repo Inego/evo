@@ -1,5 +1,8 @@
 package inego.evo.game
 
+import inego.evo.game.moves.FeedingMove
+import inego.evo.game.moves.GetRedTokenMove
+import inego.evo.properties.FeedingAction
 import inego.evo.properties.IndividualProperty
 import inego.evo.properties.StatModifier
 
@@ -14,11 +17,15 @@ class Animal(val owner: PlayerState) {
     var fat = 0
 
     var foodRequirement = 1
-    var baseFood = 0
-    var additionalFood = 0
+    var hasFood = 0
+
+    // Special property flags
+    // TODO consider to moving them to a bit map
+    // TODO clear hasPirated flag
+    var hasPirated = false
 
     val starves: Boolean
-        inline get() = foodRequirement < baseFood + additionalFood
+        inline get() = foodRequirement < hasFood
 
     fun has(individualProperty: IndividualProperty): Boolean =
             individualProperties.contains(individualProperty)
@@ -38,4 +45,23 @@ class Animal(val owner: PlayerState) {
 
     val isFed: Boolean
         inline get() = !starves && fatCapacity == fat
+
+    fun gatherFeedingMoves(gameState: GameState): List<FeedingMove> {
+        if (isFed)
+            return emptyList()
+        // TODO gather feeding moves
+        val result: MutableList<FeedingMove> = mutableListOf()
+
+        if (gameState.foodBase > 0) {
+            result.add(GetRedTokenMove(this))
+        }
+
+        individualProperties
+                .filterIsInstance<FeedingAction>()
+                .flatMapTo(result) { it.gatherMoves(this, gameState) }
+
+        // TODO if all animals don't starve AND there is no base food left, the user may pass as an option
+
+        return result
+    }
 }

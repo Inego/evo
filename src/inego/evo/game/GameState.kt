@@ -134,12 +134,46 @@ class GameState private constructor(val numberOfPlayers: Int) {
         }
 
         phase = GamePhase.FEEDING
+        currentPlayerIdx = firstPlayerIdx
 
     }
 
     private fun performFeeding() {
-        // TODO perform feeding
+
+        var entryPlayerIdx = -1
+
+        while (true) {
+
+            if (entryPlayerIdx == -1) {
+                entryPlayerIdx = currentPlayerIdx
+            }
+            else {
+                if (entryPlayerIdx == currentPlayerIdx)
+                    break
+            }
+
+            // Collect feeding moves
+
+            val player = currentPlayer
+
+            val moves = player.animals.flatMap { it.gatherFeedingMoves(this) }
+
+            if (!moves.isEmpty()) {
+                return
+            }
+
+            incCurrentPlayer()
+        }
+
+
         phase = GamePhase.EXTINCTION
+    }
+
+    fun incCurrentPlayer() {
+        currentPlayerIdx++
+
+        if (currentPlayerIdx == players.size)
+            currentPlayerIdx = 0
     }
 
     private fun processExtinction() {
@@ -151,8 +185,7 @@ class GameState private constructor(val numberOfPlayers: Int) {
 
             // Clean the state of player's animals
             player.animals.each {
-                baseFood = 0
-                additionalFood = 0
+                hasFood = 0
             }
         }
 
