@@ -14,31 +14,26 @@ object PiracyProperty : IndividualProperty("Piracy"), FeedingAction {
         if (animal.hasPirated)
             return emptyList()
 
-        gameState.players
+        return gameState.players
                 .flatMap { it.animals }
                 .filter { !it.isFed && it.hasFood > 0 }
-                .map {}
-
-
+                .map { StealFoodMove(animal, it) }
     }
 
-    override fun performFeedingAction(gameState: GameState) {
-        // to be deleted
-    }
 }
 
 
-class StealFoodMove(val pirate: Animal, val victim: Animal) : FeedingMove() {
+class StealFoodMove(animal: Animal, val victim: Animal) : FeedingMove(animal) {
     override fun doFeeding(gameState: GameState) {
-        pirate.hasFood++
+        animal.hasFood++
         victim.hasFood--
 
-        pirate.hasPirated = true
+        animal.hasPirated = true
 
     }
 
     override fun toString(gameState: GameState, player: PlayerState): String {
-        return "$pirate steals food from ${player.targetAnimalToString(victim)} (Piracy)"
+        return "$animal steals food from ${player.targetAnimalToString(victim)} (Piracy)"
     }
 
 }

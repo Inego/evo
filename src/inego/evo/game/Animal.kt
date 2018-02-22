@@ -24,8 +24,11 @@ class Animal(val owner: PlayerState) {
     // TODO clear hasPirated flag
     var hasPirated = false
 
+    var isHibernating = false
+    var hibernatedLastTurn = false
+
     val starves: Boolean
-        inline get() = foodRequirement < hasFood
+        inline get() = !isHibernating && foodRequirement < hasFood
 
     fun has(individualProperty: IndividualProperty): Boolean =
             individualProperties.contains(individualProperty)
@@ -44,7 +47,7 @@ class Animal(val owner: PlayerState) {
     }
 
     val isFed: Boolean
-        inline get() = !starves && fatCapacity == fat
+        inline get() = isHibernating || !starves && fatCapacity == fat
 
     fun gatherFeedingMoves(gameState: GameState): List<FeedingMove> {
         if (isFed)

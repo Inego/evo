@@ -4,7 +4,7 @@ import inego.evo.game.Animal
 import inego.evo.game.GameState
 import inego.evo.game.PlayerState
 
-abstract class FeedingMove() : Move() {
+abstract class FeedingMove(val animal: Animal) : Move() {
     override fun GameState.applyMove() {
         doFeeding(this)
         incCurrentPlayer()
@@ -15,12 +15,12 @@ abstract class FeedingMove() : Move() {
 }
 
 
-class GetRedTokenMove(private val taker: Animal) : FeedingMove() {
-    override fun toString(gameState: GameState, player: PlayerState) = "$taker takes 1 food"
+class GetRedTokenMove(animal: Animal) : FeedingMove(animal) {
+    override fun toString(gameState: GameState, player: PlayerState) = "$animal takes 1 food"
 
     override fun doFeeding(gameState: GameState) {
         gameState.foodBase--
-        taker.hasFood++
+        animal.hasFood++
 
         // TODO feed connected animals! take into account the possibility of combinations + using every property only once per round
 

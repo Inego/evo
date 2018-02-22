@@ -186,6 +186,15 @@ class GameState private constructor(val numberOfPlayers: Int) {
             // Clean the state of player's animals
             player.animals.each {
                 hasFood = 0
+
+                if (hibernatedLastTurn) {
+                    hibernatedLastTurn = false
+                } else {
+                    if (isHibernating) {
+                        isHibernating = false
+                        hibernatedLastTurn = true
+                    }
+                }
             }
         }
 
@@ -303,6 +312,9 @@ class GameState private constructor(val numberOfPlayers: Int) {
             }
         }
     }
+
+    val isLastTurn: Boolean
+        get() = TODO("Implement determination of the last turn")
 
 
 }
