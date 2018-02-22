@@ -195,6 +195,8 @@ class GameState private constructor(val numberOfPlayers: Int) {
                         hibernatedLastTurn = true
                     }
                 }
+
+                hasPirated = false
             }
         }
 

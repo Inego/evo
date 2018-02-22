@@ -1,10 +1,12 @@
 package inego.evo.game
 
+import inego.evo.game.moves.BurnFatMove
 import inego.evo.game.moves.FeedingMove
 import inego.evo.game.moves.GetRedTokenMove
 import inego.evo.properties.FeedingAction
 import inego.evo.properties.IndividualProperty
 import inego.evo.properties.StatModifier
+import kotlin.math.min
 
 class Animal(val owner: PlayerState) {
     inline val propertyCount
@@ -21,7 +23,6 @@ class Animal(val owner: PlayerState) {
 
     // Special property flags
     // TODO consider to moving them to a bit map
-    // TODO clear hasPirated flag
     var hasPirated = false
 
     var isHibernating = false
@@ -50,13 +51,21 @@ class Animal(val owner: PlayerState) {
         inline get() = isHibernating || !starves && fatCapacity == fat
 
     fun gatherFeedingMoves(gameState: GameState): List<FeedingMove> {
+
         if (isFed)
             return emptyList()
-        // TODO gather feeding moves
+
         val result: MutableList<FeedingMove> = mutableListOf()
 
         if (gameState.foodBase > 0) {
             result.add(GetRedTokenMove(this))
+        }
+
+        if (starves && fat > 0) {
+            val maxFatToBurn = min(foodRequirement - hasFood, fat)
+            for (fatToBurn in 1..maxFatToBurn) {
+                result.add(BurnFatMove(this, fatToBurn))
+            }
         }
 
         individualProperties
