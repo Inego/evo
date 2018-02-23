@@ -181,7 +181,7 @@ class GameState private constructor(val numberOfPlayers: Int) {
             player.passed = false
 
             // Remove dead animals
-            player.animals.removeIf { it.starves }
+            player.animals.removeIf { !it.isFed }
 
             // Clean the state of player's animals
             player.animals.each {

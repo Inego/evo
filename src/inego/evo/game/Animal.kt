@@ -28,8 +28,8 @@ class Animal(val owner: PlayerState) {
     var isHibernating = false
     var hibernatedLastTurn = false
 
-    val starves: Boolean
-        inline get() = !isHibernating && foodRequirement < hasFood
+    val isFed: Boolean
+        inline get() = isHibernating || foodRequirement == hasFood
 
     fun has(individualProperty: IndividualProperty): Boolean =
             individualProperties.contains(individualProperty)
@@ -47,12 +47,12 @@ class Animal(val owner: PlayerState) {
         return (owner.animals.indexOf(this) + 1).toString()
     }
 
-    val isFed: Boolean
-        inline get() = isHibernating || !starves && fatCapacity == fat
+    val isFull: Boolean
+        inline get() = isHibernating || isFed && fatCapacity == fat
 
     fun gatherFeedingMoves(gameState: GameState): List<FeedingMove> {
 
-        if (isFed)
+        if (isFull)
             return emptyList()
 
         val result: MutableList<FeedingMove> = mutableListOf()
@@ -61,7 +61,7 @@ class Animal(val owner: PlayerState) {
             result.add(GetRedTokenMove(this))
         }
 
-        if (starves && fat > 0) {
+        if (!isFed && fat > 0) {
             val maxFatToBurn = min(foodRequirement - hasFood, fat)
             for (fatToBurn in 1..maxFatToBurn) {
                 result.add(BurnFatMove(this, fatToBurn))
