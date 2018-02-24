@@ -2,11 +2,12 @@ package inego.evo.game
 
 import inego.evo.cards.*
 import inego.evo.each
-import inego.evo.game.moves.CreateAnimal
-import inego.evo.game.moves.DevelopmentPass
-import inego.evo.game.moves.Move
+import inego.evo.game.moves.*
+import inego.evo.properties.individual.*
 import inego.evo.removeLast
+import java.util.*
 import java.util.concurrent.ThreadLocalRandom
+import kotlin.math.min
 
 class GameState private constructor(val numberOfPlayers: Int) {
 
@@ -14,14 +15,13 @@ class GameState private constructor(val numberOfPlayers: Int) {
 
     val players: List<PlayerState> = List(numberOfPlayers) { index -> PlayerState("p${index + 1}") }
 
-    var decidingPlayer: PlayerState = players[0]
-    private val moves: MutableList<Move> = mutableListOf()
+    private val moveSelections: Deque<MoveSelection<*>> = LinkedList()
 
     var firstPlayerIdx = 0
 
     var currentPlayerIdx = 0
 
-    var computeNextPlayer = false
+    private var computeNextPlayer = false
 
     inline val currentPlayer
         get() = players[currentPlayerIdx]
@@ -38,20 +38,24 @@ class GameState private constructor(val numberOfPlayers: Int) {
         // TODO copy constructor
     }
 
-    fun next(move: Move): List<Move> {
+    fun next(move: Move): MoveSelection<*>? {
 
         applyMove(move)
+
+        // After a move was applied, other move selections may appear
+        handleTrivialMoveSelections()
+        val selection = moveSelections.peek()
+        if (selection != null) {
+            return selection
+        }
 
         do {
 
             when (phase) {
 
                 GamePhase.DEVELOPMENT -> this.performDevelopment()
-
                 GamePhase.FEEDING_BASE_DETERMINATION -> this.performFeedingBaseDetermination()
-
                 GamePhase.FEEDING -> this.performFeeding()
-
                 GamePhase.DEFENSE -> this.performDefense()
                 GamePhase.EXTINCTION -> this.processExtinction()
                 GamePhase.END -> {
@@ -59,26 +63,42 @@ class GameState private constructor(val numberOfPlayers: Int) {
                 }
             }
 
-            if (moves.size == 1) {
-                applyMove(moves[0])
+            handleTrivialMoveSelections()
+
+        } while (moveSelections.isEmpty() && phase != GamePhase.END)
+
+        return moveSelections.peek()
+    }
+
+    private fun handleTrivialMoveSelections() {
+        do {
+            val nextMoves = moveSelections.peek()?.moves
+            if (nextMoves?.size == 1) {
+                applyMove(nextMoves[0])
+                moveSelections.remove()
             }
-
-        } while (moves.isEmpty() && phase != GamePhase.END)
-
-        return moves
-
+        } while (true)
     }
 
     private fun performDefense() {
-        decidingPlayer = defendingAnimal.owner
+        val defenseMoves = defendingAnimal.gatherDefenseMoves(attackingAnimal, this)
 
-        // TODO defense
+        when {
+            defenseMoves.isEmpty() -> {
+                eat(attackingAnimal, defendingAnimal)
+                phase = GamePhase.FEEDING
+            }
+            defenseMoves.size == 1 -> defenseMoves[0].applyTo(this)
+            else -> {
+                // Several moves - let the defending animal's owner select
+                moveSelections.add(DefenseMoveSelection(defendingAnimal.owner, defenseMoves))
+            }
+        }
     }
 
     private fun applyMove(move: Move) {
         move.applyTo(this)
-
-        moves.clear()
+        moveSelections.remove()
     }
 
     private fun performDevelopment() {
@@ -98,7 +118,7 @@ class GameState private constructor(val numberOfPlayers: Int) {
 
         val player = currentPlayer
 
-        decidingPlayer = player
+        val moves: MutableList<DevelopmentMove> = mutableListOf()
 
         // Gather development moves (pass is always an option)
         moves.add(DevelopmentPass)
@@ -115,6 +135,8 @@ class GameState private constructor(val numberOfPlayers: Int) {
                 }
             }
         }
+
+        moveSelections.add(DevelopmentMoveSelection(player, moves))
     }
 
     private fun getNextDevelopingPlayer(): Int? {
@@ -168,22 +190,39 @@ class GameState private constructor(val numberOfPlayers: Int) {
             // Collect feeding moves
 
             val player = currentPlayer
-            decidingPlayer = player
 
             val moves = player.animals.flatMap { it.gatherFeedingMoves(this) }
 
             if (!moves.isEmpty()) {
+                moveSelections.add(FeedingMoveSelection(player, moves))
                 return
             }
 
-            incCurrentPlayer()
-        }
+            afterPlayerFeeding()
 
+            if (!moveSelections.isEmpty()) {
+                return
+            }
+        }
 
         phase = GamePhase.EXTINCTION
     }
 
-    fun incCurrentPlayer() {
+    fun afterPlayerFeeding() {
+
+        // Check grazing animals
+        val player = currentPlayer
+        val grazingAnimals = player.animals.count { it.has(GrazingProperty) }
+
+        val maxToGraze = min(grazingAnimals, foodBase)
+
+        if (maxToGraze > 0) {
+            val grazeFoodMoves = (0..maxToGraze).map(::GrazeFood)
+            moveSelections.add(GrazeFoodSelection(player, grazeFoodMoves))
+        }
+
+        // Go to next player
+
         currentPlayerIdx++
 
         if (currentPlayerIdx == players.size)
@@ -195,7 +234,10 @@ class GameState private constructor(val numberOfPlayers: Int) {
             player.passed = false
 
             // Remove dead animals
-            player.animals.removeIf { !it.isFed }
+            val dyingAnimals = player.animals.filter { !it.isFed || it.isPoisoned }
+            for (dyingAnimal in dyingAnimals) {
+                player.removeAnimal(dyingAnimal)
+            }
 
             // Clean the state of player's animals
             player.animals.each {
@@ -211,12 +253,16 @@ class GameState private constructor(val numberOfPlayers: Int) {
                 }
 
                 hasPirated = false
+
+            }
+
+            for (connection in player.connections) {
+                connection.isUsed = false
             }
         }
 
-        if (deck.isEmpty()) {
+        if (isLastTurn) {
             phase = GamePhase.END
-
         } else {
             // Hand out cards one by one and start a new turn
 
@@ -261,11 +307,11 @@ class GameState private constructor(val numberOfPlayers: Int) {
         cards.forEach { addCard(it) }
     }
 
-    fun fromFirstPlayer() = object : Iterator<PlayerState> {
+    private fun fromPlayer(playerIdx: Int) = object : Iterator<PlayerState> {
         var idx = 0
 
         override fun next(): PlayerState {
-            var collIdx = firstPlayerIdx + idx
+            var collIdx = playerIdx + idx
             idx++
             if (collIdx >= players.size)
                 collIdx -= players.size
@@ -275,26 +321,35 @@ class GameState private constructor(val numberOfPlayers: Int) {
         override fun hasNext() = idx < players.size
     }
 
+    private fun fromPlayer(player: PlayerState) = fromPlayer(players.indexOf(player))
+
+    fun fromFirstPlayer() = fromPlayer(firstPlayerIdx)
+
     fun canAttack(attacker: Animal, victim: Animal): Boolean {
 
-        for (individualProperty in attacker.individualProperties) {
-            if (!individualProperty.mayAttack(victim))
-                return false
-        }
+        return attacker.individualProperties.all { it.mayAttack(victim) }
+            && victim.individualProperties.all { it.mayBeAttackedBy(victim, attacker) }
+            && victim.connections.all { it.sideProperty.mayBeAttackedBy(attacker, it.other) }
+    }
 
-        for (individualProperty in victim.individualProperties) {
-            if (!individualProperty.mayBeAttackedBy(victim, attacker)) {
-                return false
+    private fun eat(predator: Animal, victim: Animal) {
+        predator.gainBlueTokens(2)
+        if (victim.has(PoisonousProperty)) {
+            predator.isPoisoned = true
+        }
+        victim.owner.removeAnimal(victim)
+
+        // Feed the scavengers
+        for (scavengerCandidate in fromPlayer(predator.owner)) {
+            val scavengers = scavengerCandidate.animals
+                    .filter { it.has(ScavengerProperty) && !it.isFull }
+
+            if (!scavengers.isEmpty()) {
+                val feedScavengerMoves = scavengers.map(::FeedTheScavengerMove)
+                moveSelections.add(ScavengerSelection(scavengerCandidate, feedScavengerMoves))
+                break
             }
         }
-
-        for (membership in victim.connections) {
-            if (!membership.sideProperty.mayBeAttackedBy(attacker, membership.other)) {
-                return false
-            }
-        }
-
-        return true
     }
 
     companion object {
@@ -330,11 +385,7 @@ class GameState private constructor(val numberOfPlayers: Int) {
     }
 
     val isLastTurn: Boolean
-        get() = TODO("Implement determination of the last turn")
-
-
-
-
+        get() = deck.isEmpty()
 }
 
 enum class GamePhase {

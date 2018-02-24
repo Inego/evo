@@ -1,6 +1,7 @@
 package inego.evo.ui
 
 import inego.evo.game.GameState
+import inego.evo.game.MoveSelection
 import inego.evo.game.moves.GameStartMove
 import inego.evo.game.moves.Move
 import java.awt.*
@@ -28,9 +29,9 @@ object MainFrame {
         preferredSize = Dimension(0, 0)
     }
 
-    private fun setCurrentMoves(moves: List<Move>) {
+    private fun setCurrentMoves(moveSelection: MoveSelection<*>?) {
         choicesListModel.clear()
-        moves.forEach { choicesListModel.addElement(it) }
+        moveSelection?.moves?.forEach { choicesListModel.addElement(it) }
         choicesList.selectedIndex = 0
         gameBoard.repaint()
     }

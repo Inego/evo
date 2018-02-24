@@ -10,7 +10,7 @@ abstract class PairedPropertySide(val name: String) {
      * @param attacker The animal whose attack is checked
      * @param other The other animal of the paired property
      */
-    open fun mayBeAttackedBy(attacker: Animal, other: Animal) = true
+    open fun mayBeAttackedBy(attacker: Animal, other: Animal) = false
 
 
     /**

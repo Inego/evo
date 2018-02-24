@@ -25,7 +25,7 @@ object CarnivorousProperty : IndividualProperty("Carnivorous"), FeedingAction {
 
 }
 
-class AttackMove(animal: Animal, val victim: Animal) : FeedingMove(animal) {
+class AttackMove(animal: Animal, private val victim: Animal) : FeedingMove(animal) {
     override fun toString(gameState: GameState, player: PlayerState) = "$animal attacks ${player.targetAnimalToString(victim)}"
 
     override fun doFeeding(gameState: GameState) {

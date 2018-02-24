@@ -4,9 +4,7 @@ import inego.evo.game.Animal
 import inego.evo.properties.AsymmetricProperty
 import inego.evo.properties.paired.PairedPropertySide
 
-object SymbiosisProperty : AsymmetricProperty("Symbiosis", SymbiosisHost, SymbiosisGuest) {
-
-}
+object SymbiosisProperty : AsymmetricProperty("Symbiosis", SymbiosisHost, SymbiosisGuest)
 
 object SymbiosisHost : PairedPropertySide("Host")
 

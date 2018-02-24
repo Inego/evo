@@ -5,18 +5,18 @@ import inego.evo.game.Animal
 import inego.evo.game.GameState
 import inego.evo.game.moves.DevelopmentAddIndividualProperty
 import inego.evo.game.moves.DevelopmentAddPairedProperty
-import inego.evo.game.moves.Move
+import inego.evo.game.moves.DevelopmentMove
 import inego.evo.properties.paired.PairedPropertySide
 
 sealed class AnimalProperty<P : AnimalProperty<P, T>, T : PropertyTarget<T, P>>(val name: String) {
 
-    fun getDevelopmentMoves(gameState: GameState, card: Card): List<Move> {
+    fun getDevelopmentMoves(gameState: GameState, card: Card): List<DevelopmentMove> {
         return getTargets(gameState).map { createDevelopmentMove(card, it) }
     }
 
     abstract fun getTargets(gameState: GameState): List<T>
 
-    protected abstract fun createDevelopmentMove(card: Card, target: T): Move
+    protected abstract fun createDevelopmentMove(card: Card, target: T): DevelopmentMove
 
     abstract fun applyTo(target: T, gameState: GameState)
 
@@ -34,14 +34,17 @@ abstract class IndividualProperty(name: String) : AnimalProperty<IndividualPrope
         target.animal.addProperty(this)
     }
 
-    override fun createDevelopmentMove(card: Card, target: SingleTarget): Move {
+    override fun createDevelopmentMove(card: Card, target: SingleTarget): DevelopmentMove {
         return DevelopmentAddIndividualProperty(card, this, target)
     }
 
     open fun mayAttack(victim: Animal) = true
 
-    open fun mayBeAttackedBy(victim: Animal, attacker: Animal) = false
+    open fun mayBeAttackedBy(victim: Animal, attacker: Animal) = true
+}
 
+class IndividualPropertyPossession(val individualProperty: IndividualProperty) {
+    var isUsed = false
 }
 
 
@@ -82,7 +85,7 @@ sealed class PairedProperty(name: String) : AnimalProperty<PairedProperty, Paire
         player.addConnection(this, target.firstAnimal, target.secondAnimal)
     }
 
-    override fun createDevelopmentMove(card: Card, target: PairedTarget): Move {
+    override fun createDevelopmentMove(card: Card, target: PairedTarget): DevelopmentMove {
         return DevelopmentAddPairedProperty(card, this, target)
     }
 }

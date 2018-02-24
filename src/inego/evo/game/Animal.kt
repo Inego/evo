@@ -1,11 +1,10 @@
 package inego.evo.game
 
 import inego.evo.game.moves.BurnFatMove
+import inego.evo.game.moves.DefenseMove
 import inego.evo.game.moves.FeedingMove
 import inego.evo.game.moves.GetRedTokenMove
-import inego.evo.properties.FeedingAction
-import inego.evo.properties.IndividualProperty
-import inego.evo.properties.StatModifier
+import inego.evo.properties.*
 import inego.evo.properties.individual.FatTissueProperty
 import kotlin.math.min
 
@@ -13,9 +12,8 @@ class Animal(val owner: PlayerState) {
     inline val propertyCount
         get() = individualProperties.size + connections.size + if (fatCapacity > 0) 1 else 0
 
-    // TODO !!! refactor to a universal mechanism to track and reset used properties
-
     val individualProperties: MutableList<IndividualProperty> = mutableListOf()
+
     val connections: MutableList<ConnectionMembership> = mutableListOf()
 
     var fatCapacity = 0
@@ -25,17 +23,19 @@ class Animal(val owner: PlayerState) {
     var hasFood = 0
 
     // Special property flags
-    // TODO consider to moving them to a bit map
+    // TODO consider moving them to a bit map
+
     var hasPirated = false
 
     var isHibernating = false
     var hibernatedLastTurn = false
 
-    val isFed: Boolean
-        inline get() = isHibernating || foodRequirement == hasFood
+    var isPoisoned = false
 
-    fun has(individualProperty: IndividualProperty): Boolean =
-            individualProperties.contains(individualProperty)
+    val isFed: Boolean
+        inline get() = isHibernating || foodRequirement <= hasFood
+
+    fun has(individualProperty: IndividualProperty) = individualProperties.contains(individualProperty)
 
     fun addProperty(individualProperty: IndividualProperty) {
         // Thread-unsafe, but any game state is supposed to be modified from a single thread
@@ -89,6 +89,29 @@ class Animal(val owner: PlayerState) {
 
         return result
     }
+
+    fun gatherDefenseMoves(attacker: Animal, gameState: GameState): List<DefenseMove> = individualProperties
+            .filterIsInstance<DefenseAction>()
+            .flatMap { it.gatherDefenseMoves(this, attacker, gameState) }
+
+    fun gainBlueTokens(numberOfTokens: Int) {
+
+        val foodToGain = min(numberOfTokens, foodRequirement - hasFood)
+
+        if (foodToGain == 0) {
+            return
+        }
+
+        // TODO handle food propagation
+        hasFood += foodToGain
+
+    }
+
+    fun gainRedToken() {
+        hasFood++
+        // TODO feed connected animals! take into account the possibility of combinations + using every property only once per round
+    }
+
 
 
 }

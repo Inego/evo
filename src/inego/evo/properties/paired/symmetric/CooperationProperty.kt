@@ -5,8 +5,7 @@ import inego.evo.properties.PostFeedingAction
 import inego.evo.properties.SymmetricProperty
 import inego.evo.properties.paired.PairedPropertySide
 
-object CooperationProperty : SymmetricProperty("Cooperation", Cooperator) {
-}
+object CooperationProperty : SymmetricProperty("Cooperation", Cooperator)
 
 object Cooperator : PairedPropertySide("Cooperator"), PostFeedingAction {
     override fun performPostFeedingAction(gameState: GameState) {

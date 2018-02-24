@@ -1,9 +1,9 @@
 package inego.evo.properties.individual
 
 import inego.evo.game.*
-import inego.evo.properties.IndividualProperty
+import inego.evo.game.moves.DefenseMove
 import inego.evo.properties.DefenseAction
-import inego.evo.properties.DefenseMove
+import inego.evo.properties.IndividualProperty
 
 object TailLossProperty : IndividualProperty("Tail Loss"), DefenseAction {
     override fun gatherDefenseMoves(defender: Animal, attacker: Animal, gameState: GameState): List<DefenseMove> {
@@ -12,7 +12,8 @@ object TailLossProperty : IndividualProperty("Tail Loss"), DefenseAction {
         if (defender.fatCapacity > 0)
             result.add(LoseIndividualProperty(defender, attacker, FatTissueProperty))
 
-        defender.individualProperties.mapTo(result) { LoseIndividualProperty(defender, attacker, it) }
+        defender.individualProperties
+                .mapTo(result) { LoseIndividualProperty(defender, attacker, it) }
 
         defender.connections.mapTo(result) { LosePairedProperty(defender, attacker, it) }
 
@@ -29,6 +30,9 @@ class LoseIndividualProperty(defender: Animal, attacker: Animal, val property: I
 
         // Attack fails
         phase = GamePhase.FEEDING
+
+        // but the attacker has "the tail"
+        attacker.gainBlueTokens(1)
     }
 
     override fun toString(gameState: GameState, player: PlayerState) =

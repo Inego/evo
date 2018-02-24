@@ -1,12 +1,9 @@
 package inego.evo.properties.individual
 
-import inego.evo.game.Animal
-import inego.evo.game.GamePhase
-import inego.evo.game.GameState
-import inego.evo.game.PlayerState
+import inego.evo.game.*
 import inego.evo.properties.IndividualProperty
 import inego.evo.properties.DefenseAction
-import inego.evo.properties.DefenseMove
+import inego.evo.game.moves.DefenseMove
 import java.util.concurrent.ThreadLocalRandom
 
 object RunningProperty : IndividualProperty("Running"), DefenseAction {
@@ -18,7 +15,7 @@ object RunningProperty : IndividualProperty("Running"), DefenseAction {
 class RunawayAttempt(defender: Animal, attacker: Animal) : DefenseMove(defender, attacker) {
     override fun GameState.applyMove() {
         // TODO log outcome
-        if (ThreadLocalRandom.current().nextInt(2) == 0) {
+        if (dice() >= 4) {
             // Defender escaped successfully, effectively ending the attack
             phase = GamePhase.FEEDING
         } else {

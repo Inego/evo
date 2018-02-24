@@ -5,8 +5,7 @@ import inego.evo.properties.PostFeedingAction
 import inego.evo.properties.SymmetricProperty
 import inego.evo.properties.paired.PairedPropertySide
 
-object CommunicationProperty : SymmetricProperty("Communication", Communicator) {
-}
+object CommunicationProperty : SymmetricProperty("Communication", Communicator)
 
 object Communicator : PairedPropertySide("Communicator"), PostFeedingAction {
 

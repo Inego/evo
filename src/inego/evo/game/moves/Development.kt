@@ -2,10 +2,11 @@ package inego.evo.game.moves
 
 import inego.evo.cards.Card
 import inego.evo.game.GameState
+import inego.evo.game.MoveSelection
 import inego.evo.game.PlayerState
 import inego.evo.properties.*
 
-class CreateAnimal(private val card: Card) : Move() {
+class CreateAnimal(private val card: Card) : DevelopmentMove() {
     override fun GameState.applyMove() {
         currentPlayer.hand.remove(card)
         currentPlayer.newAnimal()
@@ -14,7 +15,10 @@ class CreateAnimal(private val card: Card) : Move() {
     override fun toString(gameState: GameState, player: PlayerState) = "$card ⇨ Animal"
 }
 
-object DevelopmentPass : Move() {
+abstract class DevelopmentMove : Move()
+
+
+object DevelopmentPass : DevelopmentMove() {
     override fun GameState.applyMove() {
         currentPlayer.passed = true
     }
@@ -26,7 +30,7 @@ abstract class DevelopmentAddProperty<P : AnimalProperty<P, T>, T : PropertyTarg
         private val card: Card,
         val property: P,
         val target: T
-) : Move() {
+) : DevelopmentMove() {
     override fun GameState.applyMove() {
         currentPlayer.hand.remove(card)
         property.applyTo(target, this)
@@ -48,3 +52,7 @@ class DevelopmentAddPairedProperty(card: Card, property: PairedProperty, target:
         return if (property is AsymmetricProperty) "$first $property→ $second" else "$first ←$property→ $second"
     }
 }
+
+
+class DevelopmentMoveSelection(decidingPlayer: PlayerState, moves: List<DevelopmentMove>)
+    : MoveSelection<DevelopmentMove>(decidingPlayer, moves)

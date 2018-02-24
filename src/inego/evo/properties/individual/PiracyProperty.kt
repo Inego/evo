@@ -19,17 +19,15 @@ object PiracyProperty : IndividualProperty("Piracy"), FeedingAction {
                 .filter { !it.isFed && it.hasFood > 0 }
                 .map { StealFoodMove(animal, it) }
     }
-
 }
 
 
-class StealFoodMove(animal: Animal, val victim: Animal) : FeedingMove(animal) {
+class StealFoodMove(animal: Animal, private val victim: Animal) : FeedingMove(animal) {
     override fun doFeeding(gameState: GameState) {
-        animal.hasFood++
         victim.hasFood--
+        animal.gainBlueTokens(1)
 
         animal.hasPirated = true
-
     }
 
     override fun toString(gameState: GameState, player: PlayerState): String {

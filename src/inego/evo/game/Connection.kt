@@ -5,7 +5,9 @@ import inego.evo.properties.PairedProperty
 import inego.evo.properties.SymmetricProperty
 import inego.evo.properties.paired.PairedPropertySide
 
-data class Connection(val property: PairedProperty, val animal1: Animal, val animal2: Animal)
+data class Connection(val property: PairedProperty, val animal1: Animal, val animal2: Animal) {
+    var isUsed = false
+}
 
 data class ConnectionMembership(val connection: Connection, val host: Boolean) {
     inline val property: PairedProperty

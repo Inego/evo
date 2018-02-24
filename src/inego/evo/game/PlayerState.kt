@@ -11,7 +11,7 @@ class PlayerState(val name: String) {
 
     val animals: MutableList<Animal> = mutableListOf()
 
-    private val connections: MutableList<Connection> = mutableListOf()
+    val connections: MutableList<Connection> = mutableListOf()
 
     val cardsToHandOut
         inline get() = if (hand.isEmpty() and animals.isEmpty()) 6 else animals.size + 1
@@ -39,4 +39,9 @@ class PlayerState(val name: String) {
     override fun toString() = name
 
     fun targetAnimalToString(targetAnimal: Animal) = if (targetAnimal.owner == this) targetAnimal.toString() else "${targetAnimal.owner}'s $targetAnimal"
+
+    fun removeAnimal(animal: Animal) {
+        animal.connections.map { it.connection }.forEach { removeConnection(it) }
+        animals.remove(animal)
+    }
 }

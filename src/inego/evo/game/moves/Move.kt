@@ -4,10 +4,12 @@ import inego.evo.game.GameState
 import inego.evo.game.PlayerState
 import inego.evo.removeLast
 
-abstract class Move
-{
+abstract class Move {
+
     fun applyTo(gameState: GameState) = gameState.applyMove()
+
     protected abstract fun GameState.applyMove()
+
     abstract fun toString(gameState: GameState, player: PlayerState): String
 }
 

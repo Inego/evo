@@ -10,11 +10,7 @@ fun main(args: Array<String>) {
     var nextMove: Move = GameStartMove
 
     do {
-        val moves = gameState.next(nextMove)
-
-        if (moves.isEmpty()) break
-
-        nextMove = moves.getRandomElement()
-
+        val moveSelection = gameState.next(nextMove) ?: break
+        nextMove = moveSelection.moves.getRandomElement()
     } while (true)
 }
