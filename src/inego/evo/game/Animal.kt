@@ -6,11 +6,14 @@ import inego.evo.game.moves.GetRedTokenMove
 import inego.evo.properties.FeedingAction
 import inego.evo.properties.IndividualProperty
 import inego.evo.properties.StatModifier
+import inego.evo.properties.individual.FatTissueProperty
 import kotlin.math.min
 
 class Animal(val owner: PlayerState) {
     inline val propertyCount
         get() = individualProperties.size + connections.size + if (fatCapacity > 0) 1 else 0
+
+    // TODO !!! refactor to a universal mechanism to track and reset used properties
 
     val individualProperties: MutableList<IndividualProperty> = mutableListOf()
     val connections: MutableList<ConnectionMembership> = mutableListOf()
@@ -40,6 +43,16 @@ class Animal(val owner: PlayerState) {
 
         if (individualProperty is StatModifier) {
             individualProperty.onAttach(this)
+        }
+    }
+
+    fun removeProperty(individualProperty: IndividualProperty) {
+        if (individualProperty != FatTissueProperty) {
+            individualProperties.remove(individualProperty)
+        }
+
+        if (individualProperty is StatModifier) {
+            individualProperty.onDetach(this)
         }
     }
 
@@ -76,4 +89,6 @@ class Animal(val owner: PlayerState) {
 
         return result
     }
+
+
 }

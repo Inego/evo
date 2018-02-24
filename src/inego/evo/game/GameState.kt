@@ -14,6 +14,7 @@ class GameState private constructor(val numberOfPlayers: Int) {
 
     val players: List<PlayerState> = List(numberOfPlayers) { index -> PlayerState("p${index + 1}") }
 
+    var decidingPlayer: PlayerState = players[0]
     private val moves: MutableList<Move> = mutableListOf()
 
     var firstPlayerIdx = 0
@@ -26,6 +27,9 @@ class GameState private constructor(val numberOfPlayers: Int) {
         get() = players[currentPlayerIdx]
 
     var phase: GamePhase = GamePhase.DEVELOPMENT
+
+    lateinit var attackingAnimal: Animal
+    lateinit var defendingAnimal: Animal
 
     var foodBase = 0
 
@@ -48,7 +52,7 @@ class GameState private constructor(val numberOfPlayers: Int) {
 
                 GamePhase.FEEDING -> this.performFeeding()
 
-
+                GamePhase.DEFENSE -> this.performDefense()
                 GamePhase.EXTINCTION -> this.processExtinction()
                 GamePhase.END -> {
                     // Do nothing
@@ -63,6 +67,12 @@ class GameState private constructor(val numberOfPlayers: Int) {
 
         return moves
 
+    }
+
+    private fun performDefense() {
+        decidingPlayer = defendingAnimal.owner
+
+        // TODO defense
     }
 
     private fun applyMove(move: Move) {
@@ -81,11 +91,14 @@ class GameState private constructor(val numberOfPlayers: Int) {
                 return
             }
             currentPlayerIdx = nextDevelopingPlayer
+
         } else {
             computeNextPlayer = true
         }
 
         val player = currentPlayer
+
+        decidingPlayer = player
 
         // Gather development moves (pass is always an option)
         moves.add(DevelopmentPass)
@@ -155,6 +168,7 @@ class GameState private constructor(val numberOfPlayers: Int) {
             // Collect feeding moves
 
             val player = currentPlayer
+            decidingPlayer = player
 
             val moves = player.animals.flatMap { it.gatherFeedingMoves(this) }
 
@@ -319,12 +333,15 @@ class GameState private constructor(val numberOfPlayers: Int) {
         get() = TODO("Implement determination of the last turn")
 
 
+
+
 }
 
 enum class GamePhase {
     DEVELOPMENT,
     FEEDING_BASE_DETERMINATION,
     FEEDING,
+    DEFENSE,
     EXTINCTION,
     END
 }

@@ -23,6 +23,12 @@ class PlayerState(val name: String) {
         secondAnimal.connections.add(ConnectionMembership(connection, false))
     }
 
+    fun removeConnection(connection: Connection) {
+        connection.animal1.connections.removeIf { it.connection == connection }
+        connection.animal2.connections.removeIf { it.connection == connection }
+        connections.remove(connection)
+    }
+
     fun clearAnimals() {
         animals.clear()
         connections.clear()

@@ -1,6 +1,7 @@
 package inego.evo.properties.individual
 
 import inego.evo.game.Animal
+import inego.evo.game.GamePhase
 import inego.evo.game.GameState
 import inego.evo.game.PlayerState
 import inego.evo.game.moves.FeedingMove
@@ -28,7 +29,9 @@ class AttackMove(animal: Animal, val victim: Animal) : FeedingMove(animal) {
     override fun toString(gameState: GameState, player: PlayerState) = "$animal attacks ${player.targetAnimalToString(victim)}"
 
     override fun doFeeding(gameState: GameState) {
-        TODO("Implement attack (the result may depend on a chain of actions")
+        gameState.attackingAnimal = animal
+        gameState.defendingAnimal = victim
+        gameState.phase = GamePhase.DEFENSE
     }
 
 }
