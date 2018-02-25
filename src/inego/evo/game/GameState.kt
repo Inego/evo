@@ -57,6 +57,8 @@ class GameState private constructor(val numberOfPlayers: Int) {
                 GamePhase.FEEDING_BASE_DETERMINATION -> this.performFeedingBaseDetermination()
                 GamePhase.FEEDING -> this.performFeeding()
                 GamePhase.DEFENSE -> this.performDefense()
+                GamePhase.FOOD_PROPAGATION -> this.performFoodPropagation()
+                GamePhase.GRAZING -> this.performGrazing()
                 GamePhase.EXTINCTION -> this.processExtinction()
                 GamePhase.END -> {
                     // Do nothing
@@ -68,6 +70,46 @@ class GameState private constructor(val numberOfPlayers: Int) {
         } while (moveSelections.isEmpty() && phase != GamePhase.END)
 
         return moveSelections.peek()
+    }
+
+    private fun performGrazing() {
+        val player = currentPlayer
+        val grazingAnimals = player.animals.count { it.has(GrazingProperty) }
+
+        val maxToGraze = min(grazingAnimals, foodBase)
+
+        if (maxToGraze > 0) {
+            val grazeFoodMoves = (0..maxToGraze).map(::GrazeFood)
+            moveSelections.add(GrazeFoodSelection(player, grazeFoodMoves))
+        }
+
+        // Go to next player
+        currentPlayerIdx++
+        if (currentPlayerIdx == players.size)
+            currentPlayerIdx = 0
+
+        phase = GamePhase.FEEDING
+    }
+
+    private fun performFoodPropagation() {
+
+        for (player in fromPlayer(currentPlayerIdx)) {
+            do {
+                val foodPropagationMoves: List<FoodPropagationMove> = player.getFoodPropagationMoves(this)
+                if (foodPropagationMoves.isEmpty()) {
+                    break
+                } else {
+                    if (foodPropagationMoves.size == 1) {
+                        foodPropagationMoves[0].applyTo(this)
+                    } else {
+                        moveSelections.add(FoodPropagationMoveSelection(player, foodPropagationMoves))
+                        return
+                    }
+                }
+            } while (true)
+        }
+
+        phase = GamePhase.GRAZING
     }
 
     private fun handleTrivialMoveSelections() {
@@ -86,7 +128,7 @@ class GameState private constructor(val numberOfPlayers: Int) {
         when {
             defenseMoves.isEmpty() -> {
                 eat(attackingAnimal, defendingAnimal)
-                phase = GamePhase.FEEDING
+                phase = GamePhase.FOOD_PROPAGATION
             }
             defenseMoves.size == 1 -> defenseMoves[0].applyTo(this)
             else -> {
@@ -209,24 +251,7 @@ class GameState private constructor(val numberOfPlayers: Int) {
     }
 
     fun afterPlayerFeeding() {
-
-        // Check grazing animals
-        val player = currentPlayer
-        val grazingAnimals = player.animals.count { it.has(GrazingProperty) }
-
-        val maxToGraze = min(grazingAnimals, foodBase)
-
-        if (maxToGraze > 0) {
-            val grazeFoodMoves = (0..maxToGraze).map(::GrazeFood)
-            moveSelections.add(GrazeFoodSelection(player, grazeFoodMoves))
-        }
-
-        // Go to next player
-
-        currentPlayerIdx++
-
-        if (currentPlayerIdx == players.size)
-            currentPlayerIdx = 0
+        phase = GamePhase.FOOD_PROPAGATION
     }
 
     private fun processExtinction() {
@@ -252,8 +277,8 @@ class GameState private constructor(val numberOfPlayers: Int) {
                     }
                 }
 
-                hasPirated = false
-
+                usedPiracy = false
+                usedMimicry = false
             }
 
             for (connection in player.connections) {
@@ -393,6 +418,8 @@ enum class GamePhase {
     FEEDING_BASE_DETERMINATION,
     FEEDING,
     DEFENSE,
+    FOOD_PROPAGATION,
+    GRAZING,
     EXTINCTION,
     END
 }

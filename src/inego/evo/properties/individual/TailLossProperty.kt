@@ -28,11 +28,9 @@ class LoseIndividualProperty(defender: Animal, attacker: Animal, val property: I
     override fun GameState.applyMove() {
         defendingAnimal.removeProperty(property)
 
-        // Attack fails
-        phase = GamePhase.FEEDING
-
-        // but the attacker has "the tail"
+        // Attack fails, but the attacker has "the tail" (1 blue token)
         attacker.gainBlueTokens(1)
+        phase = GamePhase.FOOD_PROPAGATION
     }
 
     override fun toString(gameState: GameState, player: PlayerState) =

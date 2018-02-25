@@ -43,10 +43,6 @@ abstract class IndividualProperty(name: String) : AnimalProperty<IndividualPrope
     open fun mayBeAttackedBy(victim: Animal, attacker: Animal) = true
 }
 
-class IndividualPropertyPossession(val individualProperty: IndividualProperty) {
-    var isUsed = false
-}
-
 
 sealed class PairedProperty(name: String) : AnimalProperty<PairedProperty, PairedTarget>(name) {
 

@@ -23,4 +23,10 @@ data class ConnectionMembership(val connection: Connection, val host: Boolean) {
                 is AsymmetricProperty -> if (host) p.host else p.guest
             }
         }
+
+    var isUsed: Boolean
+        inline get() = connection.isUsed
+        inline set(value) {
+            connection.isUsed = value
+        }
 }

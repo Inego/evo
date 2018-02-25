@@ -8,7 +8,5 @@ import inego.evo.game.moves.FeedingMove
  * This property allows to perform a specific action instead of standard feeding from the food base.
  */
 interface FeedingAction {
-
-    fun gatherMoves(animal: Animal, gameState: GameState): List<FeedingMove>
-
+    fun gatherFeedingMoves(animal: Animal, gameState: GameState): List<FeedingMove>
 }

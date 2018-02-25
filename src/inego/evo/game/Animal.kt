@@ -6,6 +6,8 @@ import inego.evo.game.moves.FeedingMove
 import inego.evo.game.moves.GetRedTokenMove
 import inego.evo.properties.*
 import inego.evo.properties.individual.FatTissueProperty
+import inego.evo.properties.paired.symmetric.CommunicationProperty
+import inego.evo.properties.paired.symmetric.CooperationProperty
 import kotlin.math.min
 
 class Animal(val owner: PlayerState) {
@@ -23,9 +25,9 @@ class Animal(val owner: PlayerState) {
     var hasFood = 0
 
     // Special property flags
-    // TODO consider moving them to a bit map
 
-    var hasPirated = false
+    var usedPiracy = false
+    var usedMimicry = false
 
     var isHibernating = false
     var hibernatedLastTurn = false
@@ -83,7 +85,7 @@ class Animal(val owner: PlayerState) {
 
         individualProperties
                 .filterIsInstance<FeedingAction>()
-                .flatMapTo(result) { it.gatherMoves(this, gameState) }
+                .flatMapTo(result) { it.gatherFeedingMoves(this, gameState) }
 
         // TODO if all animals don't starve AND there is no base food left, the user may pass as an option
 
@@ -102,16 +104,31 @@ class Animal(val owner: PlayerState) {
             return
         }
 
-        // TODO handle food propagation
         hasFood += foodToGain
 
+        propagateCooperation()
     }
 
-    fun gainRedToken() {
+
+    private fun propagateCooperation() {
+        connections.filterTo(owner.foodPropagationSet) {
+            it.property == CooperationProperty && !it.isUsed && !it.other.isFed
+        }
+    }
+
+    fun gainRedToken(gameState: GameState) {
+
+        assert(gameState.foodBase > 0) { "Trying to get a red token from an empty base" }
+
+        gameState.foodBase--
         hasFood++
-        // TODO feed connected animals! take into account the possibility of combinations + using every property only once per round
+
+        if (gameState.foodBase > 0) {
+            connections.filterTo(owner.foodPropagationSet) {
+                it.property == CommunicationProperty && !it.isUsed && !it.other.isFed
+            }
+        }
+
+        propagateCooperation()
     }
-
-
-
 }

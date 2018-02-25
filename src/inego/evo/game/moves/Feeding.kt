@@ -17,12 +17,7 @@ abstract class FeedingMove(val animal: Animal) : Move() {
 
 class GetRedTokenMove(animal: Animal) : FeedingMove(animal) {
     override fun toString(gameState: GameState, player: PlayerState) = "$animal takes 1 food"
-
-    override fun doFeeding(gameState: GameState) {
-        gameState.foodBase--
-
-        animal.gainRedToken()
-    }
+    override fun doFeeding(gameState: GameState) = animal.gainRedToken(gameState)
 }
 
 class BurnFatMove(animal: Animal, private val fatToBurn: Int) : FeedingMove(animal) {

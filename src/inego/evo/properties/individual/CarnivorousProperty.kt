@@ -10,7 +10,7 @@ import inego.evo.properties.IndividualProperty
 
 object CarnivorousProperty : IndividualProperty("Carnivorous"), FeedingAction {
 
-    override fun gatherMoves(animal: Animal, gameState: GameState): List<FeedingMove> {
+    override fun gatherFeedingMoves(animal: Animal, gameState: GameState): List<FeedingMove> {
 
         // A predator can attack any animal on the board independent on its owner
         return gameState.players

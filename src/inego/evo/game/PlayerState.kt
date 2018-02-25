@@ -1,7 +1,9 @@
 package inego.evo.game
 
 import inego.evo.cards.Card
+import inego.evo.game.moves.FoodPropagationMove
 import inego.evo.properties.PairedProperty
+import inego.evo.properties.paired.FoodPropagator
 
 class PlayerState(val name: String) {
 
@@ -12,6 +14,8 @@ class PlayerState(val name: String) {
     val animals: MutableList<Animal> = mutableListOf()
 
     val connections: MutableList<Connection> = mutableListOf()
+
+    var foodPropagationSet: MutableSet<ConnectionMembership> = mutableSetOf()
 
     val cardsToHandOut
         inline get() = if (hand.isEmpty() and animals.isEmpty()) 6 else animals.size + 1
@@ -43,5 +47,29 @@ class PlayerState(val name: String) {
     fun removeAnimal(animal: Animal) {
         animal.connections.map { it.connection }.forEach { removeConnection(it) }
         animals.remove(animal)
+    }
+
+    fun getFoodPropagationMoves(gameState: GameState): List<FoodPropagationMove> {
+        if (foodPropagationSet.isEmpty()) {
+            return emptyList()
+        }
+
+        val result: MutableList<FoodPropagationMove> = mutableListOf()
+
+        val iterator = foodPropagationSet.iterator()
+
+        for (connectionMembership in iterator) {
+            with (connectionMembership.sideProperty as FoodPropagator) {
+                val otherAnimal = connectionMembership.other
+                if (!otherAnimal.isFed && !connectionMembership.isUsed && isApplicable(gameState)) {
+                    result.add(createPropagationMove(connectionMembership))
+                } else {
+                    // This connection membership is no longer valid for food propagation - remove it
+                    iterator.remove()
+                }
+            }
+        }
+
+        return result
     }
 }

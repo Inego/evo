@@ -9,16 +9,12 @@ import inego.evo.properties.IndividualProperty
 
 object PiracyProperty : IndividualProperty("Piracy"), FeedingAction {
 
-    override fun gatherMoves(animal: Animal, gameState: GameState): List<FeedingMove> {
-
-        if (animal.hasPirated)
-            return emptyList()
-
-        return gameState.players
-                .flatMap { it.animals }
-                .filter { !it.isFed && it.hasFood > 0 }
-                .map { StealFoodMove(animal, it) }
-    }
+    override fun gatherFeedingMoves(animal: Animal, gameState: GameState): List<FeedingMove> =
+            if (animal.usedPiracy) emptyList()
+            else gameState.players
+                    .flatMap { it.animals }
+                    .filter { !it.isFed && it.hasFood > 0 }
+                    .map { StealFoodMove(animal, it) }
 }
 
 
@@ -27,7 +23,7 @@ class StealFoodMove(animal: Animal, private val victim: Animal) : FeedingMove(an
         victim.hasFood--
         animal.gainBlueTokens(1)
 
-        animal.hasPirated = true
+        animal.usedPiracy = true
     }
 
     override fun toString(gameState: GameState, player: PlayerState): String {
