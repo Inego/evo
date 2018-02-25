@@ -6,6 +6,7 @@ import inego.evo.game.moves.FeedingMove
 import inego.evo.game.moves.GetRedTokenMove
 import inego.evo.properties.*
 import inego.evo.properties.individual.FatTissueProperty
+import inego.evo.properties.paired.asymmetric.SymbiosisGuest
 import inego.evo.properties.paired.symmetric.CommunicationProperty
 import inego.evo.properties.paired.symmetric.CooperationProperty
 import kotlin.math.min
@@ -28,6 +29,8 @@ class Animal(val owner: PlayerState) {
 
     var usedPiracy = false
     var usedMimicry = false
+    var usedAttack = false
+    var usedRunningAway = false // To prevent repeated runaway attempts by the same animal
 
     var isHibernating = false
     var hibernatedLastTurn = false
@@ -37,11 +40,19 @@ class Animal(val owner: PlayerState) {
     val isFed: Boolean
         inline get() = isHibernating || foodRequirement <= hasFood
 
+    val mayEat: Boolean
+        inline get() {
+            if (isFull)
+                return false
+            return !connections.any { it.sideProperty == SymbiosisGuest && !it.other.isFed }
+        }
+
     fun has(individualProperty: IndividualProperty) = individualProperties.contains(individualProperty)
 
     fun addProperty(individualProperty: IndividualProperty) {
         // Thread-unsafe, but any game state is supposed to be modified from a single thread
-        individualProperties.add(individualProperty)
+        if (individualProperty != FatTissueProperty)
+            individualProperties.add(individualProperty)
 
         if (individualProperty is StatModifier) {
             individualProperty.onAttach(this)
@@ -62,12 +73,16 @@ class Animal(val owner: PlayerState) {
         return (owner.animals.indexOf(this) + 1).toString()
     }
 
+    val fullName
+        inline get() = "$owner's $this"
+
+
     val isFull: Boolean
         inline get() = isHibernating || isFed && fatCapacity == fat
 
     fun gatherFeedingMoves(gameState: GameState): List<FeedingMove> {
 
-        if (isFull)
+        if (!mayEat)
             return emptyList()
 
         val result: MutableList<FeedingMove> = mutableListOf()
@@ -87,8 +102,6 @@ class Animal(val owner: PlayerState) {
                 .filterIsInstance<FeedingAction>()
                 .flatMapTo(result) { it.gatherFeedingMoves(this, gameState) }
 
-        // TODO if all animals don't starve AND there is no base food left, the user may pass as an option
-
         return result
     }
 
@@ -104,28 +117,40 @@ class Animal(val owner: PlayerState) {
             return
         }
 
-        hasFood += foodToGain
+        gainFood(foodToGain)
 
         propagateCooperation()
     }
 
+    private fun gainFood(quantity: Int) {
+        repeat(quantity) {
+            if (foodRequirement > hasFood)
+                hasFood++
+            else {
+                assert(fatCapacity > fat)
+                fat++
+            }
+        }
+    }
 
     private fun propagateCooperation() {
         connections.filterTo(owner.foodPropagationSet) {
-            it.property == CooperationProperty && !it.isUsed && !it.other.isFed
+            it.property == CooperationProperty && !it.isUsed && it.other.mayEat
         }
     }
 
     fun gainRedToken(gameState: GameState) {
-
         assert(gameState.foodBase > 0) { "Trying to get a red token from an empty base" }
 
         gameState.foodBase--
-        hasFood++
+
+        gameState.log { "Food left: ${gameState.foodBase}." }
+
+        gainFood(1)
 
         if (gameState.foodBase > 0) {
             connections.filterTo(owner.foodPropagationSet) {
-                it.property == CommunicationProperty && !it.isUsed && !it.other.isFed
+                it.property == CommunicationProperty && !it.isUsed && it.other.mayEat
             }
         }
 

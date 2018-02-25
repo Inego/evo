@@ -10,8 +10,11 @@ import inego.evo.properties.IndividualProperty
 
 object CarnivorousProperty : IndividualProperty("Carnivorous"), FeedingAction {
 
-    override fun gatherFeedingMoves(animal: Animal, gameState: GameState): List<FeedingMove> {
-
+    override fun gatherFeedingMoves(animal: Animal, gameState: GameState): List<FeedingMove>
+    {
+        if (animal.usedAttack) {
+            return emptyList()
+        }
         // A predator can attack any animal on the board independent on its owner
         return gameState.players
                 .flatMap { it.animals }
@@ -22,16 +25,19 @@ object CarnivorousProperty : IndividualProperty("Carnivorous"), FeedingAction {
     override fun mayAttachTo(animal: Animal): Boolean {
         return super.mayAttachTo(animal) && !animal.has(ScavengerProperty)
     }
-
 }
 
 class AttackMove(animal: Animal, private val victim: Animal) : FeedingMove(animal) {
-    override fun toString(gameState: GameState, player: PlayerState) = "$animal attacks ${player.targetAnimalToString(victim)}"
 
-    override fun doFeeding(gameState: GameState) {
+    override val logMessage: String
+        get() = "${animal.fullName} attacks ${victim.fullName}."
+
+    override fun toString(player: PlayerState) = "$animal attacks ${player.targetAnimalToString(victim)}"
+
+    override fun doFeeding(gameState: GameState): GamePhase {
+        animal.usedAttack = true
         gameState.attackingAnimal = animal
         gameState.defendingAnimal = victim
-        gameState.phase = GamePhase.DEFENSE
+        return GamePhase.DEFENSE
     }
-
 }

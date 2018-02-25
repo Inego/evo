@@ -1,9 +1,9 @@
 package inego.evo.ui
 
+import inego.evo.GameManager
 import inego.evo.cards.DoubleCard
 import inego.evo.cards.SingleCard
 import inego.evo.game.Animal
-import inego.evo.game.GameState
 import inego.evo.properties.AsymmetricProperty
 import inego.evo.properties.SymmetricProperty
 import java.awt.Color
@@ -12,7 +12,10 @@ import java.awt.Graphics2D
 import javax.swing.JPanel
 import kotlin.coroutines.experimental.buildSequence
 
-class GameBoardComponent(var gameState: GameState) : JPanel() {
+class GameBoardComponent(private val gameManager: GameManager) : JPanel() {
+
+    val gameState = gameManager.gameState
+
     companion object {
         const val SPACER_HEIGHT = 2
         const val PREFERRED_ROW_HEIGHT = 30.0
@@ -36,6 +39,8 @@ class GameBoardComponent(var gameState: GameState) : JPanel() {
         val playerHeight = height.toDouble() / numberOfPlayers
 
         for ((playerIndex, player) in gameState.players.withIndex()) {
+
+            val isAI = gameManager.isAI(player)
 
             /* The structure of the player's space:
 
@@ -101,13 +106,15 @@ class GameBoardComponent(var gameState: GameState) : JPanel() {
             for ((index, card) in player.hand.withIndex()) {
 
                 drawCard(handRow, index) {
-                    when (card) {
-                        is SingleCard ->
-                            g2.drawString(card.name, textStartX, textStartY)
-                        is DoubleCard -> {
-                            val middleBase = yStart + rowHeight / 2
-                            g2.drawString(card.firstProperty.name, textStartX, (middleBase - metrics.descent).toInt())
-                            g2.drawString(card.secondProperty.name, textStartX, (middleBase + metrics.ascent).toInt())
+                    if (!isAI) {
+                        when (card) {
+                            is SingleCard ->
+                                g2.drawString(card.name, textStartX, textStartY)
+                            is DoubleCard -> {
+                                val middleBase = yStart + rowHeight / 2
+                                g2.drawString(card.firstProperty.name, textStartX, (middleBase - metrics.descent).toInt())
+                                g2.drawString(card.secondProperty.name, textStartX, (middleBase + metrics.ascent).toInt())
+                            }
                         }
                     }
                 }
@@ -118,7 +125,7 @@ class GameBoardComponent(var gameState: GameState) : JPanel() {
             for ((idx, animal) in player.animals.withIndex()) {
                 drawCard(animalRow, idx, Color.DARK_GRAY) {
                     g2.color = Color.WHITE
-                    g2.drawString((idx + 1).toString(), textStartX, textStartY)
+                    g2.drawString("${idx + 1} ${animal.hasFood}/${animal.foodRequirement}", textStartX, textStartY)
                 }
 
                 for ((propIdx, drawableProperty) in animal.drawableProperties().withIndex()) {
@@ -139,7 +146,7 @@ class GameBoardComponent(var gameState: GameState) : JPanel() {
                                 g2.drawString("${side.name} to ${membership.other}", textStartX, textStartY)
                             }
                             is FatTissueDrawableProperty ->
-                                g2.drawString("FAT ${drawableProperty.size}", textStartX, textStartY)
+                                g2.drawString("FAT ${animal.fat}/${drawableProperty.size}", textStartX, textStartY)
                         }
                     }
                 }

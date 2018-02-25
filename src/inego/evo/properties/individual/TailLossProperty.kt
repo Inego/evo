@@ -24,6 +24,8 @@ object TailLossProperty : IndividualProperty("Tail Loss"), DefenseAction {
 
 class LoseIndividualProperty(defender: Animal, attacker: Animal, val property: IndividualProperty) :
         DefenseMove(defender, attacker) {
+    override val logMessage: String
+        get() = "${defender.fullName} loses $property as a tail"
 
     override fun GameState.applyMove() {
         defendingAnimal.removeProperty(property)
@@ -33,18 +35,22 @@ class LoseIndividualProperty(defender: Animal, attacker: Animal, val property: I
         phase = GamePhase.FOOD_PROPAGATION
     }
 
-    override fun toString(gameState: GameState, player: PlayerState) =
+    override fun toString(player: PlayerState) =
             "$defender loses $property (tail loss)"
 
 }
 
 class LosePairedProperty(defender: Animal, attacker: Animal, private val connectionMembership: ConnectionMembership)
     : DefenseMove(defender, attacker) {
+    override val logMessage: String
+        get() = "${defender.fullName} loses ${connectionMembership.sideProperty} " +
+                "to ${connectionMembership.other.fullName} as a tail."
+
     override fun GameState.applyMove() {
         defender.owner.removeConnection(connectionMembership.connection)
     }
 
-    override fun toString(gameState: GameState, player: PlayerState): String {
+    override fun toString(player: PlayerState): String {
         return "$defender loses ${connectionMembership.sideProperty} to ${connectionMembership.other} (tail loss)"
     }
 }

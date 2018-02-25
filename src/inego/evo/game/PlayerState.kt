@@ -9,6 +9,9 @@ class PlayerState(val name: String) {
 
     var passed = false
 
+    val eligibleForDevelopment
+        get() = !passed && hand.isNotEmpty()
+
     val hand: MutableList<Card> = mutableListOf()
 
     val animals: MutableList<Animal> = mutableListOf()
@@ -42,7 +45,8 @@ class PlayerState(val name: String) {
 
     override fun toString() = name
 
-    fun targetAnimalToString(targetAnimal: Animal) = if (targetAnimal.owner == this) targetAnimal.toString() else "${targetAnimal.owner}'s $targetAnimal"
+    fun targetAnimalToString(targetAnimal: Animal) =
+            if (targetAnimal.owner == this) targetAnimal.toString() else targetAnimal.fullName
 
     fun removeAnimal(animal: Animal) {
         animal.connections.map { it.connection }.forEach { removeConnection(it) }
@@ -59,9 +63,9 @@ class PlayerState(val name: String) {
         val iterator = foodPropagationSet.iterator()
 
         for (connectionMembership in iterator) {
-            with (connectionMembership.sideProperty as FoodPropagator) {
+            with(connectionMembership.sideProperty as FoodPropagator) {
                 val otherAnimal = connectionMembership.other
-                if (!otherAnimal.isFed && !connectionMembership.isUsed && isApplicable(gameState)) {
+                if (otherAnimal.mayEat && !connectionMembership.isUsed && isApplicable(gameState)) {
                     result.add(createPropagationMove(connectionMembership))
                 } else {
                     // This connection membership is no longer valid for food propagation - remove it

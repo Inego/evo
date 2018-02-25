@@ -1,6 +1,7 @@
 package inego.evo.properties.individual
 
 import inego.evo.game.Animal
+import inego.evo.game.GamePhase
 import inego.evo.game.GameState
 import inego.evo.game.PlayerState
 import inego.evo.game.moves.FeedingMove
@@ -19,14 +20,18 @@ object PiracyProperty : IndividualProperty("Piracy"), FeedingAction {
 
 
 class StealFoodMove(animal: Animal, private val victim: Animal) : FeedingMove(animal) {
-    override fun doFeeding(gameState: GameState) {
+    override val logMessage: String
+        get() = "${animal.fullName} pirated 1 food from ${victim.fullName}"
+
+    override fun doFeeding(gameState: GameState): GamePhase {
         victim.hasFood--
         animal.gainBlueTokens(1)
 
         animal.usedPiracy = true
+        return GamePhase.FOOD_PROPAGATION
     }
 
-    override fun toString(gameState: GameState, player: PlayerState): String {
+    override fun toString(player: PlayerState): String {
         return "$animal steals food from ${player.targetAnimalToString(victim)} (Piracy)"
     }
 

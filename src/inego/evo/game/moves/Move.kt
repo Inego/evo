@@ -6,15 +6,23 @@ import inego.evo.removeLast
 
 abstract class Move {
 
-    fun applyTo(gameState: GameState) = gameState.applyMove()
+    abstract val logMessage: String
+
+    fun applyTo(gameState: GameState) {
+        gameState.log { logMessage }
+        gameState.applyMove()
+    }
 
     protected abstract fun GameState.applyMove()
 
-    abstract fun toString(gameState: GameState, player: PlayerState): String
+    abstract fun toString(player: PlayerState): String
 }
 
 object GameStartMove : Move() {
-    override fun toString(gameState: GameState, player: PlayerState) = "Start game"
+    override val logMessage: String
+        get() = "The game has started."
+
+    override fun toString(player: PlayerState) = "Start game"
 
     override fun GameState.applyMove() {
         // Hand out 6 cards for each player
@@ -23,5 +31,7 @@ object GameStartMove : Move() {
                 player.hand.add(deck.removeLast())
             }
         }
+
+        logTurnStart()
     }
 }

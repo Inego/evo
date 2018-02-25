@@ -1,5 +1,7 @@
 package inego.evo.ui
 
+import inego.evo.GameManager
+import inego.evo.RandomEngine
 import inego.evo.game.GameState
 import inego.evo.game.MoveSelection
 import inego.evo.game.moves.GameStartMove
@@ -12,39 +14,82 @@ import javax.swing.*
 
 object MainFrame {
 
+    private val nextButton = JButton("Next").apply {
+
+        addActionListener {
+            handleNextMove(choicesList.selectedValue)
+        }
+
+    }
+
     private val gameState = GameState.new(2)
 
-    private val gameBoard = GameBoardComponent(gameState).apply {
+    private val gameManager = GameManager(gameState).apply {
+        setEngine(0, RandomEngine)
+    }
+
+
+    private val gameBoard = GameBoardComponent(gameManager).apply {
         preferredSize = Dimension(0, 0)
     }
 
-    private val logList = JList<String>().apply {
+    private val logListModel = DefaultListModel<String>()
+
+    private val logList = JList<String>(logListModel)
+
+    private val logListScrollPane = JScrollPane().apply {
         preferredSize = Dimension(0, 0)
+        setViewportView(logList)
     }
+
+    private var moveSelection: MoveSelection<*>? = null
 
     private val choicesListModel = DefaultListModel<Move>()
 
     private val choicesList = JList<Move>(choicesListModel).apply {
         selectionMode = ListSelectionModel.SINGLE_SELECTION
-        preferredSize = Dimension(0, 0)
+
     }
 
-    private fun setCurrentMoves(moveSelection: MoveSelection<*>?) {
+    private val choicesListScrollPane = JScrollPane().apply {
+        preferredSize = Dimension(0, 0)
+        setViewportView(choicesList)
+    }
+
+    private fun setCurrentMoves(newMoveSelection: MoveSelection<*>?) {
         choicesListModel.clear()
-        moveSelection?.moves?.forEach { choicesListModel.addElement(it) }
+        if (newMoveSelection == null) {
+            nextButton.text = "Next"
+        }
+        else {
+            newMoveSelection.moves.forEach { choicesListModel.addElement(it) }
+            nextButton.text = "${newMoveSelection.decidingPlayer}: Next"
+        }
+        moveSelection = newMoveSelection
         choicesList.selectedIndex = 0
         gameBoard.repaint()
     }
 
     private fun handleNextMove(move: Move) {
-        val nextMoves = gameState.next(move)
+        val nextMoves = gameManager.next(move)
+        val newLogMessages = gameState.takeFromLog()
+        for (newLogMessage in newLogMessages) {
+            logListModel.addElement(newLogMessage)
+        }
+
+        SwingUtilities.invokeLater {
+            // Scroll to the bottom
+            with (logListScrollPane.verticalScrollBar) {
+                value = maximum
+            }
+        }
+
         setCurrentMoves(nextMoves)
     }
 
     init {
-
         choicesList.cellRenderer = MoveListCellRenderer {
-            it.toString(gameState, gameState.currentPlayer)
+            it.toString(moveSelection!!.decidingPlayer)
         }
 
         choicesList.addMouseListener(object : MouseAdapter() {
@@ -56,14 +101,6 @@ object MainFrame {
         })
 
         handleNextMove(GameStartMove)
-    }
-
-    private val nextButton = JButton("Next").apply {
-
-        addActionListener {
-            handleNextMove(choicesList.selectedValue)
-        }
-
     }
 
     private fun addComponentsToPane(pane: Container) {
@@ -85,7 +122,7 @@ object MainFrame {
             gridheight = 3
         }
 
-        add(logList, 1, 0) {
+        add(logListScrollPane, 1, 0) {
             weightx = 0.2
             weighty = 0.5
             gridwidth = 2
@@ -102,7 +139,7 @@ object MainFrame {
             anchor = GridBagConstraints.CENTER
         }
 
-        add(choicesList, 1, 2) {
+        add(choicesListScrollPane, 1, 2) {
             weighty = 0.5
             gridwidth = 2
             fill = GridBagConstraints.BOTH

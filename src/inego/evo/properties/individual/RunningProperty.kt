@@ -6,22 +6,28 @@ import inego.evo.properties.DefenseAction
 import inego.evo.properties.IndividualProperty
 
 object RunningProperty : IndividualProperty("Running"), DefenseAction {
-    override fun gatherDefenseMoves(defender: Animal, attacker: Animal, gameState: GameState): List<DefenseMove> {
-        return listOf(RunawayAttempt(defender, attacker))
-    }
+    override fun gatherDefenseMoves(defender: Animal, attacker: Animal, gameState: GameState): List<DefenseMove> =
+            if (defender.usedRunningAway) emptyList() else listOf(RunawayAttempt(defender, attacker))
 }
 
 class RunawayAttempt(defender: Animal, attacker: Animal) : DefenseMove(defender, attacker) {
+    override val logMessage: String
+        get() = "${defender.fullName} is trying to run away from ${attacker.fullName}."
+
     override fun GameState.applyMove() {
-        // TODO log outcome
-        if (dice() >= 4) {
+        val outcome = dice()
+        log { "Dice = $outcome" }
+        if (outcome >= 4) {
+            log { "Success! A life has been saved." }
             // Defender escaped successfully, effectively ending the attack
             // Skip food propagation
             phase = GamePhase.GRAZING
         } else {
+            log { "${defender.fullName} failed to run away from ${attacker.fullName}." }
+            defendingAnimal.usedRunningAway = true
             // Otherwise, the attack goes on
         }
     }
 
-    override fun toString(gameState: GameState, player: PlayerState) = "$defender tries to run away"
+    override fun toString(player: PlayerState) = "$defender tries to run away"
 }

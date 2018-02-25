@@ -17,10 +17,14 @@ object Cooperator : PairedPropertySide("Cooperator"), FoodPropagator {
 
 
 class CooperationFoodPropagationMove(connectionMembership: ConnectionMembership) : FoodPropagationMove(connectionMembership) {
+    override val logMessage: String
+        get() = "${connectionMembership.other.fullName} gets 1 blue token " +
+                "from ${connectionMembership.thisAnimal} with Cooperation"
+
     override fun onPropagation(animal: Animal, gameState: GameState) {
         animal.gainBlueTokens(1)
     }
 
-    override fun toString(gameState: GameState, player: PlayerState): String =
-            "${connectionMembership.other} gets 1 blue token (Cooperation)"
+    override fun toString(player: PlayerState): String =
+            "${connectionMembership.other}: get 1 blue token from ${connectionMembership.thisAnimal} with Cooperation"
 }

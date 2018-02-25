@@ -19,10 +19,14 @@ object Communicator : PairedPropertySide("Communicator"), FoodPropagator {
 
 class CommunicationFoodPropagationMove(connectionMembership: ConnectionMembership)
     : FoodPropagationMove(connectionMembership) {
+    override val logMessage: String
+        get() = "${connectionMembership.other.fullName} gets 1 red token " +
+                "from ${connectionMembership.thisAnimal} by Communication."
+
     override fun onPropagation(animal: Animal, gameState: GameState) {
         animal.gainRedToken(gameState)
     }
 
-    override fun toString(gameState: GameState, player: PlayerState) =
-            "${connectionMembership.other} gets 1 red token (Communication)"
+    override fun toString(player: PlayerState) =
+            "${connectionMembership.other}: get 1 red token from ${connectionMembership.thisAnimal} by Communication"
 }

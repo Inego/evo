@@ -8,4 +8,5 @@ fun <T> Iterable<T>.each(action: T.() -> Unit) {
 
 fun <T> MutableList<T>.removeLast() = removeAt(size - 1)
 
-fun <T> List<T>.getRandomElement(): T = this[ThreadLocalRandom.current().nextInt(size)]
+val <T> List<T>.randomElement
+    get(): T = this[ThreadLocalRandom.current().nextInt(size)]

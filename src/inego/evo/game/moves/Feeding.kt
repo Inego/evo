@@ -1,32 +1,39 @@
 package inego.evo.game.moves
 
-import inego.evo.game.Animal
-import inego.evo.game.GameState
-import inego.evo.game.MoveSelection
-import inego.evo.game.PlayerState
+import inego.evo.game.*
 
 abstract class FeedingMove(val animal: Animal) : Move() {
     override fun GameState.applyMove() {
-        doFeeding(this)
-        afterPlayerFeeding()
+        phase = doFeeding(this)
     }
 
-    abstract fun doFeeding(gameState: GameState)
+    abstract fun doFeeding(gameState: GameState): GamePhase
 }
 
 
 class GetRedTokenMove(animal: Animal) : FeedingMove(animal) {
-    override fun toString(gameState: GameState, player: PlayerState) = "$animal takes 1 food"
-    override fun doFeeding(gameState: GameState) = animal.gainRedToken(gameState)
+    override val logMessage: String
+        get() = "${animal.fullName} feeds from the base."
+
+    override fun toString(player: PlayerState) = "$animal: take 1 food from base"
+    override fun doFeeding(gameState: GameState): GamePhase {
+        animal.gainRedToken(gameState)
+        return GamePhase.FOOD_PROPAGATION
+    }
 }
 
 class BurnFatMove(animal: Animal, private val fatToBurn: Int) : FeedingMove(animal) {
-    override fun doFeeding(gameState: GameState) {
+    override val logMessage: String
+        get() = "${animal.fullName} converts $fatToBurn fat to food."
+
+    override fun doFeeding(gameState: GameState): GamePhase {
         animal.fat -= fatToBurn
+        // Fat burning is a special action and as such does not lead to food propagation.
         animal.hasFood += fatToBurn
+        return GamePhase.GRAZING
     }
 
-    override fun toString(gameState: GameState, player: PlayerState) = "$animal converts $fatToBurn fat to food"
+    override fun toString(player: PlayerState) = "$animal: convert $fatToBurn fat to food"
 }
 
 

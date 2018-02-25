@@ -14,11 +14,14 @@ object ScavengerProperty : IndividualProperty("Scavenger") {
 }
 
 class FeedTheScavengerMove(private val scavenger: Animal) : Move() {
+    override val logMessage: String
+        get() = "${scavenger.fullName} scavenged 1 food."
+
     override fun GameState.applyMove() {
         scavenger.gainBlueTokens(1)
     }
 
-    override fun toString(gameState: GameState, player: PlayerState) = "Feed $scavenger (Scavenger)"
+    override fun toString(player: PlayerState) = "Feed $scavenger (Scavenger)"
 }
 
 class ScavengerSelection(decidingPlayer: PlayerState, moves: List<FeedTheScavengerMove>)

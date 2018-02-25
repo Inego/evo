@@ -16,12 +16,15 @@ object MimicryProperty : IndividualProperty("Mimicry"), DefenseAction {
 }
 
 class RedirectAttack(defender: Animal, attacker: Animal, private val anotherVictim: Animal) : DefenseMove(defender, attacker) {
+    override val logMessage: String
+        get() = "${defender.fullName} redirects attack to $anotherVictim"
+
     override fun GameState.applyMove() {
         defender.usedMimicry = true
         defendingAnimal = anotherVictim
         // ...and the attack goes on...
     }
 
-    override fun toString(gameState: GameState, player: PlayerState) =
-            "$defender redirects attack to $anotherVictim"
+    override fun toString(player: PlayerState) =
+            "$defender: redirect attack to $anotherVictim"
 }

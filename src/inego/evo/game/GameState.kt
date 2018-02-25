@@ -9,11 +9,15 @@ import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 import kotlin.math.min
 
-class GameState private constructor(val numberOfPlayers: Int) {
+class GameState private constructor(val numberOfPlayers: Int, val logging: Boolean) {
+
+    private var turnNumber = 1
+
+    val logMessages: MutableList<String> = mutableListOf()
 
     var deck: MutableList<Card> = mutableListOf()
 
-    val players: List<PlayerState> = List(numberOfPlayers) { index -> PlayerState("p${index + 1}") }
+    val players: List<PlayerState> = List(numberOfPlayers) { index -> PlayerState(DEFAULT_PLAYER_NAMES[index]) }
 
     private val moveSelections: Deque<MoveSelection<*>> = LinkedList()
 
@@ -27,6 +31,13 @@ class GameState private constructor(val numberOfPlayers: Int) {
         get() = players[currentPlayerIdx]
 
     var phase: GamePhase = GamePhase.DEVELOPMENT
+        set(value) {
+            if (field == GamePhase.DEFENSE) {
+                // Clear defending animal's runaway flag to be able to escape from the next predator
+                defendingAnimal.usedRunningAway = false
+            }
+            field = value
+        }
 
     lateinit var attackingAnimal: Animal
     lateinit var defendingAnimal: Animal
@@ -34,17 +45,16 @@ class GameState private constructor(val numberOfPlayers: Int) {
     var foodBase = 0
 
 
-    constructor(src: GameState) : this(src.numberOfPlayers) {
+    constructor(src: GameState) : this(src.numberOfPlayers, false) {
         // TODO copy constructor
     }
 
     fun next(move: Move): MoveSelection<*>? {
 
-        applyMove(move)
+        move.applyTo(this)
 
-        // After a move was applied, other move selections may appear
-        handleTrivialMoveSelections()
-        val selection = moveSelections.peek()
+        // After a move was applied, other move selections may arise
+        var selection: MoveSelection<*>? = getNextNonTrivialMoveSelection()
         if (selection != null) {
             return selection
         }
@@ -65,11 +75,14 @@ class GameState private constructor(val numberOfPlayers: Int) {
                 }
             }
 
-            handleTrivialMoveSelections()
+            selection = getNextNonTrivialMoveSelection()
+            if (selection != null) {
+                return selection
+            }
 
-        } while (moveSelections.isEmpty() && phase != GamePhase.END)
+        } while (phase != GamePhase.END)
 
-        return moveSelections.peek()
+        return null
     }
 
     private fun performGrazing() {
@@ -79,16 +92,20 @@ class GameState private constructor(val numberOfPlayers: Int) {
         val maxToGraze = min(grazingAnimals, foodBase)
 
         if (maxToGraze > 0) {
-            val grazeFoodMoves = (0..maxToGraze).map(::GrazeFood)
+            val grazeFoodMoves = (0..maxToGraze).map { GrazeFood(player, it) }
             moveSelections.add(GrazeFoodSelection(player, grazeFoodMoves))
         }
 
         // Go to next player
+        incCurrentPlayer()
+
+        phase = GamePhase.FEEDING
+    }
+
+    private fun incCurrentPlayer() {
         currentPlayerIdx++
         if (currentPlayerIdx == players.size)
             currentPlayerIdx = 0
-
-        phase = GamePhase.FEEDING
     }
 
     private fun performFoodPropagation() {
@@ -109,17 +126,36 @@ class GameState private constructor(val numberOfPlayers: Int) {
             } while (true)
         }
 
+        // TODO think about optimization since this may be called quite often
+        @Suppress("LoopToCallChain")
+        for (player in players) {
+            for (connection in player.connections) {
+                connection.isUsed = false
+            }
+        }
+
         phase = GamePhase.GRAZING
     }
 
-    private fun handleTrivialMoveSelections() {
+    /**
+     * Automatically handles all trivial (i.e. containing a single move) move selections and returns
+     * either the next non-trivial one, or `null` if there are no move selections left
+     */
+    private fun getNextNonTrivialMoveSelection(): MoveSelection<*>? {
         do {
-            val nextMoves = moveSelections.peek()?.moves
-            if (nextMoves?.size == 1) {
-                applyMove(nextMoves[0])
-                moveSelections.remove()
+            val moveSelection: MoveSelection<*>? = moveSelections.poll()
+            if (moveSelection == null) {
+                break
+            } else {
+                val moves = moveSelection.moves
+                if (moves.size == 1) {
+                    moves[0].applyTo(this)
+                } else {
+                    return moveSelection
+                }
             }
         } while (true)
+        return null
     }
 
     private fun performDefense() {
@@ -136,11 +172,6 @@ class GameState private constructor(val numberOfPlayers: Int) {
                 moveSelections.add(DefenseMoveSelection(defendingAnimal.owner, defenseMoves))
             }
         }
-    }
-
-    private fun applyMove(move: Move) {
-        move.applyTo(this)
-        moveSelections.remove()
     }
 
     private fun performDevelopment() {
@@ -163,10 +194,10 @@ class GameState private constructor(val numberOfPlayers: Int) {
         val moves: MutableList<DevelopmentMove> = mutableListOf()
 
         // Gather development moves (pass is always an option)
-        moves.add(DevelopmentPass)
+        moves.add(DevelopmentPass(player))
 
         for (card in player.hand.toSet()) {
-            moves.add(CreateAnimal(card))
+            moves.add(CreateAnimal(player, card))
             when (card) {
                 is SingleCard -> {
                     moves += card.property.getDevelopmentMoves(this, card)
@@ -193,12 +224,12 @@ class GameState private constructor(val numberOfPlayers: Int) {
                 break
             }
             val p = players[cur]
-            if (p.passed || p.hand.isEmpty()) {
+            if (!p.eligibleForDevelopment) {
                 continue
             }
             return cur
         }
-        return null
+        return if (currentPlayer.eligibleForDevelopment) currentPlayerIdx else null
     }
 
     private fun performFeedingBaseDetermination() {
@@ -209,6 +240,8 @@ class GameState private constructor(val numberOfPlayers: Int) {
             4 -> dice() + dice() + 2
             else -> throw IllegalStateException()
         }
+
+        log { "Food base for this move: $foodBase." }
 
         phase = GamePhase.FEEDING
         currentPlayerIdx = firstPlayerIdx
@@ -223,8 +256,7 @@ class GameState private constructor(val numberOfPlayers: Int) {
 
             if (entryPlayerIdx == -1) {
                 entryPlayerIdx = currentPlayerIdx
-            }
-            else {
+            } else {
                 if (entryPlayerIdx == currentPlayerIdx)
                     break
             }
@@ -240,18 +272,11 @@ class GameState private constructor(val numberOfPlayers: Int) {
                 return
             }
 
-            afterPlayerFeeding()
-
-            if (!moveSelections.isEmpty()) {
-                return
-            }
+            incCurrentPlayer()
         }
 
-        phase = GamePhase.EXTINCTION
-    }
 
-    fun afterPlayerFeeding() {
-        phase = GamePhase.FOOD_PROPAGATION
+        phase = GamePhase.EXTINCTION
     }
 
     private fun processExtinction() {
@@ -260,6 +285,10 @@ class GameState private constructor(val numberOfPlayers: Int) {
 
             // Remove dead animals
             val dyingAnimals = player.animals.filter { !it.isFed || it.isPoisoned }
+            // First log, then remove
+            if (logging) {
+                dyingAnimals.mapTo(logMessages) { "${it.fullName} dies." }
+            }
             for (dyingAnimal in dyingAnimals) {
                 player.removeAnimal(dyingAnimal)
             }
@@ -279,14 +308,12 @@ class GameState private constructor(val numberOfPlayers: Int) {
 
                 usedPiracy = false
                 usedMimicry = false
-            }
-
-            for (connection in player.connections) {
-                connection.isUsed = false
+                usedAttack = false
             }
         }
 
         if (isLastTurn) {
+            log { "Game over." }
             phase = GamePhase.END
         } else {
             // Hand out cards one by one and start a new turn
@@ -309,6 +336,12 @@ class GameState private constructor(val numberOfPlayers: Int) {
                 toHandOut = newToHandOut.asSequence()
             }
 
+            if (isLastTurn) {
+                log { "The deck is empty. This is the last turn!" }
+            }
+
+            turnNumber++
+
             firstPlayerIdx++
 
             if (firstPlayerIdx >= players.size) {
@@ -317,8 +350,16 @@ class GameState private constructor(val numberOfPlayers: Int) {
 
             currentPlayerIdx = firstPlayerIdx
 
+            logTurnStart()
+
+            computeNextPlayer = false
+
             phase = GamePhase.DEVELOPMENT
         }
+    }
+
+    fun logTurnStart() {
+        log { "===== TURN $turnNumber =====   First player: $currentPlayer" }
     }
 
 
@@ -352,14 +393,17 @@ class GameState private constructor(val numberOfPlayers: Int) {
 
     fun canAttack(attacker: Animal, victim: Animal): Boolean {
 
-        return attacker.individualProperties.all { it.mayAttack(victim) }
-            && victim.individualProperties.all { it.mayBeAttackedBy(victim, attacker) }
-            && victim.connections.all { it.sideProperty.mayBeAttackedBy(attacker, it.other) }
+        return victim != attacker
+                && attacker.individualProperties.all { it.mayAttack(victim) }
+                && victim.individualProperties.all { it.mayBeAttackedBy(victim, attacker) }
+                && victim.connections.all { it.sideProperty.mayBeAttackedBy(attacker, it.other) }
     }
 
     private fun eat(predator: Animal, victim: Animal) {
+        log { "${predator.fullName} kills and eats ${victim.fullName}." }
         predator.gainBlueTokens(2)
         if (victim.has(PoisonousProperty)) {
+            log { "${predator.fullName} is POISONED!" }
             predator.isPoisoned = true
         }
         victim.owner.removeAnimal(victim)
@@ -377,11 +421,25 @@ class GameState private constructor(val numberOfPlayers: Int) {
         }
     }
 
+    inline fun log(messageProducer: () -> String) {
+        if (logging) {
+            logMessages.add(messageProducer())
+        }
+    }
+
+    fun takeFromLog(): List<String> {
+        val result = logMessages.toList()
+        logMessages.clear()
+        return result
+    }
+
     companion object {
+
+        val DEFAULT_PLAYER_NAMES = listOf("A", "B", "C", "D", "E")
 
         fun new(numberOfPlayers: Int): GameState {
 
-            return GameState(numberOfPlayers).apply {
+            return GameState(numberOfPlayers, true).apply {
                 addCards(
                         CamouflageCard,
                         BurrowingCard,

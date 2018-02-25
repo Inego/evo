@@ -13,5 +13,4 @@ object SymbiosisGuest : PairedPropertySide("Guest") {
 
     override fun mayBeAttackedBy(attacker: Animal, other: Animal) = false
 
-    override fun mayEat(other: Animal) = other.isFed
 }

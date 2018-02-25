@@ -16,13 +16,7 @@ abstract class PairedPropertySide(val name: String) {
      * @param attacker The animal whose attack is checked
      * @param other The other animal of the paired property
      */
-    open fun mayBeAttackedBy(attacker: Animal, other: Animal) = false
-
-    /**
-     * Checks whether the animal possessing this paired property side may eat (receive red or blue food tokens)
-     */
-    // TODO call this from all appropriate places
-    open fun mayEat(other: Animal) = true
+    open fun mayBeAttackedBy(attacker: Animal, other: Animal) = true
 }
 
 

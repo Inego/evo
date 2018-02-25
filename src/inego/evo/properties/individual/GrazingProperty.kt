@@ -9,11 +9,15 @@ import inego.evo.properties.IndividualProperty
 object GrazingProperty : IndividualProperty("Grazing")
 
 
-class GrazeFood(private val foodToGraze: Int) : Move() {
-    override fun toString(gameState: GameState, player: PlayerState) = "Graze $foodToGraze food"
+class GrazeFood(private val player: PlayerState, private val foodToGraze: Int) : Move() {
+    override val logMessage: String
+        get() = "$player grazed $foodToGraze food."
+
+    override fun toString(player: PlayerState) = "Graze $foodToGraze food"
 
     override fun GameState.applyMove() {
         foodBase -= foodToGraze
+        log { "Food left: $foodBase." }
     }
 }
 
