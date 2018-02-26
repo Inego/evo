@@ -111,7 +111,7 @@ class Animal(val owner: PlayerState) {
 
     fun gainBlueTokens(numberOfTokens: Int) {
 
-        val foodToGain = min(numberOfTokens, foodRequirement - hasFood)
+        val foodToGain = min(numberOfTokens, foodRequirement - hasFood + fatCapacity - fat)
 
         if (foodToGain == 0) {
             return

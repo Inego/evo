@@ -1,4 +1,4 @@
-package inego.evo
+package inego.evo.test
 
 import inego.evo.game.GameState
 import org.junit.jupiter.api.Assertions

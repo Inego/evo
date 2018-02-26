@@ -4,6 +4,7 @@ import inego.evo.game.Animal
 import inego.evo.game.GamePhase
 import inego.evo.game.GameState
 import inego.evo.game.PlayerState
+import inego.evo.game.moves.FeedingAnimalMove
 import inego.evo.game.moves.FeedingMove
 import inego.evo.properties.FeedingAction
 import inego.evo.properties.IndividualProperty
@@ -17,7 +18,7 @@ object HibernationProperty : IndividualProperty("Hibernation"), FeedingAction {
     }
 }
 
-class HibernationMove(animal: Animal) : FeedingMove(animal) {
+class HibernationMove(animal: Animal) : FeedingAnimalMove(animal) {
     override val logMessage: String
         get() = "${animal.fullName} falls asleep"
 

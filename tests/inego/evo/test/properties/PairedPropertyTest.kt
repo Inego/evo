@@ -1,4 +1,4 @@
-package inego.evo.properties
+package inego.evo.test.properties
 
 import inego.evo.game.GameState
 import org.junit.jupiter.api.BeforeEach

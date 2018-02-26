@@ -2,7 +2,7 @@ package inego.evo.game.moves
 
 import inego.evo.game.*
 
-abstract class FeedingMove(val animal: Animal) : Move() {
+abstract class FeedingMove : Move() {
     override fun GameState.applyMove() {
         phase = doFeeding(this)
     }
@@ -11,7 +11,10 @@ abstract class FeedingMove(val animal: Animal) : Move() {
 }
 
 
-class GetRedTokenMove(animal: Animal) : FeedingMove(animal) {
+abstract class FeedingAnimalMove(val animal: Animal) : FeedingMove()
+
+
+class GetRedTokenMove(animal: Animal) : FeedingAnimalMove(animal) {
     override val logMessage: String
         get() = "${animal.fullName} feeds from the base."
 
@@ -22,7 +25,7 @@ class GetRedTokenMove(animal: Animal) : FeedingMove(animal) {
     }
 }
 
-class BurnFatMove(animal: Animal, private val fatToBurn: Int) : FeedingMove(animal) {
+class BurnFatMove(animal: Animal, private val fatToBurn: Int) : FeedingAnimalMove(animal) {
     override val logMessage: String
         get() = "${animal.fullName} converts $fatToBurn fat to food."
 
@@ -34,6 +37,19 @@ class BurnFatMove(animal: Animal, private val fatToBurn: Int) : FeedingMove(anim
     }
 
     override fun toString(player: PlayerState) = "$animal: convert $fatToBurn fat to food"
+}
+
+
+data class FeedingPassMove(val player: PlayerState) : FeedingMove() {
+    override fun doFeeding(gameState: GameState): GamePhase {
+        player.passed = true
+        return GamePhase.FEEDING
+    }
+
+    override val logMessage: String
+        get() = "$player passed from feeding."
+
+    override fun toString(player: PlayerState) = "Pass from feeding"
 }
 
 

@@ -11,7 +11,7 @@ import kotlin.math.min
 
 class GameState private constructor(val numberOfPlayers: Int, val logging: Boolean) {
 
-    private var turnNumber = 1
+    var turnNumber = 1
 
     val logMessages: MutableList<String> = mutableListOf()
 
@@ -49,10 +49,15 @@ class GameState private constructor(val numberOfPlayers: Int, val logging: Boole
         // TODO copy constructor
     }
 
+    /**
+     * Applies the specified move and plays the game either until a non-trivial move selection
+     * has to be made by any player, or until the end.
+     *
+     * @return The next move selection or `null` if the game has been played to the end.
+     */
     fun next(move: Move): MoveSelection<*>? {
 
         move.applyTo(this)
-
         // After a move was applied, other move selections may arise
         var selection: MoveSelection<*>? = getNextNonTrivialMoveSelection()
         if (selection != null) {
@@ -60,7 +65,6 @@ class GameState private constructor(val numberOfPlayers: Int, val logging: Boole
         }
 
         do {
-
             when (phase) {
 
                 GamePhase.DEVELOPMENT -> this.performDevelopment()
@@ -233,7 +237,6 @@ class GameState private constructor(val numberOfPlayers: Int, val logging: Boole
     }
 
     private fun performFeedingBaseDetermination() {
-
         foodBase = when (players.size) {
             2 -> dice() + 2
             3 -> dice() + dice()
@@ -246,6 +249,8 @@ class GameState private constructor(val numberOfPlayers: Int, val logging: Boole
         phase = GamePhase.FEEDING
         currentPlayerIdx = firstPlayerIdx
 
+        // Since `PlayerState.passed` flag is reused during Feeding, clear it
+        players.forEach { it.passed = false }
     }
 
     private fun performFeeding() {
@@ -265,9 +270,22 @@ class GameState private constructor(val numberOfPlayers: Int, val logging: Boole
 
             val player = currentPlayer
 
-            val moves = player.animals.flatMap { it.gatherFeedingMoves(this) }
+            if (player.passed) continue
+
+            var moves = player.animals.flatMap { it.gatherFeedingMoves(this) }
 
             if (!moves.isEmpty()) {
+
+                if (player.animals.all { it.isFed } && foodBase == 0) {
+                    // All available moves are connected with killing other animals for fat.
+                    // At this stage, the player may pass out from feeding.
+
+                    val extendedMoves = moves.toMutableList()
+                    extendedMoves.add(FeedingPassMove(player))
+
+                    moves = extendedMoves
+                }
+
                 moveSelections.add(FeedingMoveSelection(player, moves))
                 return
             }

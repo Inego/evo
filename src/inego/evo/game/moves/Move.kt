@@ -35,3 +35,15 @@ object GameStartMove : Move() {
         logTurnStart()
     }
 }
+
+
+object EmptyMove : Move() {
+    override val logMessage: String
+        get() = "An empty move did nothing."
+
+    override fun GameState.applyMove() {
+        // Do nothing
+    }
+
+    override fun toString(player: PlayerState) = "Do nothing"
+}
