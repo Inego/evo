@@ -5,7 +5,7 @@ import inego.evo.game.moves.FoodPropagationMove
 import inego.evo.properties.PairedProperty
 import inego.evo.properties.paired.FoodPropagator
 
-class PlayerState(val name: String) {
+class Player(val name: String) {
 
     var passed = false
 
@@ -53,7 +53,7 @@ class PlayerState(val name: String) {
         animals.remove(animal)
     }
 
-    fun getFoodPropagationMoves(gameState: GameState): List<FoodPropagationMove> {
+    fun getFoodPropagationMoves(game: Game): List<FoodPropagationMove> {
         if (foodPropagationSet.isEmpty()) {
             return emptyList()
         }
@@ -65,7 +65,7 @@ class PlayerState(val name: String) {
         for (connectionMembership in iterator) {
             with(connectionMembership.sideProperty as FoodPropagator) {
                 val otherAnimal = connectionMembership.other
-                if (otherAnimal.mayEat && !connectionMembership.isUsed && isApplicable(gameState)) {
+                if (otherAnimal.mayEat && !connectionMembership.isUsed && isApplicable(game)) {
                     result.add(createPropagationMove(connectionMembership))
                 } else {
                     // This connection membership is no longer valid for food propagation - remove it

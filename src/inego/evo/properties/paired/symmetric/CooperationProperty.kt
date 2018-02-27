@@ -21,10 +21,10 @@ class CooperationFoodPropagationMove(connectionMembership: ConnectionMembership)
         get() = "${connectionMembership.other.fullName} gets 1 blue token " +
                 "from ${connectionMembership.thisAnimal} with Cooperation"
 
-    override fun onPropagation(animal: Animal, gameState: GameState) {
+    override fun onPropagation(animal: Animal, game: Game) {
         animal.gainBlueTokens(1)
     }
 
-    override fun toString(player: PlayerState): String =
+    override fun toString(player: Player): String =
             "${connectionMembership.other}: get 1 blue token from ${connectionMembership.thisAnimal} with Cooperation"
 }

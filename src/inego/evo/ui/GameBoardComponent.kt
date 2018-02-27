@@ -14,7 +14,7 @@ import kotlin.coroutines.experimental.buildSequence
 
 class GameBoardComponent(private val gameManager: GameManager) : JPanel() {
 
-    val gameState = gameManager.gameState
+    val game = gameManager.game
 
     companion object {
         const val SPACER_HEIGHT = 2
@@ -34,11 +34,11 @@ class GameBoardComponent(private val gameManager: GameManager) : JPanel() {
         val metrics = g2.fontMetrics
         val fontHeight = metrics.ascent + metrics.descent
 
-        val numberOfPlayers = gameState.numberOfPlayers
+        val numberOfPlayers = game.numberOfPlayers
 
         val playerHeight = height.toDouble() / numberOfPlayers
 
-        for ((playerIndex, player) in gameState.players.withIndex()) {
+        for ((playerIndex, player) in game.players.withIndex()) {
 
             val isAI = gameManager.isAI(player)
 

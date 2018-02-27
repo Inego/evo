@@ -2,7 +2,7 @@ package inego.evo.properties
 
 import inego.evo.cards.Card
 import inego.evo.game.Animal
-import inego.evo.game.GameState
+import inego.evo.game.Game
 import inego.evo.game.moves.DevelopmentAddIndividualProperty
 import inego.evo.game.moves.DevelopmentAddPairedProperty
 import inego.evo.game.moves.DevelopmentMove
@@ -10,15 +10,15 @@ import inego.evo.properties.paired.PairedPropertySide
 
 sealed class AnimalProperty<P : AnimalProperty<P, T>, T : PropertyTarget<T, P>>(val name: String) {
 
-    fun getDevelopmentMoves(gameState: GameState, card: Card): List<DevelopmentMove> {
-        return getTargets(gameState).map { createDevelopmentMove(card, it) }
+    fun getDevelopmentMoves(game: Game, card: Card): List<DevelopmentMove> {
+        return getTargets(game).map { createDevelopmentMove(card, it) }
     }
 
-    abstract fun getTargets(gameState: GameState): List<T>
+    abstract fun getTargets(game: Game): List<T>
 
     protected abstract fun createDevelopmentMove(card: Card, target: T): DevelopmentMove
 
-    abstract fun applyTo(target: T, gameState: GameState)
+    abstract fun applyTo(target: T, game: Game)
 
     override fun toString() = name
 }
@@ -27,10 +27,10 @@ abstract class IndividualProperty(name: String) : AnimalProperty<IndividualPrope
 
     protected open fun mayAttachTo(animal: Animal) = !animal.has(this)
 
-    override fun getTargets(gameState: GameState): List<SingleTarget> =
-            gameState.currentPlayer.animals.filter { mayAttachTo(it) }.map { SingleTarget(it) }
+    override fun getTargets(game: Game): List<SingleTarget> =
+            game.currentPlayer.animals.filter { mayAttachTo(it) }.map { SingleTarget(it) }
 
-    override fun applyTo(target: SingleTarget, gameState: GameState) {
+    override fun applyTo(target: SingleTarget, game: Game) {
         target.animal.addProperty(this)
     }
 
@@ -46,11 +46,11 @@ abstract class IndividualProperty(name: String) : AnimalProperty<IndividualPrope
 
 sealed class PairedProperty(name: String) : AnimalProperty<PairedProperty, PairedTarget>(name) {
 
-    override fun getTargets(gameState: GameState): List<PairedTarget> {
+    override fun getTargets(game: Game): List<PairedTarget> {
 
         val result = mutableListOf<PairedTarget>()
 
-        val player = gameState.currentPlayer
+        val player = game.currentPlayer
         val animals = player.animals
         for (i in 0 until animals.size - 1) {
             val animal1 = animals[i]
@@ -76,8 +76,8 @@ sealed class PairedProperty(name: String) : AnimalProperty<PairedProperty, Paire
         return result
     }
 
-    override fun applyTo(target: PairedTarget, gameState: GameState) {
-        val player = gameState.currentPlayer
+    override fun applyTo(target: PairedTarget, game: Game) {
+        val player = game.currentPlayer
         player.addConnection(this, target.firstAnimal, target.secondAnimal)
     }
 

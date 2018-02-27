@@ -1,35 +1,35 @@
 package inego.evo.game.moves
 
 import inego.evo.cards.Card
-import inego.evo.game.GameState
+import inego.evo.game.Game
 import inego.evo.game.MoveSelection
-import inego.evo.game.PlayerState
+import inego.evo.game.Player
 import inego.evo.properties.*
 
-class CreateAnimal(private  val player: PlayerState, private val card: Card) : DevelopmentMove() {
+class CreateAnimal(private  val player: Player, private val card: Card) : DevelopmentMove() {
     override val logMessage: String
         get() = "$player creates an animal."
 
-    override fun GameState.applyMove() {
+    override fun Game.applyMove() {
         currentPlayer.hand.remove(card)
         currentPlayer.newAnimal()
     }
 
-    override fun toString(player: PlayerState) = "$card ⇨ Animal"
+    override fun toString(player: Player) = "$card ⇨ Animal"
 }
 
 abstract class DevelopmentMove : Move()
 
 
-class DevelopmentPass(private val player: PlayerState) : DevelopmentMove() {
+class DevelopmentPass(private val player: Player) : DevelopmentMove() {
     override val logMessage: String
         get() = "$player passes from development."
 
-    override fun GameState.applyMove() {
+    override fun Game.applyMove() {
         currentPlayer.passed = true
     }
 
-    override fun toString(player: PlayerState) = "Pass from development"
+    override fun toString(player: Player) = "Pass from development"
 }
 
 abstract class DevelopmentAddProperty<P : AnimalProperty<P, T>, T : PropertyTarget<T, P>>(
@@ -37,7 +37,7 @@ abstract class DevelopmentAddProperty<P : AnimalProperty<P, T>, T : PropertyTarg
         val property: P,
         val target: T
 ) : DevelopmentMove() {
-    override fun GameState.applyMove() {
+    override fun Game.applyMove() {
         currentPlayer.hand.remove(card)
         property.applyTo(target, this)
     }
@@ -48,7 +48,7 @@ class DevelopmentAddIndividualProperty(card: Card, property: IndividualProperty,
     override val logMessage: String
         get() = "${target.animal.owner} adds $property to ${target.animal}."
 
-    override fun toString(player: PlayerState) =
+    override fun toString(player: Player) =
             "$property ⇨ ${player.targetAnimalToString(target.animal)}"
 
 }
@@ -58,7 +58,7 @@ class DevelopmentAddPairedProperty(card: Card, property: PairedProperty, target:
     override val logMessage: String
         get() = "${target.firstAnimal.owner} adds $property from ${target.firstAnimal} to ${target.secondAnimal}."
 
-    override fun toString(player: PlayerState): String {
+    override fun toString(player: Player): String {
         val first = player.targetAnimalToString(target.firstAnimal)
         val second = player.targetAnimalToString(target.secondAnimal)
         return if (property is AsymmetricProperty) "$first $property→ $second" else "$first ←$property→ $second"
@@ -66,5 +66,5 @@ class DevelopmentAddPairedProperty(card: Card, property: PairedProperty, target:
 }
 
 
-class DevelopmentMoveSelection(decidingPlayer: PlayerState, moves: List<DevelopmentMove>)
+class DevelopmentMoveSelection(decidingPlayer: Player, moves: List<DevelopmentMove>)
     : MoveSelection<DevelopmentMove>(decidingPlayer, moves)

@@ -1,7 +1,7 @@
 package inego.evo.test.moves
 
 import inego.evo.game.GamePhase
-import inego.evo.game.GameState
+import inego.evo.game.Game
 import inego.evo.game.moves.DevelopmentMoveSelection
 import inego.evo.game.moves.FeedingMoveSelection
 import inego.evo.properties.individual.AttackMove
@@ -18,9 +18,9 @@ class DefenseTest {
     @Test
     fun killOwnAnimalsForFat() {
 
-        val gameState = GameState.new(2)
+        val game = Game.new(2)
 
-        val p1 = gameState.players[0]
+        val p1 = game.players[0]
 
         val a1 = p1.newAnimal(CarnivorousProperty).apply {
             hasFood = 1  // 1/1
@@ -30,21 +30,21 @@ class DefenseTest {
         val a2 = p1.newAnimal()
         val a3 = p1.newAnimal()
 
-        gameState.phase = GamePhase.FEEDING
+        game.phase = GamePhase.FEEDING
 
-        val moveSelection = gameState.next()!!
+        val moveSelection = game.next()!!
 
         assertTrue(moveSelection is FeedingMoveSelection)
         assertEquals(2, moveSelection.moves.size)
         assertEquals(moveSelection.moves[0], AttackMove(a1, a2))
         assertEquals(moveSelection.moves[1], AttackMove(a1, a3))
 
-        gameState.next(moveSelection.moves[0])!!
+        game.next(moveSelection.moves[0])!!
 
         // After a1 attacked a2, there are no feeding moves left, because a1 has already attacked.
         // Game goes to next move.
 
-        assertEquals(2, gameState.turnNumber)
+        assertEquals(2, game.turnNumber)
     }
 
     @Test
@@ -60,16 +60,16 @@ class DefenseTest {
                 throw AssertionError()
             }
 
-            val gameState = GameState.new(2)
-            gameState.phase = GamePhase.FEEDING
+            val game = Game.new(2)
+            game.phase = GamePhase.FEEDING
 
 
-            val p1 = gameState.players[0]
+            val p1 = game.players[0]
 
             p1.newAnimal(CarnivorousProperty)
             p1.newAnimal(RunningProperty)
 
-            val moveSelection = gameState.next()!!
+            val moveSelection = game.next()!!
 
             assertTrue(moveSelection is DevelopmentMoveSelection)
 

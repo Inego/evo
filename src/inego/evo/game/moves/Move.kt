@@ -1,30 +1,30 @@
 package inego.evo.game.moves
 
-import inego.evo.game.GameState
-import inego.evo.game.PlayerState
+import inego.evo.game.Game
+import inego.evo.game.Player
 import inego.evo.removeLast
 
 abstract class Move {
 
     abstract val logMessage: String
 
-    fun applyTo(gameState: GameState) {
-        gameState.log { logMessage }
-        gameState.applyMove()
+    fun applyTo(game: Game) {
+        game.log { logMessage }
+        game.applyMove()
     }
 
-    protected abstract fun GameState.applyMove()
+    protected abstract fun Game.applyMove()
 
-    abstract fun toString(player: PlayerState): String
+    abstract fun toString(player: Player): String
 }
 
 object GameStartMove : Move() {
     override val logMessage: String
         get() = "The game has started."
 
-    override fun toString(player: PlayerState) = "Start game"
+    override fun toString(player: Player) = "Start game"
 
-    override fun GameState.applyMove() {
+    override fun Game.applyMove() {
         // Hand out 6 cards for each player
         for (player in players) {
             repeat(6) {
@@ -41,9 +41,9 @@ object EmptyMove : Move() {
     override val logMessage: String
         get() = "An empty move did nothing."
 
-    override fun GameState.applyMove() {
+    override fun Game.applyMove() {
         // Do nothing
     }
 
-    override fun toString(player: PlayerState) = "Do nothing"
+    override fun toString(player: Player) = "Do nothing"
 }

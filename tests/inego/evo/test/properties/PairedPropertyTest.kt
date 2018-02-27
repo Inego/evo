@@ -1,6 +1,6 @@
 package inego.evo.test.properties
 
-import inego.evo.game.GameState
+import inego.evo.game.Game
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import inego.evo.properties.paired.asymmetric.SymbiosisProperty
@@ -9,9 +9,9 @@ import org.junit.jupiter.api.Assertions.assertEquals
 
 internal class PairedPropertyTest {
 
-    private val gameState = GameState.new(1)
+    private val game = Game.new(1)
 
-    private val p = gameState.players[0]
+    private val p = game.players[0]
 
     @BeforeEach
     fun setup() {
@@ -26,7 +26,7 @@ internal class PairedPropertyTest {
 
         p.addConnection(CooperationProperty, a2, a3)
 
-        val targets = CooperationProperty.getTargets(gameState)
+        val targets = CooperationProperty.getTargets(game)
         assertEquals(2, targets.size)
         assertEquals(a1, targets[0].firstAnimal)
         assertEquals(a2, targets[0].secondAnimal)
@@ -38,7 +38,7 @@ internal class PairedPropertyTest {
     fun testSimpleAsymmetric() {
         val a1 = p.newAnimal()
         val a2 = p.newAnimal()
-        val targets = SymbiosisProperty.getTargets(gameState)
+        val targets = SymbiosisProperty.getTargets(game)
         assertEquals(2, targets.size)
         assertEquals(a1, targets[0].firstAnimal)
         assertEquals(a2, targets[0].secondAnimal)

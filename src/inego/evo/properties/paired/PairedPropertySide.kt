@@ -2,7 +2,7 @@ package inego.evo.properties.paired
 
 import inego.evo.game.Animal
 import inego.evo.game.ConnectionMembership
-import inego.evo.game.GameState
+import inego.evo.game.Game
 import inego.evo.game.moves.FoodPropagationMove
 
 
@@ -29,7 +29,7 @@ interface FoodPropagator {
      *
      * It's true by default, but some propagators may perform additional checks.
      */
-    fun isApplicable(gameState: GameState) = true
+    fun isApplicable(game: Game) = true
 
     /**
      * Creates a food propagation move based on a specified connection membership.

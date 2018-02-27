@@ -2,8 +2,8 @@ package inego.evo.properties.individual
 
 import inego.evo.game.Animal
 import inego.evo.game.GamePhase
-import inego.evo.game.GameState
-import inego.evo.game.PlayerState
+import inego.evo.game.Game
+import inego.evo.game.Player
 import inego.evo.game.moves.FeedingAnimalMove
 import inego.evo.game.moves.FeedingMove
 import inego.evo.properties.FeedingAction
@@ -11,9 +11,9 @@ import inego.evo.properties.IndividualProperty
 
 object PiracyProperty : IndividualProperty("Piracy"), FeedingAction {
 
-    override fun gatherFeedingMoves(animal: Animal, gameState: GameState): List<FeedingMove> =
+    override fun gatherFeedingMoves(animal: Animal, game: Game): List<FeedingMove> =
             if (animal.usedPiracy) emptyList()
-            else gameState.players
+            else game.players
                     .flatMap { it.animals }
                     .filter { !it.isFed && it.hasFood > 0 }
                     .map { StealFoodMove(animal, it) }
@@ -24,7 +24,7 @@ class StealFoodMove(animal: Animal, private val victim: Animal) : FeedingAnimalM
     override val logMessage: String
         get() = "${animal.fullName} pirated 1 food from ${victim.fullName}"
 
-    override fun doFeeding(gameState: GameState): GamePhase {
+    override fun doFeeding(game: Game): GamePhase {
         victim.hasFood--
         animal.gainBlueTokens(1)
 
@@ -32,7 +32,7 @@ class StealFoodMove(animal: Animal, private val victim: Animal) : FeedingAnimalM
         return GamePhase.FOOD_PROPAGATION
     }
 
-    override fun toString(player: PlayerState): String {
+    override fun toString(player: Player): String {
         return "$animal steals food from ${player.targetAnimalToString(victim)} (Piracy)"
     }
 

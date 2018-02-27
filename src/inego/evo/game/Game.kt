@@ -9,7 +9,7 @@ import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 import kotlin.math.min
 
-class GameState private constructor(val numberOfPlayers: Int, val logging: Boolean) {
+class Game private constructor(val numberOfPlayers: Int, val logging: Boolean) {
 
     var turnNumber = 1
 
@@ -17,7 +17,7 @@ class GameState private constructor(val numberOfPlayers: Int, val logging: Boole
 
     var deck: MutableList<Card> = mutableListOf()
 
-    val players: List<PlayerState> = List(numberOfPlayers) { index -> PlayerState(DEFAULT_PLAYER_NAMES[index]) }
+    val players: List<Player> = List(numberOfPlayers) { index -> Player(DEFAULT_PLAYER_NAMES[index]) }
 
     private val moveSelections: Deque<MoveSelection<*>> = LinkedList()
 
@@ -45,7 +45,7 @@ class GameState private constructor(val numberOfPlayers: Int, val logging: Boole
     var foodBase = 0
 
 
-    constructor(src: GameState) : this(src.numberOfPlayers, false) {
+    constructor(src: Game) : this(src.numberOfPlayers, false) {
         // TODO copy constructor
     }
 
@@ -249,7 +249,7 @@ class GameState private constructor(val numberOfPlayers: Int, val logging: Boole
         phase = GamePhase.FEEDING
         currentPlayerIdx = firstPlayerIdx
 
-        // Since `PlayerState.passed` flag is reused during Feeding, clear it
+        // Since `Player.passed` flag is reused during Feeding, clear it
         players.forEach { it.passed = false }
     }
 
@@ -339,7 +339,7 @@ class GameState private constructor(val numberOfPlayers: Int, val logging: Boole
             var toHandOut = fromFirstPlayer().asSequence().map { Pair(it, it.cardsToHandOut) }
 
             loop@ while (true) {
-                val newToHandOut: MutableList<Pair<PlayerState, Int>> = mutableListOf()
+                val newToHandOut: MutableList<Pair<Player, Int>> = mutableListOf()
                 for (pair in toHandOut) {
                     val card = deck.removeLast()
                     pair.first.hand.add(card)
@@ -391,10 +391,10 @@ class GameState private constructor(val numberOfPlayers: Int, val logging: Boole
         cards.forEach { addCard(it) }
     }
 
-    private fun fromPlayer(playerIdx: Int) = object : Iterator<PlayerState> {
+    private fun fromPlayer(playerIdx: Int) = object : Iterator<Player> {
         var idx = 0
 
-        override fun next(): PlayerState {
+        override fun next(): Player {
             var collIdx = playerIdx + idx
             idx++
             if (collIdx >= players.size)
@@ -405,7 +405,7 @@ class GameState private constructor(val numberOfPlayers: Int, val logging: Boole
         override fun hasNext() = idx < players.size
     }
 
-    private fun fromPlayer(player: PlayerState) = fromPlayer(players.indexOf(player))
+    private fun fromPlayer(player: Player) = fromPlayer(players.indexOf(player))
 
     fun fromFirstPlayer() = fromPlayer(firstPlayerIdx)
 
@@ -455,9 +455,9 @@ class GameState private constructor(val numberOfPlayers: Int, val logging: Boole
 
         val DEFAULT_PLAYER_NAMES = listOf("A", "B", "C", "D", "E")
 
-        fun new(numberOfPlayers: Int): GameState {
+        fun new(numberOfPlayers: Int): Game {
 
-            return GameState(numberOfPlayers, true).apply {
+            return Game(numberOfPlayers, true).apply {
                 addCards(
                         CamouflageCard,
                         BurrowingCard,

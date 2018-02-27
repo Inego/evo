@@ -10,7 +10,7 @@ object CommunicationProperty : SymmetricProperty("Communication", Communicator)
 
 object Communicator : PairedPropertySide("Communicator"), FoodPropagator {
     // Food must be present in the base in order to propagate it via communication
-    override fun isApplicable(gameState: GameState) = gameState.foodBase > 0
+    override fun isApplicable(game: Game) = game.foodBase > 0
 
     override fun createPropagationMove(connectionMembership: ConnectionMembership) =
             CommunicationFoodPropagationMove(connectionMembership)
@@ -23,10 +23,10 @@ class CommunicationFoodPropagationMove(connectionMembership: ConnectionMembershi
         get() = "${connectionMembership.other.fullName} gets 1 red token " +
                 "from ${connectionMembership.thisAnimal} by Communication."
 
-    override fun onPropagation(animal: Animal, gameState: GameState) {
-        animal.gainRedToken(gameState)
+    override fun onPropagation(animal: Animal, game: Game) {
+        animal.gainRedToken(game)
     }
 
-    override fun toString(player: PlayerState) =
+    override fun toString(player: Player) =
             "${connectionMembership.other}: get 1 red token from ${connectionMembership.thisAnimal} by Communication"
 }

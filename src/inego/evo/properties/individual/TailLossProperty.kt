@@ -6,7 +6,7 @@ import inego.evo.properties.DefenseAction
 import inego.evo.properties.IndividualProperty
 
 object TailLossProperty : IndividualProperty("Tail Loss"), DefenseAction {
-    override fun gatherDefenseMoves(defender: Animal, attacker: Animal, gameState: GameState): List<DefenseMove> {
+    override fun gatherDefenseMoves(defender: Animal, attacker: Animal, game: Game): List<DefenseMove> {
         val result : MutableList<DefenseMove> = mutableListOf()
 
         if (defender.fatCapacity > 0)
@@ -27,7 +27,7 @@ class LoseIndividualProperty(defender: Animal, attacker: Animal, val property: I
     override val logMessage: String
         get() = "${defender.fullName} loses $property as a tail"
 
-    override fun GameState.applyMove() {
+    override fun Game.applyMove() {
         defendingAnimal.removeProperty(property)
 
         // Attack fails, but the attacker has "the tail" (1 blue token)
@@ -35,7 +35,7 @@ class LoseIndividualProperty(defender: Animal, attacker: Animal, val property: I
         phase = GamePhase.FOOD_PROPAGATION
     }
 
-    override fun toString(player: PlayerState) =
+    override fun toString(player: Player) =
             "$defender loses $property (tail loss)"
 
 }
@@ -46,11 +46,11 @@ class LosePairedProperty(defender: Animal, attacker: Animal, private val connect
         get() = "${defender.fullName} loses ${connectionMembership.sideProperty} " +
                 "to ${connectionMembership.other.fullName} as a tail."
 
-    override fun GameState.applyMove() {
+    override fun Game.applyMove() {
         defender.owner.removeConnection(connectionMembership.connection)
     }
 
-    override fun toString(player: PlayerState): String {
+    override fun toString(player: Player): String {
         return "$defender loses ${connectionMembership.sideProperty} to ${connectionMembership.other} (tail loss)"
     }
 }

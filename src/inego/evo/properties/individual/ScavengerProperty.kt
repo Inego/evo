@@ -1,9 +1,9 @@
 package inego.evo.properties.individual
 
 import inego.evo.game.Animal
-import inego.evo.game.GameState
+import inego.evo.game.Game
 import inego.evo.game.MoveSelection
-import inego.evo.game.PlayerState
+import inego.evo.game.Player
 import inego.evo.game.moves.Move
 import inego.evo.properties.IndividualProperty
 
@@ -17,12 +17,12 @@ class FeedTheScavengerMove(private val scavenger: Animal) : Move() {
     override val logMessage: String
         get() = "${scavenger.fullName} scavenged 1 food."
 
-    override fun GameState.applyMove() {
+    override fun Game.applyMove() {
         scavenger.gainBlueTokens(1)
     }
 
-    override fun toString(player: PlayerState) = "Feed $scavenger (Scavenger)"
+    override fun toString(player: Player) = "Feed $scavenger (Scavenger)"
 }
 
-class ScavengerSelection(decidingPlayer: PlayerState, moves: List<FeedTheScavengerMove>)
+class ScavengerSelection(decidingPlayer: Player, moves: List<FeedTheScavengerMove>)
     : MoveSelection<FeedTheScavengerMove>(decidingPlayer, moves)

@@ -2,8 +2,8 @@ package inego.evo.properties.individual
 
 import inego.evo.game.Animal
 import inego.evo.game.GamePhase
-import inego.evo.game.GameState
-import inego.evo.game.PlayerState
+import inego.evo.game.Game
+import inego.evo.game.Player
 import inego.evo.game.moves.FeedingAnimalMove
 import inego.evo.game.moves.FeedingMove
 import inego.evo.properties.FeedingAction
@@ -12,15 +12,15 @@ import java.util.*
 
 object CarnivorousProperty : IndividualProperty("Carnivorous"), FeedingAction {
 
-    override fun gatherFeedingMoves(animal: Animal, gameState: GameState): List<FeedingMove>
+    override fun gatherFeedingMoves(animal: Animal, game: Game): List<FeedingMove>
     {
         if (animal.usedAttack) {
             return emptyList()
         }
         // A predator can attack any animal on the board independent on its owner
-        return gameState.players
+        return game.players
                 .flatMap { it.animals }
-                .filter { gameState.canAttack(animal, it) }
+                .filter { game.canAttack(animal, it) }
                 .map { AttackMove(animal, it) }
     }
 
@@ -34,12 +34,12 @@ class AttackMove(animal: Animal, private val victim: Animal) : FeedingAnimalMove
     override val logMessage: String
         get() = "${animal.fullName} attacks ${victim.fullName}."
 
-    override fun toString(player: PlayerState) = "$animal attacks ${player.targetAnimalToString(victim)}"
+    override fun toString(player: Player) = "$animal attacks ${player.targetAnimalToString(victim)}"
 
-    override fun doFeeding(gameState: GameState): GamePhase {
+    override fun doFeeding(game: Game): GamePhase {
         animal.usedAttack = true
-        gameState.attackingAnimal = animal
-        gameState.defendingAnimal = victim
+        game.attackingAnimal = animal
+        game.defendingAnimal = victim
         return GamePhase.DEFENSE
     }
 

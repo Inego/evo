@@ -11,7 +11,7 @@ import inego.evo.properties.paired.symmetric.CommunicationProperty
 import inego.evo.properties.paired.symmetric.CooperationProperty
 import kotlin.math.min
 
-class Animal(val owner: PlayerState) {
+class Animal(val owner: Player) {
     inline val propertyCount
         get() = individualProperties.size + connections.size + if (fatCapacity > 0) 1 else 0
 
@@ -80,14 +80,14 @@ class Animal(val owner: PlayerState) {
     val isFull: Boolean
         inline get() = isHibernating || isFed && fatCapacity == fat
 
-    fun gatherFeedingMoves(gameState: GameState): List<FeedingMove> {
+    fun gatherFeedingMoves(game: Game): List<FeedingMove> {
 
         if (!mayEat)
             return emptyList()
 
         val result: MutableList<FeedingMove> = mutableListOf()
 
-        if (gameState.foodBase > 0) {
+        if (game.foodBase > 0) {
             result.add(GetRedTokenMove(this))
         }
 
@@ -100,14 +100,14 @@ class Animal(val owner: PlayerState) {
 
         individualProperties
                 .filterIsInstance<FeedingAction>()
-                .flatMapTo(result) { it.gatherFeedingMoves(this, gameState) }
+                .flatMapTo(result) { it.gatherFeedingMoves(this, game) }
 
         return result
     }
 
-    fun gatherDefenseMoves(attacker: Animal, gameState: GameState): List<DefenseMove> = individualProperties
+    fun gatherDefenseMoves(attacker: Animal, game: Game): List<DefenseMove> = individualProperties
             .filterIsInstance<DefenseAction>()
-            .flatMap { it.gatherDefenseMoves(this, attacker, gameState) }
+            .flatMap { it.gatherDefenseMoves(this, attacker, game) }
 
     fun gainBlueTokens(numberOfTokens: Int) {
 
@@ -139,16 +139,16 @@ class Animal(val owner: PlayerState) {
         }
     }
 
-    fun gainRedToken(gameState: GameState) {
-        assert(gameState.foodBase > 0) { "Trying to get a red token from an empty base" }
+    fun gainRedToken(game: Game) {
+        assert(game.foodBase > 0) { "Trying to get a red token from an empty base" }
 
-        gameState.foodBase--
+        game.foodBase--
 
-        gameState.log { "Food left: ${gameState.foodBase}." }
+        game.log { "Food left: ${game.foodBase}." }
 
         gainFood(1)
 
-        if (gameState.foodBase > 0) {
+        if (game.foodBase > 0) {
             connections.filterTo(owner.foodPropagationSet) {
                 it.property == CommunicationProperty && !it.isUsed && it.other.mayEat
             }

@@ -2,7 +2,7 @@ package inego.evo.ui
 
 import inego.evo.GameManager
 import inego.evo.RandomEngine
-import inego.evo.game.GameState
+import inego.evo.game.Game
 import inego.evo.game.MoveSelection
 import inego.evo.game.moves.GameStartMove
 import inego.evo.game.moves.Move
@@ -22,9 +22,9 @@ object MainFrame {
 
     }
 
-    private val gameState = GameState.new(2)
+    private val game = Game.new(2)
 
-    private val gameManager = GameManager(gameState).apply {
+    private val gameManager = GameManager(game).apply {
         setEngine(0, RandomEngine)
     }
 
@@ -72,7 +72,7 @@ object MainFrame {
 
     private fun handleNextMove(move: Move) {
         val nextMoves = gameManager.next(move)
-        val newLogMessages = gameState.takeFromLog()
+        val newLogMessages = game.takeFromLog()
         for (newLogMessage in newLogMessages) {
             logListModel.addElement(newLogMessage)
         }
