@@ -5,6 +5,7 @@ import inego.evo.game.MoveSelection
 import inego.evo.game.Player
 import inego.evo.game.moves.GameStartMove
 import inego.evo.game.moves.Move
+import kotlin.system.measureTimeMillis
 
 
 class GameManager(val game: Game) {
@@ -47,22 +48,29 @@ fun main(args: Array<String>) {
     var p1Wins = 0
     var ties = 0
 
-    repeat(10000) {
-        val game = Game.new(2, false)
+    val elapsed = measureTimeMillis {
+        for (i in 0..100000) {
 
-        var nextMove: Move = GameStartMove
+            if (i % 10000 == 0) {
+                println(i)
+            }
 
-        do {
-            val moveSelection = game.next(nextMove) ?: break
-            nextMove = moveSelection.moves.randomElement
-        } while (true)
+            val game = Game.new(2, false)
 
-        val winner = game.winner
-        when (winner) {
-            game.players[0] -> p1Wins++
-            null -> ties++
+            var nextMove: Move = GameStartMove
+
+            do {
+                val moveSelection = game.next(nextMove) ?: break
+                nextMove = moveSelection.moves.randomElement
+            } while (true)
+
+            val winner = game.winner
+            when (winner) {
+                game.players[0] -> p1Wins++
+                null -> ties++
+            }
         }
     }
-
-    print("Wins: $p1Wins, ties: $ties")
+    println("Elapsed time: $elapsed ms")
+    println("Wins: $p1Wins, ties: $ties")
 }
