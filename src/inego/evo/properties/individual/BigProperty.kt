@@ -5,6 +5,8 @@ import inego.evo.properties.IndividualProperty
 import inego.evo.properties.StatModifier
 
 object BigProperty : IndividualProperty("Big"), StatModifier {
+    override val enumValue: IndividualPropertyEnum
+        get() = IndividualPropertyEnum.BIG
 
     override fun mayBeAttackedBy(victim: Animal, attacker: Animal): Boolean {
         if (!attacker.has(BigProperty)) {

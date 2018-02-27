@@ -6,6 +6,7 @@ import inego.evo.game.Game
 import inego.evo.game.moves.DevelopmentAddIndividualProperty
 import inego.evo.game.moves.DevelopmentAddPairedProperty
 import inego.evo.game.moves.DevelopmentMove
+import inego.evo.properties.individual.IndividualPropertyEnum
 import inego.evo.properties.paired.PairedPropertySide
 
 sealed class AnimalProperty<P : AnimalProperty<P, T>, T : PropertyTarget<T, P>>(val name: String) {
@@ -25,10 +26,12 @@ sealed class AnimalProperty<P : AnimalProperty<P, T>, T : PropertyTarget<T, P>>(
 
 abstract class IndividualProperty(name: String) : AnimalProperty<IndividualProperty, SingleTarget>(name) {
 
+    abstract val enumValue: IndividualPropertyEnum
+
     protected open fun mayAttachTo(animal: Animal) = !animal.has(this)
 
     override fun getTargets(game: Game): List<SingleTarget> =
-            game.currentPlayer.animals.filter { mayAttachTo(it) }.map { SingleTarget(it) }
+        game.currentPlayer.animals.filter { mayAttachTo(it) }.map { SingleTarget(it) }
 
     override fun applyTo(target: SingleTarget, game: Game) {
         target.animal.addProperty(this)

@@ -8,6 +8,9 @@ import inego.evo.game.moves.Move
 import inego.evo.properties.IndividualProperty
 
 object ScavengerProperty : IndividualProperty("Scavenger") {
+    override val enumValue: IndividualPropertyEnum
+        get() = IndividualPropertyEnum.SCAVENGER
+
     override fun mayAttachTo(animal: Animal): Boolean {
         return super.mayAttachTo(animal) && !animal.has(CarnivorousProperty)
     }

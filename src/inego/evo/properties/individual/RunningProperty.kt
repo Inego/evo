@@ -6,6 +6,9 @@ import inego.evo.properties.DefenseAction
 import inego.evo.properties.IndividualProperty
 
 object RunningProperty : IndividualProperty("Running"), DefenseAction {
+    override val enumValue: IndividualPropertyEnum
+        get() = IndividualPropertyEnum.RUNNING
+
     override fun gatherDefenseMoves(defender: Animal, attacker: Animal, game: Game): List<DefenseMove> =
             if (defender.usedRunningAway) emptyList() else listOf(RunawayAttempt(defender, attacker))
 }

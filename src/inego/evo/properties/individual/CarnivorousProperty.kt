@@ -11,6 +11,8 @@ import inego.evo.properties.IndividualProperty
 import java.util.*
 
 object CarnivorousProperty : IndividualProperty("Carnivorous"), FeedingAction {
+    override val enumValue: IndividualPropertyEnum
+        get() = IndividualPropertyEnum.CARNIVOROUS
 
     override fun gatherFeedingMoves(animal: Animal, game: Game): List<FeedingMove>
     {

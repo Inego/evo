@@ -4,6 +4,8 @@ import inego.evo.game.Animal
 import inego.evo.properties.IndividualProperty
 
 object SwimmingProperty : IndividualProperty("Swimming") {
+    override val enumValue: IndividualPropertyEnum
+        get() = IndividualPropertyEnum.SWIMMING
 
     override fun mayAttack(victim: Animal): Boolean {
         if (!victim.has(SwimmingProperty)) {

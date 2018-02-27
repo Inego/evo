@@ -23,10 +23,10 @@ class Player(val name: String) {
     val cardsToHandOut
         inline get() = if (hand.isEmpty() and animals.isEmpty()) 6 else animals.size + 1
 
-    var discardSize = 0
+    private var discardSize = 0
 
     private val score
-        get() = animals.sumBy { 2 + it.individualProperties.sumBy { it.score } + it.fatCapacity } +
+        get() = animals.sumBy { 2 + it.individualProperties.sumBy { it.individualProperty.score } + it.fatCapacity } +
                 connections.size
 
     val result
@@ -85,7 +85,6 @@ class Player(val name: String) {
     }
 }
 
-
-class PlayerResult(val player: Player, val score: Int, val discard: Int): Comparable<PlayerResult> {
+class PlayerResult(val player: Player, private val score: Int, private val discard: Int): Comparable<PlayerResult> {
     override fun compareTo(other: PlayerResult) = compareValuesBy(this, other, { it.score }, { it.discard })
 }

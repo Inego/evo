@@ -7,6 +7,8 @@ import inego.evo.properties.SingleTarget
 import inego.evo.properties.StatModifier
 
 object ParasiteProperty : IndividualProperty("Parasite"), StatModifier {
+    override val enumValue: IndividualPropertyEnum
+        get() = IndividualPropertyEnum.PARASITE
 
     override fun getTargets(game: Game): List<SingleTarget> {
 

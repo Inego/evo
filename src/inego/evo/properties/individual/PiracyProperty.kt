@@ -10,6 +10,8 @@ import inego.evo.properties.FeedingAction
 import inego.evo.properties.IndividualProperty
 
 object PiracyProperty : IndividualProperty("Piracy"), FeedingAction {
+    override val enumValue: IndividualPropertyEnum
+        get() = IndividualPropertyEnum.PIRACY
 
     override fun gatherFeedingMoves(animal: Animal, game: Game): List<FeedingMove> =
             if (animal.usedPiracy) emptyList()

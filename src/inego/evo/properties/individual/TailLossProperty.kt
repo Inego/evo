@@ -6,6 +6,9 @@ import inego.evo.properties.DefenseAction
 import inego.evo.properties.IndividualProperty
 
 object TailLossProperty : IndividualProperty("Tail Loss"), DefenseAction {
+    override val enumValue: IndividualPropertyEnum
+        get() = IndividualPropertyEnum.TAIL_LOSS
+
     override fun gatherDefenseMoves(defender: Animal, attacker: Animal, game: Game): List<DefenseMove> {
         val result : MutableList<DefenseMove> = mutableListOf()
 
@@ -13,7 +16,7 @@ object TailLossProperty : IndividualProperty("Tail Loss"), DefenseAction {
             result.add(LoseIndividualProperty(defender, attacker, FatTissueProperty))
 
         defender.individualProperties
-                .mapTo(result) { LoseIndividualProperty(defender, attacker, it) }
+                .mapTo(result) { LoseIndividualProperty(defender, attacker, it.individualProperty) }
 
         defender.connections.mapTo(result) { LosePairedProperty(defender, attacker, it) }
 

@@ -204,11 +204,11 @@ class Game private constructor(val numberOfPlayers: Int, val logging: Boolean) {
             moves.add(CreateAnimal(player, card))
             when (card) {
                 is SingleCard -> {
-                    moves += card.property.getDevelopmentMoves(this, card)
+                    card.property.getDevelopmentMoves(this, card).toCollection(moves)
                 }
                 is DoubleCard -> {
-                    moves += card.firstProperty.getDevelopmentMoves(this, card)
-                    moves += card.secondProperty.getDevelopmentMoves(this, card)
+                    card.firstProperty.getDevelopmentMoves(this, card).toCollection(moves)
+                    card.secondProperty.getDevelopmentMoves(this, card).toCollection(moves)
                 }
             }
         }
@@ -412,8 +412,8 @@ class Game private constructor(val numberOfPlayers: Int, val logging: Boolean) {
     fun canAttack(attacker: Animal, victim: Animal): Boolean {
 
         return victim != attacker
-                && attacker.individualProperties.all { it.mayAttack(victim) }
-                && victim.individualProperties.all { it.mayBeAttackedBy(victim, attacker) }
+                && attacker.individualProperties.all { it.individualProperty.mayAttack(victim) }
+                && victim.individualProperties.all { it.individualProperty.mayBeAttackedBy(victim, attacker) }
                 && victim.connections.all { it.sideProperty.mayBeAttackedBy(attacker, it.other) }
     }
 

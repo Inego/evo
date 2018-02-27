@@ -6,16 +6,18 @@ import inego.evo.game.moves.FeedingMove
 import inego.evo.game.moves.GetRedTokenMove
 import inego.evo.properties.*
 import inego.evo.properties.individual.FatTissueProperty
+import inego.evo.properties.individual.IndividualPropertyEnum
 import inego.evo.properties.paired.asymmetric.SymbiosisGuest
 import inego.evo.properties.paired.symmetric.CommunicationProperty
 import inego.evo.properties.paired.symmetric.CooperationProperty
+import java.util.*
 import kotlin.math.min
 
 class Animal(val owner: Player) {
     inline val propertyCount
         get() = individualProperties.size + connections.size + if (fatCapacity > 0) 1 else 0
 
-    val individualProperties: MutableList<IndividualProperty> = mutableListOf()
+    val individualProperties: EnumSet<IndividualPropertyEnum> = EnumSet.noneOf(IndividualPropertyEnum::class.java)
 
     val connections: MutableList<ConnectionMembership> = mutableListOf()
 
@@ -47,12 +49,12 @@ class Animal(val owner: Player) {
             return !connections.any { it.sideProperty == SymbiosisGuest && !it.other.isFed }
         }
 
-    fun has(individualProperty: IndividualProperty) = individualProperties.contains(individualProperty)
+    fun has(individualProperty: IndividualProperty) = individualProperties.contains(individualProperty.enumValue)
 
     fun addProperty(individualProperty: IndividualProperty) {
         // Thread-unsafe, but any game state is supposed to be modified from a single thread
         if (individualProperty != FatTissueProperty)
-            individualProperties.add(individualProperty)
+            individualProperties.add(individualProperty.enumValue)
 
         if (individualProperty is StatModifier) {
             individualProperty.onAttach(this)
@@ -61,7 +63,7 @@ class Animal(val owner: Player) {
 
     fun removeProperty(individualProperty: IndividualProperty) {
         if (individualProperty != FatTissueProperty) {
-            individualProperties.remove(individualProperty)
+            individualProperties.remove(individualProperty.enumValue)
         }
 
         if (individualProperty is StatModifier) {
@@ -99,6 +101,7 @@ class Animal(val owner: Player) {
         }
 
         individualProperties
+                .map { it.individualProperty }
                 .filterIsInstance<FeedingAction>()
                 .flatMapTo(result) { it.gatherFeedingMoves(this, game) }
 
@@ -106,6 +109,7 @@ class Animal(val owner: Player) {
     }
 
     fun gatherDefenseMoves(attacker: Animal, game: Game): List<DefenseMove> = individualProperties
+            .map { it.individualProperty }
             .filterIsInstance<DefenseAction>()
             .flatMap { it.gatherDefenseMoves(this, attacker, game) }
 

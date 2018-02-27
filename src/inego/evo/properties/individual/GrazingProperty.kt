@@ -6,7 +6,10 @@ import inego.evo.game.Player
 import inego.evo.game.moves.Move
 import inego.evo.properties.IndividualProperty
 
-object GrazingProperty : IndividualProperty("Grazing")
+object GrazingProperty : IndividualProperty("Grazing") {
+    override val enumValue: IndividualPropertyEnum
+        get() = IndividualPropertyEnum.GRAZING
+}
 
 
 class GrazeFood(private val player: Player, private val foodToGraze: Int) : Move() {

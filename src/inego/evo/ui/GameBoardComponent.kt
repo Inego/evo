@@ -168,6 +168,6 @@ fun Animal.drawableProperties() = buildSequence {
     if (fatCapacity > 0) {
         yield(FatTissueDrawableProperty(fatCapacity))
     }
-    yieldAll(individualProperties.map { IndividualDrawableProperty(it) })
+    yieldAll(individualProperties.map { IndividualDrawableProperty(it.individualProperty) })
     yieldAll(connections.map { ConnectionMembershipDrawableProperty(it) })
 }

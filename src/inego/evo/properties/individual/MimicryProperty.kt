@@ -8,6 +8,9 @@ import inego.evo.properties.DefenseAction
 import inego.evo.game.moves.DefenseMove
 
 object MimicryProperty : IndividualProperty("Mimicry"), DefenseAction {
+    override val enumValue: IndividualPropertyEnum
+        get() = IndividualPropertyEnum.MIMICRY
+
     override fun gatherDefenseMoves(defender: Animal, attacker: Animal, game: Game): List<DefenseMove> =
             if (defender.usedMimicry) emptyList()
             else defender.owner.animals

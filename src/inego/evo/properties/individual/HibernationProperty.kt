@@ -10,6 +10,9 @@ import inego.evo.properties.FeedingAction
 import inego.evo.properties.IndividualProperty
 
 object HibernationProperty : IndividualProperty("Hibernation"), FeedingAction {
+    override val enumValue: IndividualPropertyEnum
+        get() = IndividualPropertyEnum.HIBERNATION
+
     override fun gatherFeedingMoves(animal: Animal, game: Game): List<FeedingMove> {
         if (!(animal.hibernatedLastTurn || game.isLastTurn)) {
             return listOf(HibernationMove(animal))
