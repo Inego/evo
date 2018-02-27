@@ -21,4 +21,7 @@ object BigProperty : IndividualProperty("Big"), StatModifier {
     override fun onDetach(animal: Animal) {
         animal.foodRequirement--
     }
+
+    override val score: Int
+        get() = 2
 }

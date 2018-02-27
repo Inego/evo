@@ -455,9 +455,9 @@ class Game private constructor(val numberOfPlayers: Int, val logging: Boolean) {
 
         val DEFAULT_PLAYER_NAMES = listOf("A", "B", "C", "D", "E")
 
-        fun new(numberOfPlayers: Int): Game {
+        fun new(numberOfPlayers: Int, logging: Boolean): Game {
 
-            return Game(numberOfPlayers, true).apply {
+            return Game(numberOfPlayers, logging).apply {
                 addCards(
                         CamouflageCard,
                         BurrowingCard,
@@ -487,6 +487,18 @@ class Game private constructor(val numberOfPlayers: Int, val logging: Boolean) {
 
     val isLastTurn: Boolean
         get() = deck.isEmpty()
+
+    val winner: Player?
+        get() {
+            if (phase != GamePhase.END)
+                throw IllegalStateException()
+
+            val sorted = players.map { it.result }.sortedDescending()
+            val winner = sorted[0]
+            val runnerUp = sorted[1]
+
+            return if (winner > runnerUp) winner.player else null
+        }
 }
 
 enum class GamePhase {

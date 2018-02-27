@@ -1,6 +1,7 @@
 package inego.evo.test.properties
 
 import inego.evo.game.Game
+import inego.evo.game.Player
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import inego.evo.properties.paired.asymmetric.SymbiosisProperty
@@ -9,13 +10,16 @@ import org.junit.jupiter.api.Assertions.assertEquals
 
 internal class PairedPropertyTest {
 
-    private val game = Game.new(1)
+    private val game = Game.new(1, false)
 
     private val p = game.players[0]
 
     @BeforeEach
     fun setup() {
-        p.clearAnimals()
+        p.apply {
+            animals.clear()
+            connections.clear()
+        }
     }
 
     @Test

@@ -25,4 +25,7 @@ object ParasiteProperty : IndividualProperty("Parasite"), StatModifier {
     override fun onDetach(animal: Animal) {
         animal.foodRequirement -= 2
     }
+
+    override val score: Int
+        get() = 3
 }

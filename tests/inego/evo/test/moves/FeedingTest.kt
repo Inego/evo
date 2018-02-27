@@ -18,7 +18,7 @@ class FeedingTest {
     @Test
     fun passingOutOfFeeding() {
 
-        val game = Game.new(2)
+        val game = Game.new(2, false)
         game.phase = GamePhase.FEEDING
 
         // P1 has two fed carnivorous animals with unfilled fat capacity.

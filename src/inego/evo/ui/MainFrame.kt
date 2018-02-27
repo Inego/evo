@@ -22,7 +22,7 @@ object MainFrame {
 
     }
 
-    private val game = Game.new(2)
+    private val game = Game.new(2, true)
 
     private val gameManager = GameManager(game).apply {
         setEngine(0, RandomEngine)

@@ -23,6 +23,15 @@ class Player(val name: String) {
     val cardsToHandOut
         inline get() = if (hand.isEmpty() and animals.isEmpty()) 6 else animals.size + 1
 
+    var discardSize = 0
+
+    private val score
+        get() = animals.sumBy { 2 + it.individualProperties.sumBy { it.score } + it.fatCapacity } +
+                connections.size
+
+    val result
+        get() = PlayerResult(this, score, discardSize)
+
     fun addConnection(pairedProperty: PairedProperty, firstAnimal: Animal, secondAnimal: Animal) {
         val connection = Connection(pairedProperty, firstAnimal, secondAnimal)
         connections.add(connection)
@@ -34,11 +43,7 @@ class Player(val name: String) {
         connection.animal1.connections.removeIf { it.connection == connection }
         connection.animal2.connections.removeIf { it.connection == connection }
         connections.remove(connection)
-    }
-
-    fun clearAnimals() {
-        animals.clear()
-        connections.clear()
+        discardSize++
     }
 
     fun newAnimal() = Animal(this).also { animals.add(it) }
@@ -49,6 +54,8 @@ class Player(val name: String) {
             if (targetAnimal.owner == this) targetAnimal.toString() else targetAnimal.fullName
 
     fun removeAnimal(animal: Animal) {
+        discardSize += 1 + animal.individualProperties.size + animal.fatCapacity
+
         animal.connections.map { it.connection }.forEach { removeConnection(it) }
         animals.remove(animal)
     }
@@ -76,4 +83,9 @@ class Player(val name: String) {
 
         return result
     }
+}
+
+
+class PlayerResult(val player: Player, val score: Int, val discard: Int): Comparable<PlayerResult> {
+    override fun compareTo(other: PlayerResult) = compareValuesBy(this, other, { it.score }, { it.discard })
 }

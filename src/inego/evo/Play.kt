@@ -43,12 +43,26 @@ object RandomEngine : Engine {
 
 
 fun main(args: Array<String>) {
-    val game = Game.new(2)
 
-    var nextMove: Move = GameStartMove
+    var p1Wins = 0
+    var ties = 0
 
-    do {
-        val moveSelection = game.next(nextMove) ?: break
-        nextMove = moveSelection.moves.randomElement
-    } while (true)
+    repeat(10000) {
+        val game = Game.new(2, false)
+
+        var nextMove: Move = GameStartMove
+
+        do {
+            val moveSelection = game.next(nextMove) ?: break
+            nextMove = moveSelection.moves.randomElement
+        } while (true)
+
+        val winner = game.winner
+        when (winner) {
+            game.players[0] -> p1Wins++
+            null -> ties++
+        }
+    }
+
+    print("Wins: $p1Wins, ties: $ties")
 }

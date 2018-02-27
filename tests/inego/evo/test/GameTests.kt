@@ -8,13 +8,13 @@ class GameTests {
 
     @Test
     fun `New game deck size`() {
-        val g = Game.new(0)
+        val g = Game.new(0, false)
         Assertions.assertEquals(84, g.deck.size)
     }
 
     @Test
     fun fromFirstPlayerSequence() {
-        val g = Game.new(2)
+        val g = Game.new(2, false)
         val iterator = g.fromFirstPlayer()
 
         iterator.assertNext(g.players[0])
@@ -24,7 +24,7 @@ class GameTests {
 
     @Test
     fun fromFirstPlayerSequence2() {
-        val g = Game.new(2)
+        val g = Game.new(2, false)
         g.firstPlayerIdx = 1
         val iterator = g.fromFirstPlayer()
 
