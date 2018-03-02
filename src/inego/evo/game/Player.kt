@@ -1,6 +1,7 @@
 package inego.evo.game
 
-import inego.evo.cards.Card
+import inego.evo.cards.CardQuantities
+import inego.evo.cards.ECard
 import inego.evo.game.moves.FoodPropagationMove
 import inego.evo.properties.PairedProperty
 import inego.evo.properties.paired.FoodPropagator
@@ -12,7 +13,7 @@ class Player(val name: String) {
     val eligibleForDevelopment
         get() = !passed && hand.isNotEmpty()
 
-    val hand: MutableList<Card> = mutableListOf()
+    val hand: MutableList<ECard> = mutableListOf()
 
     val animals: MutableList<Animal> = mutableListOf()
 
@@ -24,6 +25,8 @@ class Player(val name: String) {
         inline get() = if (hand.isEmpty() and animals.isEmpty()) 6 else animals.size + 1
 
     private var discardSize = 0
+
+    val cardsPlayedAsAnimals = CardQuantities { 0 }
 
     private val score
         get() = animals.sumBy { 2 + it.individualProperties.sumBy { it.individualProperty.score } + it.fatCapacity } +

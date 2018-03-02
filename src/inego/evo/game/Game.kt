@@ -15,7 +15,7 @@ class Game private constructor(val numberOfPlayers: Int, val logging: Boolean) {
 
     val logMessages: MutableList<String> = mutableListOf()
 
-    var deck: MutableList<Card> = mutableListOf()
+    var deck: MutableList<ECard> = mutableListOf()
 
     val players: List<Player> = List(numberOfPlayers) { index -> Player(DEFAULT_PLAYER_NAMES[index]) }
 
@@ -43,6 +43,8 @@ class Game private constructor(val numberOfPlayers: Int, val logging: Boolean) {
     lateinit var defendingAnimal: Animal
 
     var foodBase = 0
+
+    val seenCards = CardQuantities { 0 }
 
 
     constructor(src: Game) : this(src.numberOfPlayers, false) {
@@ -202,15 +204,9 @@ class Game private constructor(val numberOfPlayers: Int, val logging: Boolean) {
 
         for (card in player.hand.toSet()) {
             moves.add(CreateAnimal(player, card))
-            when (card) {
-                is SingleCard -> {
-                    card.property.getDevelopmentMoves(this, card).toCollection(moves)
-                }
-                is DoubleCard -> {
-                    card.firstProperty.getDevelopmentMoves(this, card).toCollection(moves)
-                    card.secondProperty.getDevelopmentMoves(this, card).toCollection(moves)
-                }
-            }
+            card.firstProperty.getDevelopmentMoves(this, card).toCollection(moves)
+            if (card.secondProperty != null)
+                card.secondProperty.getDevelopmentMoves(this, card).toCollection(moves)
         }
 
         moveSelections.add(DevelopmentMoveSelection(player, moves))
@@ -380,17 +376,6 @@ class Game private constructor(val numberOfPlayers: Int, val logging: Boolean) {
         log { "===== TURN $turnNumber =====   First player: $currentPlayer" }
     }
 
-
-    fun addCard(card: Card, number: Int = 4) {
-        repeat(number) {
-            this.deck.add(card)
-        }
-    }
-
-    fun addCards(vararg cards: Card) {
-        cards.forEach { addCard(it) }
-    }
-
     private fun fromPlayer(playerIdx: Int) = object : Iterator<Player> {
         var idx = 0
 
@@ -458,28 +443,11 @@ class Game private constructor(val numberOfPlayers: Int, val logging: Boolean) {
         fun new(numberOfPlayers: Int, logging: Boolean): Game {
 
             return Game(numberOfPlayers, logging).apply {
-                addCards(
-                        CamouflageCard,
-                        BurrowingCard,
-                        SharpVisionCard,
-                        SymbiosisCard,
-                        PiracyCard,
-                        GrazingCard,
-                        TailLossCard,
-                        HibernationCard,
-                        PoisonousCard,
-                        CommunicationCard,
-                        ScavengerCard,
-                        RunningCard,
-                        MimicryCard,
-                        ParasiteCarnivorousCard,
-                        ParasiteFatTissueCard,
-                        CooperationCarnivorousCard,
-                        CooperationFatTissueCard,
-                        BigCarnivorousCard,
-                        BigFatTissueCard
-                )
-                addCard(SwimmingCard, 8)
+                for (eCard in ECard.values()) {
+                    repeat(eCard.startingQuantity) {
+                        deck.add(eCard)
+                    }
+                }
                 deck.shuffle()
             }
         }

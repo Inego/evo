@@ -1,24 +1,27 @@
 package inego.evo.game.moves
 
-import inego.evo.cards.Card
+import inego.evo.cards.ECard
 import inego.evo.game.Game
 import inego.evo.game.MoveSelection
 import inego.evo.game.Player
 import inego.evo.properties.*
 
-class CreateAnimal(private  val player: Player, private val card: Card) : DevelopmentMove() {
+
+abstract class DevelopmentMove : Move()
+
+
+class CreateAnimal(private  val player: Player, private val card: ECard) : DevelopmentMove() {
     override val logMessage: String
         get() = "$player creates an animal."
 
     override fun Game.applyMove() {
         currentPlayer.hand.remove(card)
+        currentPlayer.cardsPlayedAsAnimals += card
         currentPlayer.newAnimal()
     }
 
     override fun toString(player: Player) = "$card ⇨ Animal"
 }
-
-abstract class DevelopmentMove : Move()
 
 
 class DevelopmentPass(private val player: Player) : DevelopmentMove() {
@@ -33,17 +36,18 @@ class DevelopmentPass(private val player: Player) : DevelopmentMove() {
 }
 
 abstract class DevelopmentAddProperty<P : AnimalProperty<P, T>, T : PropertyTarget<T, P>>(
-        private val card: Card,
+        private val card: ECard,
         val property: P,
         val target: T
 ) : DevelopmentMove() {
     override fun Game.applyMove() {
         currentPlayer.hand.remove(card)
+        seenCards += card
         property.applyTo(target, this)
     }
 }
 
-class DevelopmentAddIndividualProperty(card: Card, property: IndividualProperty, target: SingleTarget)
+class DevelopmentAddIndividualProperty(card: ECard, property: IndividualProperty, target: SingleTarget)
     : DevelopmentAddProperty<IndividualProperty, SingleTarget>(card, property, target) {
     override val logMessage: String
         get() = "${target.animal.owner} adds $property to ${target.animal}."
@@ -53,7 +57,7 @@ class DevelopmentAddIndividualProperty(card: Card, property: IndividualProperty,
 
 }
 
-class DevelopmentAddPairedProperty(card: Card, property: PairedProperty, target: PairedTarget)
+class DevelopmentAddPairedProperty(card: ECard, property: PairedProperty, target: PairedTarget)
     : DevelopmentAddProperty<PairedProperty, PairedTarget>(card, property, target) {
     override val logMessage: String
         get() = "${target.firstAnimal.owner} adds $property from ${target.firstAnimal} to ${target.secondAnimal}."

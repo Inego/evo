@@ -6,44 +6,33 @@ import inego.evo.properties.paired.asymmetric.SymbiosisProperty
 import inego.evo.properties.paired.symmetric.CommunicationProperty
 import inego.evo.properties.paired.symmetric.CooperationProperty
 
-sealed class Card {
-    abstract val name: String
-    override fun toString() = name
-}
-
-abstract class SingleCard(val property: AnimalProperty<*, *>) : Card() {
-
-    override val name: String
-        get() = property.name
-}
-
-abstract class DoubleCard(
+enum class ECard(
         val firstProperty: AnimalProperty<*, *>,
-        val secondProperty: AnimalProperty<*, *>
-) : Card() {
+        val secondProperty: AnimalProperty<*, *>? = null,
+        val startingQuantity: Int = 4
+) {
+    CAMOUFLAGE(CamouflageProperty),
+    BURROWING(BurrowingProperty),
+    SHARP_VISION(SharpVisionProperty),
+    SYMBIOSIS(SymbiosisProperty),
+    PIRACY(PiracyProperty),
+    GRAZING(GrazingProperty),
+    TAIL_LOSS(TailLossProperty),
+    HIBERNATION(HibernationProperty),
+    POISONOUS(PoisonousProperty),
+    COMMUNICATION(CommunicationProperty),
+    SCAVENGER(ScavengerProperty),
+    RUNNING(RunningProperty),
+    MIMICRY(MimicryProperty),
+    SWIMMING(SwimmingProperty, startingQuantity = 8),
+    PARASITE__CARNIVOROUS(ParasiteProperty, CarnivorousProperty),
+    PARASITE__FAT_TISSUE(ParasiteProperty, FatTissueProperty),
+    COOPERATION__CARNIVOROUS(CooperationProperty, CarnivorousProperty),
+    COOPERATION__FAT_TISSUE(CooperationProperty, FatTissueProperty),
+    BIG__CARNIVOROUS(BigProperty, CarnivorousProperty),
+    BIG__FAT_TISSUE(BigProperty, FatTissueProperty);
 
-    override val name: String
-        get() = "${firstProperty.name} / ${secondProperty.name}"
-
+    override fun toString(): String {
+        return if (secondProperty == null) firstProperty.name else "${firstProperty.name} / ${secondProperty.name}"
+    }
 }
-
-object CamouflageCard : SingleCard(CamouflageProperty)
-object BurrowingCard : SingleCard(BurrowingProperty)
-object SharpVisionCard : SingleCard(SharpVisionProperty)
-object SymbiosisCard : SingleCard(SymbiosisProperty)
-object PiracyCard : SingleCard(PiracyProperty)
-object GrazingCard : SingleCard(GrazingProperty)
-object TailLossCard : SingleCard(TailLossProperty)
-object HibernationCard : SingleCard(HibernationProperty)
-object PoisonousCard : SingleCard(PoisonousProperty)
-object CommunicationCard : SingleCard(CommunicationProperty)
-object ScavengerCard : SingleCard(ScavengerProperty)
-object RunningCard : SingleCard(RunningProperty)
-object MimicryCard : SingleCard(MimicryProperty)
-object SwimmingCard : SingleCard(SwimmingProperty)
-object ParasiteCarnivorousCard : DoubleCard(ParasiteProperty, CarnivorousProperty)
-object ParasiteFatTissueCard : DoubleCard(ParasiteProperty, FatTissueProperty)
-object CooperationCarnivorousCard : DoubleCard(CooperationProperty, CarnivorousProperty)
-object CooperationFatTissueCard : DoubleCard(CooperationProperty, FatTissueProperty)
-object BigCarnivorousCard : DoubleCard(BigProperty, CarnivorousProperty)
-object BigFatTissueCard : DoubleCard(BigProperty, FatTissueProperty)

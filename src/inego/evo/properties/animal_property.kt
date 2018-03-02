@@ -1,6 +1,6 @@
 package inego.evo.properties
 
-import inego.evo.cards.Card
+import inego.evo.cards.ECard
 import inego.evo.game.Animal
 import inego.evo.game.Game
 import inego.evo.game.moves.DevelopmentAddIndividualProperty
@@ -11,13 +11,13 @@ import inego.evo.properties.paired.PairedPropertySide
 
 sealed class AnimalProperty<P : AnimalProperty<P, T>, T : PropertyTarget<T, P>>(val name: String) {
 
-    fun getDevelopmentMoves(game: Game, card: Card): List<DevelopmentMove> {
+    fun getDevelopmentMoves(game: Game, card: ECard): List<DevelopmentMove> {
         return getTargets(game).map { createDevelopmentMove(card, it) }
     }
 
     abstract fun getTargets(game: Game): List<T>
 
-    protected abstract fun createDevelopmentMove(card: Card, target: T): DevelopmentMove
+    protected abstract fun createDevelopmentMove(card: ECard, target: T): DevelopmentMove
 
     abstract fun applyTo(target: T, game: Game)
 
@@ -37,7 +37,7 @@ abstract class IndividualProperty(name: String) : AnimalProperty<IndividualPrope
         target.animal.addProperty(this)
     }
 
-    override fun createDevelopmentMove(card: Card, target: SingleTarget): DevelopmentMove {
+    override fun createDevelopmentMove(card: ECard, target: SingleTarget): DevelopmentMove {
         return DevelopmentAddIndividualProperty(card, this, target)
     }
 
@@ -86,7 +86,7 @@ sealed class PairedProperty(name: String) : AnimalProperty<PairedProperty, Paire
         player.addConnection(this, target.firstAnimal, target.secondAnimal)
     }
 
-    override fun createDevelopmentMove(card: Card, target: PairedTarget): DevelopmentMove {
+    override fun createDevelopmentMove(card: ECard, target: PairedTarget): DevelopmentMove {
         return DevelopmentAddPairedProperty(card, this, target)
     }
 }

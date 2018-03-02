@@ -1,8 +1,6 @@
 package inego.evo.ui
 
 import inego.evo.GameManager
-import inego.evo.cards.DoubleCard
-import inego.evo.cards.SingleCard
 import inego.evo.game.Animal
 import inego.evo.properties.AsymmetricProperty
 import inego.evo.properties.SymmetricProperty
@@ -107,14 +105,12 @@ class GameBoardComponent(private val gameManager: GameManager) : JPanel() {
 
                 drawCard(handRow, index) {
                     if (!isAI) {
-                        when (card) {
-                            is SingleCard ->
-                                g2.drawString(card.name, textStartX, textStartY)
-                            is DoubleCard -> {
-                                val middleBase = yStart + rowHeight / 2
-                                g2.drawString(card.firstProperty.name, textStartX, (middleBase - metrics.descent).toInt())
-                                g2.drawString(card.secondProperty.name, textStartX, (middleBase + metrics.ascent).toInt())
-                            }
+                        if (card.secondProperty == null) {
+                            g2.drawString(card.name, textStartX, textStartY)
+                        } else {
+                            val middleBase = yStart + rowHeight / 2
+                            g2.drawString(card.firstProperty.name, textStartX, (middleBase - metrics.descent).toInt())
+                            g2.drawString(card.secondProperty.name, textStartX, (middleBase + metrics.ascent).toInt())
                         }
                     }
                 }

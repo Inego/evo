@@ -55,7 +55,7 @@ fun main(args: Array<String>) {
                 println(i)
             }
 
-            val game = Game.new(2, false)
+            val game = Game.new(3, false)
 
             var nextMove: Move = GameStartMove
 

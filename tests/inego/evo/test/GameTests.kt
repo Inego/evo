@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 class GameTests {
 
     @Test
-    fun `New game deck size`() {
+    fun newGameDeckSize() {
         val g = Game.new(0, false)
         Assertions.assertEquals(84, g.deck.size)
     }
