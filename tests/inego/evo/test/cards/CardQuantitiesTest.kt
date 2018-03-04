@@ -9,7 +9,7 @@ class CardQuantitiesTest {
 
     @Test
     fun test() {
-        val quantities = CardQuantities { 0 }
+        val quantities = CardQuantities.new()
         assertEquals(0, quantities[ECard.BURROWING])
         quantities += ECard.BURROWING
         assertEquals(1, quantities[ECard.BURROWING])

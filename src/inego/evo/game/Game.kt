@@ -1,23 +1,29 @@
 package inego.evo.game
 
-import inego.evo.cards.*
+import inego.evo.cards.CardQuantities
+import inego.evo.cards.ECard
 import inego.evo.each
 import inego.evo.game.moves.*
 import inego.evo.properties.individual.*
 import inego.evo.removeLast
 import java.util.*
+import java.util.Collections.shuffle
 import java.util.concurrent.ThreadLocalRandom
 import kotlin.math.min
 
-class Game private constructor(val numberOfPlayers: Int, val logging: Boolean) {
+class Game private constructor(
+        val numberOfPlayers: Int,
+        val logging: Boolean,
+        val seenCards: CardQuantities,
+        val players: List<Player>,
+        val random: Random = ThreadLocalRandom.current()
+) {
 
     var turnNumber = 1
 
     val logMessages: MutableList<String> = mutableListOf()
 
     var deck: MutableList<ECard> = mutableListOf()
-
-    val players: List<Player> = List(numberOfPlayers) { index -> Player(DEFAULT_PLAYER_NAMES[index]) }
 
     private val moveSelections: Deque<MoveSelection<*>> = LinkedList()
 
@@ -44,12 +50,31 @@ class Game private constructor(val numberOfPlayers: Int, val logging: Boolean) {
 
     var foodBase = 0
 
-    val seenCards = CardQuantities { 0 }
 
+    constructor(c: GameCopier) : this(
+            c.src.numberOfPlayers,
+            false,
+            c.src.seenCards.clone(),
+            c.copiedPlayers,
+            c.src.random
+    ) {
 
-    constructor(src: Game) : this(src.numberOfPlayers, false) {
-        // TODO copy constructor
+        c.src.let {
+            turnNumber = it.turnNumber
+            firstPlayerIdx = it.firstPlayerIdx
+            currentPlayerIdx = it.currentPlayerIdx
+            computeNextPlayer = it.computeNextPlayer
+            phase = it.phase
+            foodBase = it.foodBase
+
+            if (it::attackingAnimal.isInitialized) {
+                attackingAnimal = c[it.attackingAnimal]
+                defendingAnimal = c[it.defendingAnimal]
+            }
+        }
+
     }
+
 
     /**
      * Applies the specified move and plays the game either until a non-trivial move selection
@@ -90,6 +115,8 @@ class Game private constructor(val numberOfPlayers: Int, val logging: Boolean) {
 
         return null
     }
+
+    fun dice() = random.nextInt(6) + 1
 
     private fun performGrazing() {
         val player = currentPlayer
@@ -438,17 +465,27 @@ class Game private constructor(val numberOfPlayers: Int, val logging: Boolean) {
 
     companion object {
 
-        val DEFAULT_PLAYER_NAMES = listOf("A", "B", "C", "D", "E")
+        private val DEFAULT_PLAYER_NAMES = listOf("A", "B", "C", "D", "E")
 
-        fun new(numberOfPlayers: Int, logging: Boolean): Game {
+        fun new(
+                numberOfPlayers: Int,
+                logging: Boolean,
+                random: Random = ThreadLocalRandom.current()
+        ): Game {
 
-            return Game(numberOfPlayers, logging).apply {
+            return Game(
+                    numberOfPlayers,
+                    logging,
+                    CardQuantities.new(),
+                    List(numberOfPlayers) { index -> Player.new(DEFAULT_PLAYER_NAMES[index]) },
+                    random
+            ).apply {
                 for (eCard in ECard.values()) {
                     repeat(eCard.startingQuantity) {
                         deck.add(eCard)
                     }
                 }
-                deck.shuffle()
+                shuffle(deck, random)
             }
         }
     }
@@ -479,5 +516,3 @@ enum class GamePhase {
     EXTINCTION,
     END
 }
-
-fun dice() = ThreadLocalRandom.current().nextInt(6) + 1

@@ -27,7 +27,7 @@ internal class PairedPropertyTest {
         val a2 = p.newAnimal()
         val a3 = p.newAnimal()
 
-        p.addConnection(CooperationProperty, a2, a3)
+        p.addConnection(CooperationProperty, a2, a3, false)
 
         val targets = CooperationProperty.getTargets(game).toList()
         assertEquals(2, targets.size)

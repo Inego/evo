@@ -13,31 +13,26 @@ import inego.evo.properties.paired.symmetric.CooperationProperty
 import java.util.*
 import kotlin.math.min
 
-class Animal(val owner: Player) {
+class Animal private constructor(
+        val owner: Player,
+        val individualProperties: EnumSet<IndividualPropertyEnum>,
+        var fatCapacity: Int,
+        var fat: Int,
+        var foodRequirement: Int,
+        var hasFood: Int,
+        var usedPiracy: Boolean,
+        var usedMimicry: Boolean,
+        var usedAttack: Boolean,
+        var usedRunningAway: Boolean,
+        var isHibernating: Boolean,
+        var hibernatedLastTurn: Boolean,
+        var isPoisoned: Boolean
+
+) {
     inline val propertyCount
         get() = individualProperties.size + connections.size + if (fatCapacity > 0) 1 else 0
 
-    val individualProperties: EnumSet<IndividualPropertyEnum> = EnumSet.noneOf(IndividualPropertyEnum::class.java)
-
     val connections: MutableList<ConnectionMembership> = mutableListOf()
-
-    var fatCapacity = 0
-    var fat = 0
-
-    var foodRequirement = 1
-    var hasFood = 0
-
-    // Special property flags
-
-    var usedPiracy = false
-    var usedMimicry = false
-    var usedAttack = false
-    var usedRunningAway = false // To prevent repeated runaway attempts by the same animal
-
-    var isHibernating = false
-    var hibernatedLastTurn = false
-
-    var isPoisoned = false
 
     val isFed: Boolean
         inline get() = isHibernating || foodRequirement <= hasFood
@@ -159,5 +154,39 @@ class Animal(val owner: Player) {
         }
 
         propagateCooperation()
+    }
+
+    fun clone(targetPlayer: Player) = Animal(
+            targetPlayer,
+            individualProperties.clone(),
+            fatCapacity,
+            fat,
+            foodRequirement,
+            hasFood,
+            usedPiracy,
+            usedMimicry,
+            usedAttack,
+            usedRunningAway,
+            isHibernating,
+            hibernatedLastTurn,
+            isPoisoned
+    )
+
+    companion object {
+        fun new(owner: Player): Animal = Animal(
+                owner,
+                EnumSet.noneOf(IndividualPropertyEnum::class.java),
+                0,
+                0,
+                1,
+                0,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false
+        )
     }
 }

@@ -83,7 +83,7 @@ sealed class PairedProperty(name: String) : AnimalProperty<PairedProperty, Paire
 
     override fun applyTo(target: PairedTarget, game: Game) {
         val player = game.currentPlayer
-        player.addConnection(this, target.firstAnimal, target.secondAnimal)
+        player.addConnection(this, target.firstAnimal, target.secondAnimal, false)
     }
 
     override fun createDevelopmentMove(card: ECard, target: PairedTarget): DevelopmentMove {

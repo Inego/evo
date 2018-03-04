@@ -6,40 +6,101 @@ import inego.evo.game.moves.FoodPropagationMove
 import inego.evo.properties.PairedProperty
 import inego.evo.properties.paired.FoodPropagator
 
-class Player(val name: String) {
-
-    var passed = false
+class Player private constructor(
+        val name: String,
+        var passed: Boolean,
+        private var discardSize: Int,
+        val hand: MutableList<ECard>,
+        val cardsPlayedAsAnimals: CardQuantities
+) {
+    val animals: MutableList<Animal> = mutableListOf()
+    val connections: MutableList<Connection> = mutableListOf()
+    var foodPropagationSet: MutableSet<ConnectionMembership> = mutableSetOf()
 
     val eligibleForDevelopment
         get() = !passed && hand.isNotEmpty()
 
-    val hand: MutableList<ECard> = mutableListOf()
-
-    val animals: MutableList<Animal> = mutableListOf()
-
-    val connections: MutableList<Connection> = mutableListOf()
-
-    var foodPropagationSet: MutableSet<ConnectionMembership> = mutableSetOf()
-
     val cardsToHandOut
         inline get() = if (hand.isEmpty() and animals.isEmpty()) 6 else animals.size + 1
 
-    private var discardSize = 0
-
-    val cardsPlayedAsAnimals = CardQuantities { 0 }
-
-    private val score
+    val score
         get() = animals.sumBy { 2 + it.individualProperties.sumBy { it.individualProperty.score } + it.fatCapacity } +
                 connections.size
 
     val result
         get() = PlayerResult(this, score, discardSize)
 
-    fun addConnection(pairedProperty: PairedProperty, firstAnimal: Animal, secondAnimal: Animal) {
-        val connection = Connection(pairedProperty, firstAnimal, secondAnimal)
+    fun clone(gameCopier: GameCopier): Player {
+
+        val copiedPlayer = Player(
+                name,
+                passed,
+                discardSize,
+                hand.toMutableList(),
+                cardsPlayedAsAnimals.clone()
+        )
+
+        for (srcAnimal in animals) {
+            val copiedAnimal = srcAnimal.clone(copiedPlayer)
+            gameCopier[srcAnimal] = copiedAnimal
+        }
+
+        // Second pass: copy connections and memberships
+
+        val copiedConnections: MutableMap<Connection, Connection> = mutableMapOf()
+
+        for (srcAnimal in animals) {
+            for (srcMembership in srcAnimal.connections) {
+                val copiedAnimal = gameCopier[srcAnimal]
+
+                val srcConnection = srcMembership.connection
+
+                var copiedConnection = copiedConnections[srcConnection]
+
+                if (copiedConnection == null) {
+
+                    copiedConnection = if (srcMembership.host) {
+                        Connection(
+                                srcConnection.property,
+                                copiedAnimal,
+                                gameCopier[srcConnection.animal2],
+                                srcConnection.isUsed
+                        )
+                    } else {
+                        Connection(
+                                srcConnection.property,
+                                gameCopier[srcConnection.animal1],
+                                copiedAnimal,
+                                srcConnection.isUsed
+                        )
+                    }
+                    copiedPlayer.connections.add(copiedConnection)
+                    copiedConnections[srcConnection] = copiedConnection
+                }
+
+                val copiedMembership = ConnectionMembership(copiedConnection, srcMembership.host)
+                copiedAnimal.connections.add(copiedMembership)
+                gameCopier[srcMembership] = copiedMembership
+            }
+        }
+
+        foodPropagationSet.mapTo(copiedPlayer.foodPropagationSet) { gameCopier[it] }
+
+        return copiedPlayer
+    }
+
+    fun addConnection(
+            pairedProperty: PairedProperty,
+            firstAnimal: Animal,
+            secondAnimal: Animal,
+            isUsed: Boolean
+    ) {
+        val connection = Connection(pairedProperty, firstAnimal, secondAnimal, isUsed)
         connections.add(connection)
-        firstAnimal.connections.add(ConnectionMembership(connection, true))
-        secondAnimal.connections.add(ConnectionMembership(connection, false))
+        val m1 = ConnectionMembership(connection, true)
+        val m2 = ConnectionMembership(connection, false)
+        firstAnimal.connections.add(m1)
+        secondAnimal.connections.add(m2)
     }
 
     fun removeConnection(connection: Connection) {
@@ -49,7 +110,7 @@ class Player(val name: String) {
         discardSize++
     }
 
-    fun newAnimal() = Animal(this).also { animals.add(it) }
+    fun newAnimal() = Animal.new(this).also { animals.add(it) }
 
     override fun toString() = name
 
@@ -86,8 +147,18 @@ class Player(val name: String) {
 
         return result
     }
+
+    companion object {
+        fun new(name: String): Player = Player(
+                name,
+                false,
+                0,
+                mutableListOf(),
+                CardQuantities.new()
+        )
+    }
 }
 
-class PlayerResult(val player: Player, private val score: Int, private val discard: Int): Comparable<PlayerResult> {
+class PlayerResult(val player: Player, private val score: Int, private val discard: Int) : Comparable<PlayerResult> {
     override fun compareTo(other: PlayerResult) = compareValuesBy(this, other, { it.score }, { it.discard })
 }
