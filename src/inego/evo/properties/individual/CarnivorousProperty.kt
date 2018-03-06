@@ -8,9 +8,10 @@ import inego.evo.game.moves.FeedingAnimalMove
 import inego.evo.game.moves.FeedingMove
 import inego.evo.properties.FeedingAction
 import inego.evo.properties.IndividualProperty
+import inego.evo.properties.StatModifier
 import java.util.*
 
-object CarnivorousProperty : IndividualProperty("Carnivorous"), FeedingAction {
+object CarnivorousProperty : IndividualProperty("Carnivorous"), FeedingAction, StatModifier {
     override val enumValue: IndividualPropertyEnum
         get() = IndividualPropertyEnum.CARNIVOROUS
 
@@ -28,6 +29,14 @@ object CarnivorousProperty : IndividualProperty("Carnivorous"), FeedingAction {
 
     override fun mayAttachTo(animal: Animal): Boolean {
         return super.mayAttachTo(animal) && !animal.has(ScavengerProperty)
+    }
+
+    override fun onAttach(animal: Animal) {
+        animal.foodRequirement += 1
+    }
+
+    override fun onDetach(animal: Animal) {
+        animal.foodRequirement -= 1
     }
 }
 
