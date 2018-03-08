@@ -62,7 +62,7 @@ object MainFrame {
             nextButton.text = "Next"
         }
         else {
-            newMoveSelection.moves.forEach { choicesListModel.addElement(it) }
+            newMoveSelection.forEach { choicesListModel.addElement(it) }
             nextButton.text = "${newMoveSelection.decidingPlayer}: Next"
         }
         moveSelection = newMoveSelection

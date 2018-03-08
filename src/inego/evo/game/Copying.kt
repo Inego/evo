@@ -8,7 +8,7 @@ class GameCopier(val src: Game) {
 
     private val players = src.players.associateBy({ it }) { it.clone(this) }
 
-    val copy = Game(this)
+    val copiedGame = Game(this)
 
     val copiedPlayers: List<Player>
         get() = players.values.toList()

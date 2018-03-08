@@ -35,11 +35,11 @@ class DefenseTest {
         val moveSelection = game.next()!!
 
         assertTrue(moveSelection is FeedingMoveSelection)
-        assertEquals(2, moveSelection.moves.size)
-        assertEquals(moveSelection.moves[0], AttackMove(a1, a2))
-        assertEquals(moveSelection.moves[1], AttackMove(a1, a3))
+        assertEquals(2, moveSelection.size)
+        assertEquals(moveSelection[0], AttackMove(a1, a2))
+        assertEquals(moveSelection[1], AttackMove(a1, a3))
 
-        game.next(moveSelection.moves[0])!!
+        game.next(moveSelection[0])!!
 
         // After a1 attacked a2, there are no feeding moves left, because a1 has already attacked.
         // Game goes to next move.

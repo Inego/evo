@@ -38,9 +38,12 @@ object CarnivorousProperty : IndividualProperty("Carnivorous"), FeedingAction, S
     override fun onDetach(animal: Animal) {
         animal.foodRequirement -= 1
     }
+
+    override val score: Int
+        get() = 2
 }
 
-class AttackMove(animal: Animal, private val victim: Animal) : FeedingAnimalMove(animal) {
+class AttackMove(animal: Animal, val victim: Animal) : FeedingAnimalMove(animal) {
 
     override val logMessage: String
         get() = "${animal.fullName} attacks ${victim.fullName}."

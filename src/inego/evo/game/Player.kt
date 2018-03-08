@@ -9,7 +9,7 @@ import inego.evo.properties.paired.FoodPropagator
 class Player private constructor(
         val name: String,
         var passed: Boolean,
-        private var discardSize: Int,
+        var discardSize: Int,
         val hand: MutableList<ECard>,
         val cardsPlayedAsAnimals: CardQuantities
 ) {
@@ -42,10 +42,11 @@ class Player private constructor(
 
         for (srcAnimal in animals) {
             val copiedAnimal = srcAnimal.clone(copiedPlayer)
+            copiedPlayer.animals.add(copiedAnimal)
             gameCopier[srcAnimal] = copiedAnimal
         }
 
-        // Second pass: copy connections and memberships
+        // Second pass: copiedGame connections and memberships
 
         val copiedConnections: MutableMap<Connection, Connection> = mutableMapOf()
 
@@ -93,7 +94,7 @@ class Player private constructor(
             pairedProperty: PairedProperty,
             firstAnimal: Animal,
             secondAnimal: Animal,
-            isUsed: Boolean
+            isUsed: Boolean = false
     ) {
         val connection = Connection(pairedProperty, firstAnimal, secondAnimal, isUsed)
         connections.add(connection)

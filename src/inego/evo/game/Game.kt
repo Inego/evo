@@ -16,7 +16,7 @@ class Game private constructor(
         val logging: Boolean,
         val seenCards: CardQuantities,
         val players: List<Player>,
-        val random: Random = ThreadLocalRandom.current()
+        private val random: Random = ThreadLocalRandom.current()
 ) {
 
     var turnNumber = 1
@@ -40,13 +40,15 @@ class Game private constructor(
         set(value) {
             if (field == GamePhase.DEFENSE) {
                 // Clear defending animal's runaway flag to be able to escape from the next predator
-                defendingAnimal.usedRunningAway = false
+                defendingAnimal!!.usedRunningAway = false
+                defendingAnimal = null
+                attackingAnimal = null
             }
             field = value
         }
 
-    lateinit var attackingAnimal: Animal
-    lateinit var defendingAnimal: Animal
+    var attackingAnimal: Animal? = null
+    var defendingAnimal: Animal? = null
 
     var foodBase = 0
 
@@ -67,14 +69,15 @@ class Game private constructor(
             phase = it.phase
             foodBase = it.foodBase
 
-            if (it::attackingAnimal.isInitialized) {
-                attackingAnimal = c[it.attackingAnimal]
-                defendingAnimal = c[it.defendingAnimal]
+            val srcAttackingAnimal = it.attackingAnimal
+
+            if (srcAttackingAnimal != null) {
+                attackingAnimal = c[srcAttackingAnimal]
+                defendingAnimal = c[it.defendingAnimal!!]
             }
         }
 
     }
-
 
     /**
      * Applies the specified move and plays the game either until a non-trivial move selection
@@ -160,7 +163,6 @@ class Game private constructor(
         }
 
         // TODO think about optimization since this may be called quite often
-        @Suppress("LoopToCallChain")
         for (player in players) {
             for (connection in player.connections) {
                 connection.isUsed = false
@@ -180,9 +182,12 @@ class Game private constructor(
             if (moveSelection == null) {
                 break
             } else {
-                val moves = moveSelection.moves
-                if (moves.size == 1) {
-                    moves[0].applyTo(this)
+                if (moveSelections.isNotEmpty()) {
+                    throw AssertionError()
+                }
+
+                if (moveSelection.size == 1) {
+                    moveSelection[0].applyTo(this)
                 } else {
                     return moveSelection
                 }
@@ -192,17 +197,18 @@ class Game private constructor(
     }
 
     private fun performDefense() {
-        val defenseMoves = defendingAnimal.gatherDefenseMoves(attackingAnimal, this)
+
+        val defenseMoves = defendingAnimal!!.gatherDefenseMoves(attackingAnimal!!, this)
 
         when {
             defenseMoves.isEmpty() -> {
-                eat(attackingAnimal, defendingAnimal)
+                eat(attackingAnimal!!, defendingAnimal!!)
                 phase = GamePhase.FOOD_PROPAGATION
             }
             defenseMoves.size == 1 -> defenseMoves[0].applyTo(this)
             else -> {
                 // Several moves - let the defending animal's owner select
-                moveSelections.add(DefenseMoveSelection(defendingAnimal.owner, defenseMoves))
+                moveSelections.add(DefenseMoveSelection(defendingAnimal!!.owner, defenseMoves))
             }
         }
     }
@@ -463,13 +469,15 @@ class Game private constructor(
         return result
     }
 
+    operator fun get(playerIdx: Int) = players[playerIdx]
+
     companion object {
 
         private val DEFAULT_PLAYER_NAMES = listOf("A", "B", "C", "D", "E")
 
         fun new(
                 numberOfPlayers: Int,
-                logging: Boolean,
+                logging: Boolean = false,
                 random: Random = ThreadLocalRandom.current()
         ): Game {
 

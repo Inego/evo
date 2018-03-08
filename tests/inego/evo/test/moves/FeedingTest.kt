@@ -27,23 +27,23 @@ class FeedingTest {
         val p1 = game.players[0]
 
         p1.newAnimal(CarnivorousProperty).apply {
-            hasFood = 1
+            hasFood = 2
             fatCapacity = 2
         }
 
         p1.newAnimal(CarnivorousProperty).apply {
-            hasFood = 1
+            hasFood = 2
             fatCapacity = 2
         }
 
         var next = game.next()!!
 
         assertTrue(next is FeedingMoveSelection)
-        assertEquals(3, next.moves.size)
+        assertEquals(3, next.size)
 
         val pass = FeedingPassMove(p1)
 
-        assertTrue(next.moves.contains(pass))
+        assertTrue(next.contains(pass))
 
         next = game.next(pass)!!
 

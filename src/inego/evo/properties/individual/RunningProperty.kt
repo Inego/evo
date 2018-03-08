@@ -27,7 +27,7 @@ class RunawayAttempt(defender: Animal, attacker: Animal) : DefenseMove(defender,
             phase = GamePhase.GRAZING
         } else {
             log { "${defender.fullName} failed to run away from ${attacker.fullName}." }
-            defendingAnimal.usedRunningAway = true
+            defendingAnimal!!.usedRunningAway = true
             // Otherwise, the attack goes on
         }
     }

@@ -31,7 +31,7 @@ class LoseIndividualProperty(defender: Animal, attacker: Animal, val property: I
         get() = "${defender.fullName} loses $property as a tail"
 
     override fun Game.applyMove() {
-        defendingAnimal.removeProperty(property)
+        defendingAnimal!!.removeProperty(property)
 
         // Attack fails, but the attacker has "the tail" (1 blue token)
         attacker.gainBlueTokens(1)

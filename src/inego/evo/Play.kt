@@ -38,7 +38,7 @@ interface Engine {
 
 object RandomEngine : Engine {
     override fun selectMove(game: Game, moveSelection: MoveSelection<*>): Move {
-        return moveSelection.moves.randomElement
+        return moveSelection.randomElement
     }
 }
 
@@ -61,7 +61,7 @@ fun main(args: Array<String>) {
 
             do {
                 val moveSelection = game.next(nextMove) ?: break
-                nextMove = moveSelection.moves.randomElement
+                nextMove = moveSelection.randomElement
             } while (true)
 
             val winner = game.winner
