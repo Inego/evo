@@ -15,6 +15,9 @@ abstract class FeedingAnimalMove(val animal: Animal) : FeedingMove()
 
 
 class GetRedTokenMove(animal: Animal) : FeedingAnimalMove(animal) {
+
+    override fun clone(c: GameCopier) = GetRedTokenMove(c[animal])
+
     override val logMessage: String
         get() = "${animal.fullName} feeds from the base."
 
@@ -26,6 +29,9 @@ class GetRedTokenMove(animal: Animal) : FeedingAnimalMove(animal) {
 }
 
 class BurnFatMove(animal: Animal, private val fatToBurn: Int) : FeedingAnimalMove(animal) {
+
+    override fun clone(c: GameCopier) = BurnFatMove(c[animal], fatToBurn)
+
     override val logMessage: String
         get() = "${animal.fullName} converts $fatToBurn fat to food."
 
@@ -41,6 +47,9 @@ class BurnFatMove(animal: Animal, private val fatToBurn: Int) : FeedingAnimalMov
 
 
 data class FeedingPassMove(val player: Player) : FeedingMove() {
+
+    override fun clone(c: GameCopier) = FeedingPassMove(c[player])
+
     override fun doFeeding(game: Game): GamePhase {
         player.passed = true
         return GamePhase.FEEDING

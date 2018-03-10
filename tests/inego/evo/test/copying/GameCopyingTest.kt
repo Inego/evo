@@ -24,7 +24,7 @@ class GameCopyingTest {
     fun complexGameCopy() {
         val g = Game.new(2)
         g.phase = GamePhase.DEFENSE
-        g.seenCards += ECard.HIBERNATION
+        g.seenCards += ECard.HIBERNATION.from(g)
         g.turnNumber = 10
 
         val p = g.players[0]
@@ -32,12 +32,12 @@ class GameCopyingTest {
         p.passed = true
         p.discardSize = 100
 
-        p.hand.add(ECard.BURROWING)
-        p.hand.add(ECard.BIG__CARNIVOROUS)
+        p.hand.add(ECard.BURROWING.from(g))
+        p.hand.add(ECard.BIG__CARNIVOROUS.from(g))
 
-        p.cardsPlayedAsAnimals += ECard.CAMOUFLAGE
-        p.cardsPlayedAsAnimals += ECard.CAMOUFLAGE
-        p.cardsPlayedAsAnimals += ECard.GRAZING
+        p.cardsPlayedAsAnimals += ECard.CAMOUFLAGE.from(g)
+        p.cardsPlayedAsAnimals += ECard.CAMOUFLAGE.from(g)
+        p.cardsPlayedAsAnimals += ECard.GRAZING.from(g)
 
         val a1 = p.newAnimal(CarnivorousProperty)
 
@@ -58,13 +58,14 @@ class GameCopyingTest {
         g.attackingAnimal = a1
         g.defendingAnimal = a2
 
+        g.deck.remove(ECard.SYMBIOSIS)
         p.addConnection(SymbiosisProperty, a1, a2, true)
 
         p.foodPropagationSet.add(a1.connections[0])
 
         // COPY
 
-        val copier = GameCopier(g)
+        val copier = GameCopier(g, p)
         val cg = copier.copiedGame
 
         g.phase = GamePhase.FEEDING
@@ -78,12 +79,10 @@ class GameCopyingTest {
         assertEquals(10, cg.turnNumber)
 
         val deckSize = g.deck.size
-        val firstCard = g.deck[0]
 
         g.deck.clear()
 
         assertEquals(deckSize, cg.deck.size)
-        assertEquals(firstCard, cg.deck[0])
 
         assertEquals(2, cg.players.size)
 
@@ -180,37 +179,6 @@ class GameCopyingTest {
         assertEquals(ca1, cg.attackingAnimal)
         assertEquals(ca2, cg.defendingAnimal)
     }
-
-
-    @Test
-    fun testGameCopyAndModification() {
-
-        val r = Random()
-        r.setSeed(1)
-
-        val oldGame = Game.new(2, false, random = r)
-
-        val p1 = oldGame.players[0]
-        val p2 = oldGame.players[1]
-
-        var move: Move = GameStartMove
-        var selection: MoveSelection<*>? = null
-
-        var counter = 0
-
-        do {
-            selection = oldGame.next(move)
-            if (selection == null) break
-            println("$counter. T${oldGame.turnNumber} ${selection.decidingPlayer}: $selection")
-            move = r.from(selection)
-            counter++
-        } while (counter < 100)
-
-        val copier = GameCopier(oldGame)
-
-        val copy = copier.copiedGame
-
-        println("P1 = ${p1.score}")
-        println("P2 = ${p2.score}")
-    }
 }
+
+fun ECard.from(game: Game) = this.also { game.deck.remove(it) }

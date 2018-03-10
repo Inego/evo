@@ -16,7 +16,11 @@ object Cooperator : PairedPropertySide("Cooperator"), FoodPropagator {
 }
 
 
-class CooperationFoodPropagationMove(connectionMembership: ConnectionMembership) : FoodPropagationMove(connectionMembership) {
+class CooperationFoodPropagationMove(connectionMembership: ConnectionMembership) :
+        FoodPropagationMove(connectionMembership) {
+
+    override fun clone(c: GameCopier) = CooperationFoodPropagationMove(c[connectionMembership])
+
     override val logMessage: String
         get() = "${connectionMembership.other.fullName} gets 1 blue token " +
                 "from ${connectionMembership.thisAnimal} with Cooperation"

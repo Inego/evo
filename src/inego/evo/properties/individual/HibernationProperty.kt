@@ -1,9 +1,6 @@
 package inego.evo.properties.individual
 
-import inego.evo.game.Animal
-import inego.evo.game.GamePhase
-import inego.evo.game.Game
-import inego.evo.game.Player
+import inego.evo.game.*
 import inego.evo.game.moves.FeedingAnimalMove
 import inego.evo.game.moves.FeedingMove
 import inego.evo.properties.FeedingAction
@@ -22,6 +19,8 @@ object HibernationProperty : IndividualProperty("Hibernation"), FeedingAction {
 }
 
 class HibernationMove(animal: Animal) : FeedingAnimalMove(animal) {
+    override fun clone(c: GameCopier) = HibernationMove(c[animal])
+
     override val logMessage: String
         get() = "${animal.fullName} falls asleep"
 

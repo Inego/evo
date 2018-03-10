@@ -32,12 +32,29 @@ class Player private constructor(
 
     fun clone(gameCopier: GameCopier): Player {
 
+        val exactCopy = this == gameCopier.forPlayer
+
+        val copiedHand =
+                if (exactCopy) hand.toMutableList()
+                else gameCopier.takeUnseenCards(hand.size)
+
+        val copiedCardsPlayedAsAnimals =
+                if (exactCopy) cardsPlayedAsAnimals.clone()
+                else {
+                    val result = CardQuantities.new()
+                    val count: Int = cardsPlayedAsAnimals.totalCount
+                    repeat(count) {
+                        result += gameCopier.unseenCards.next()
+                    }
+                    result
+                }
+
         val copiedPlayer = Player(
                 name,
                 passed,
                 discardSize,
-                hand.toMutableList(),
-                cardsPlayedAsAnimals.clone()
+                copiedHand,
+                copiedCardsPlayedAsAnimals
         )
 
         for (srcAnimal in animals) {

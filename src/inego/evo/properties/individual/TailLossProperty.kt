@@ -10,7 +10,7 @@ object TailLossProperty : IndividualProperty("Tail Loss"), DefenseAction {
         get() = IndividualPropertyEnum.TAIL_LOSS
 
     override fun gatherDefenseMoves(defender: Animal, attacker: Animal, game: Game): List<DefenseMove> {
-        val result : MutableList<DefenseMove> = mutableListOf()
+        val result: MutableList<DefenseMove> = mutableListOf()
 
         if (defender.fatCapacity > 0)
             result.add(LoseIndividualProperty(defender, attacker, FatTissueProperty))
@@ -27,6 +27,9 @@ object TailLossProperty : IndividualProperty("Tail Loss"), DefenseAction {
 
 class LoseIndividualProperty(defender: Animal, attacker: Animal, val property: IndividualProperty) :
         DefenseMove(defender, attacker) {
+
+    override fun clone(c: GameCopier) = LoseIndividualProperty(c[defender], c[attacker], property)
+
     override val logMessage: String
         get() = "${defender.fullName} loses $property as a tail"
 
@@ -45,6 +48,12 @@ class LoseIndividualProperty(defender: Animal, attacker: Animal, val property: I
 
 class LosePairedProperty(defender: Animal, attacker: Animal, private val connectionMembership: ConnectionMembership)
     : DefenseMove(defender, attacker) {
+    override fun clone(c: GameCopier) = LosePairedProperty(
+            c[defender],
+            c[attacker],
+            c[connectionMembership]
+    )
+
     override val logMessage: String
         get() = "${defender.fullName} loses ${connectionMembership.sideProperty} " +
                 "to ${connectionMembership.other.fullName} as a tail."

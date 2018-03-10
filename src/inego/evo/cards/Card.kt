@@ -35,4 +35,14 @@ enum class ECard(
     override fun toString(): String {
         return if (secondProperty == null) firstProperty.name else "${firstProperty.name} / ${secondProperty.name}"
     }
+
+    companion object {
+        val array = values()
+
+        val initialQuantities = IntArray(array.size) { array[it].startingQuantity }
+
+        val readOnlyInitialQuantities = CardQuantities(initialQuantities)
+
+        fun createInitialQuantities(): CardQuantities = CardQuantities(initialQuantities.clone())
+    }
 }

@@ -17,8 +17,11 @@ object Communicator : PairedPropertySide("Communicator"), FoodPropagator {
 
 }
 
-class CommunicationFoodPropagationMove(connectionMembership: ConnectionMembership)
-    : FoodPropagationMove(connectionMembership) {
+class CommunicationFoodPropagationMove(connectionMembership: ConnectionMembership) :
+        FoodPropagationMove(connectionMembership) {
+
+    override fun clone(c: GameCopier) = CommunicationFoodPropagationMove(c[connectionMembership])
+
     override val logMessage: String
         get() = "${connectionMembership.other.fullName} gets 1 red token " +
                 "from ${connectionMembership.thisAnimal} by Communication."

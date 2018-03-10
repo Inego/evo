@@ -7,13 +7,13 @@ import inego.evo.game.moves.*
 import inego.evo.properties.individual.*
 import inego.evo.removeLast
 import java.util.*
-import java.util.Collections.shuffle
 import java.util.concurrent.ThreadLocalRandom
 import kotlin.math.min
 
 class Game private constructor(
         val numberOfPlayers: Int,
         val logging: Boolean,
+        val deck: MutableList<ECard>,
         val seenCards: CardQuantities,
         val players: List<Player>,
         private val random: Random = ThreadLocalRandom.current()
@@ -22,8 +22,6 @@ class Game private constructor(
     var turnNumber = 1
 
     val logMessages: MutableList<String> = mutableListOf()
-
-    var deck: MutableList<ECard> = mutableListOf()
 
     private val moveSelections: Deque<MoveSelection<*>> = LinkedList()
 
@@ -53,30 +51,31 @@ class Game private constructor(
     var foodBase = 0
 
 
-    constructor(c: GameCopier) : this(
-            c.src.numberOfPlayers,
+    constructor(c: GameCopier, src: Game) : this(
+            src.numberOfPlayers,
             false,
-            c.src.seenCards.clone(),
+            c.takeUnseenCards(src.deck.size),
+            src.seenCards.clone(),
             c.copiedPlayers,
-            c.src.random
+            src.random
     ) {
+        turnNumber = src.turnNumber
 
-        c.src.let {
-            turnNumber = it.turnNumber
-            firstPlayerIdx = it.firstPlayerIdx
-            currentPlayerIdx = it.currentPlayerIdx
-            computeNextPlayer = it.computeNextPlayer
-            phase = it.phase
-            foodBase = it.foodBase
+        if (moveSelections.isNotEmpty())
+            throw AssertionError("Non-empty move selection on copying")
 
-            val srcAttackingAnimal = it.attackingAnimal
+        firstPlayerIdx = src.firstPlayerIdx
+        currentPlayerIdx = src.currentPlayerIdx
+        computeNextPlayer = src.computeNextPlayer
+        phase = src.phase
+        foodBase = src.foodBase
 
-            if (srcAttackingAnimal != null) {
-                attackingAnimal = c[srcAttackingAnimal]
-                defendingAnimal = c[it.defendingAnimal!!]
-            }
+        val srcAttackingAnimal = src.attackingAnimal
+
+        if (srcAttackingAnimal != null) {
+            attackingAnimal = c[srcAttackingAnimal]
+            defendingAnimal = c[src.defendingAnimal!!]
         }
-
     }
 
     /**
@@ -479,23 +478,14 @@ class Game private constructor(
                 numberOfPlayers: Int,
                 logging: Boolean = false,
                 random: Random = ThreadLocalRandom.current()
-        ): Game {
-
-            return Game(
-                    numberOfPlayers,
-                    logging,
-                    CardQuantities.new(),
-                    List(numberOfPlayers) { index -> Player.new(DEFAULT_PLAYER_NAMES[index]) },
-                    random
-            ).apply {
-                for (eCard in ECard.values()) {
-                    repeat(eCard.startingQuantity) {
-                        deck.add(eCard)
-                    }
-                }
-                shuffle(deck, random)
-            }
-        }
+        ): Game = Game(
+                numberOfPlayers,
+                logging,
+                ECard.readOnlyInitialQuantities.toListOfCards(),
+                CardQuantities.new(),
+                List(numberOfPlayers) { index -> Player.new(DEFAULT_PLAYER_NAMES[index]) },
+                random
+        )
     }
 
     val isLastTurn: Boolean

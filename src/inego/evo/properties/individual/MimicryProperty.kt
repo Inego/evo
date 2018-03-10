@@ -2,6 +2,7 @@ package inego.evo.properties.individual
 
 import inego.evo.game.Animal
 import inego.evo.game.Game
+import inego.evo.game.GameCopier
 import inego.evo.game.Player
 import inego.evo.properties.IndividualProperty
 import inego.evo.properties.DefenseAction
@@ -18,7 +19,11 @@ object MimicryProperty : IndividualProperty("Mimicry"), DefenseAction {
                     .map { RedirectAttack(defender, attacker, it) }
 }
 
-class RedirectAttack(defender: Animal, attacker: Animal, private val anotherVictim: Animal) : DefenseMove(defender, attacker) {
+class RedirectAttack(defender: Animal, attacker: Animal, private val anotherVictim: Animal) :
+        DefenseMove(defender, attacker) {
+
+    override fun clone(c: GameCopier) = RedirectAttack(c[defender], c[attacker], c[anotherVictim])
+
     override val logMessage: String
         get() = "${defender.fullName} redirects attack to $anotherVictim"
 

@@ -1,9 +1,6 @@
 package inego.evo.properties.individual
 
-import inego.evo.game.Animal
-import inego.evo.game.GamePhase
-import inego.evo.game.Game
-import inego.evo.game.Player
+import inego.evo.game.*
 import inego.evo.game.moves.FeedingAnimalMove
 import inego.evo.game.moves.FeedingMove
 import inego.evo.properties.FeedingAction
@@ -23,6 +20,8 @@ object PiracyProperty : IndividualProperty("Piracy"), FeedingAction {
 
 
 class StealFoodMove(animal: Animal, private val victim: Animal) : FeedingAnimalMove(animal) {
+    override fun clone(c: GameCopier) = StealFoodMove(c[animal], c[victim])
+
     override val logMessage: String
         get() = "${animal.fullName} pirated 1 food from ${victim.fullName}"
 

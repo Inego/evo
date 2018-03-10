@@ -1,9 +1,6 @@
 package inego.evo.properties.individual
 
-import inego.evo.game.Animal
-import inego.evo.game.Game
-import inego.evo.game.MoveSelection
-import inego.evo.game.Player
+import inego.evo.game.*
 import inego.evo.game.moves.Move
 import inego.evo.properties.IndividualProperty
 
@@ -17,6 +14,8 @@ object ScavengerProperty : IndividualProperty("Scavenger") {
 }
 
 class FeedTheScavengerMove(private val scavenger: Animal) : Move() {
+    override fun clone(c: GameCopier) = FeedTheScavengerMove(c[scavenger])
+
     override val logMessage: String
         get() = "${scavenger.fullName} scavenged 1 food."
 
