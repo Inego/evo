@@ -25,7 +25,7 @@ fun <T> Iterator<T>.assertNext(nextValue: T?) {
  * Plays the game and returns a move selection or `null`
  * if the game has been played until the end.
  */
-fun Game.next(): MoveSelection<*>? = next(EmptyMove)
+fun Game.next(): MoveSelection<*>? = next(currentPlayer, EmptyMove)
 
 
 /**

@@ -21,8 +21,7 @@ class CooperationFoodPropagationMove(connectionMembership: ConnectionMembership)
 
     override fun clone(c: GameCopier) = CooperationFoodPropagationMove(c[connectionMembership])
 
-    override val logMessage: String
-        get() = "${connectionMembership.other.fullName} gets 1 blue token " +
+    override fun logMessage(player: Player) = "${connectionMembership.other.fullName} gets 1 blue token " +
                 "from ${connectionMembership.thisAnimal} with Cooperation"
 
     override fun onPropagation(animal: Animal, game: Game) {

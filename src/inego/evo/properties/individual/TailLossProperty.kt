@@ -30,10 +30,9 @@ class LoseIndividualProperty(defender: Animal, attacker: Animal, val property: I
 
     override fun clone(c: GameCopier) = LoseIndividualProperty(c[defender], c[attacker], property)
 
-    override val logMessage: String
-        get() = "${defender.fullName} loses $property as a tail"
+    override fun logMessage(player: Player) = "${defender.fullName} loses $property as a tail"
 
-    override fun Game.applyMove() {
+    override fun Game.applyMove(player: Player) {
         defendingAnimal!!.removeProperty(property)
 
         // Attack fails, but the attacker has "the tail" (1 blue token)
@@ -54,11 +53,10 @@ class LosePairedProperty(defender: Animal, attacker: Animal, private val connect
             c[connectionMembership]
     )
 
-    override val logMessage: String
-        get() = "${defender.fullName} loses ${connectionMembership.sideProperty} " +
+    override fun logMessage(player: Player) = "${defender.fullName} loses ${connectionMembership.sideProperty} " +
                 "to ${connectionMembership.other.fullName} as a tail."
 
-    override fun Game.applyMove() {
+    override fun Game.applyMove(player: Player) {
         defender.owner.removeConnection(connectionMembership.connection)
     }
 

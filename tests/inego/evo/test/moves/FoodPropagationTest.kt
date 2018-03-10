@@ -45,7 +45,7 @@ class FoodPropagationTest {
             it is AttackMove && it.victim == victim
         }
 
-        selection = g.next(attackVictim)
+        selection = g.next(p1, attackVictim)
 
         if (selection !is FoodPropagationMoveSelection)
             throw AssertionError()
@@ -53,7 +53,7 @@ class FoodPropagationTest {
         assertEquals(2, selection.size)
         assertEquals(p1, selection.decidingPlayer)
 
-        selection = g.next(selection[0])
+        selection = g.next(p1, selection[0])
 
         if (selection !is FoodPropagationMoveSelection)
             throw AssertionError()
@@ -61,5 +61,4 @@ class FoodPropagationTest {
         assertEquals(2, selection.size)
         assertEquals(p2, selection.decidingPlayer)
     }
-
 }

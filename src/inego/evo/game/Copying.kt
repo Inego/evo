@@ -25,6 +25,12 @@ class GameCopier(private val src: Game, val forPlayer: Player) {
 
     val copiedGame = Game(this, src)
 
+    init {
+        if (unseenCards.hasNext()) {
+            throw AssertionError(unseenCards.asSequence().joinToString())
+        }
+    }
+
     val copiedPlayers: List<Player>
         get() = players.values.toList()
 

@@ -16,10 +16,9 @@ object ScavengerProperty : IndividualProperty("Scavenger") {
 class FeedTheScavengerMove(private val scavenger: Animal) : Move() {
     override fun clone(c: GameCopier) = FeedTheScavengerMove(c[scavenger])
 
-    override val logMessage: String
-        get() = "${scavenger.fullName} scavenged 1 food."
+    override fun logMessage(player: Player) = "${scavenger.fullName} scavenged 1 food."
 
-    override fun Game.applyMove() {
+    override fun Game.applyMove(player: Player) {
         scavenger.gainBlueTokens(1)
     }
 

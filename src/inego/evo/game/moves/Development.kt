@@ -11,32 +11,30 @@ import inego.evo.properties.*
 abstract class DevelopmentMove : Move()
 
 
-class CreateAnimal(private val player: Player, private val card: ECard) : DevelopmentMove() {
+class CreateAnimal(private val card: ECard) : DevelopmentMove() {
 
-    override fun clone(c: GameCopier) = CreateAnimal(c[player], card)
+    override fun clone(c: GameCopier) = CreateAnimal(card)
 
-    override val logMessage: String
-        get() = "$player creates an animal."
+    override fun logMessage(player: Player) = "$player creates an animal."
 
-    override fun Game.applyMove() {
-        currentPlayer.hand.remove(card)
-        currentPlayer.cardsPlayedAsAnimals += card
-        currentPlayer.newAnimal()
+    override fun Game.applyMove(player: Player) {
+        player.hand.remove(card)
+        player.cardsPlayedAsAnimals += card
+        player.newAnimal()
     }
 
     override fun toString(player: Player) = "$card ⇨ Animal"
 }
 
 
-class DevelopmentPass(private val player: Player) : DevelopmentMove() {
+object DevelopmentPass : DevelopmentMove() {
 
-    override fun clone(c: GameCopier) = DevelopmentPass(c[player])
+    override fun clone(c: GameCopier) = this
 
-    override val logMessage: String
-        get() = "$player passes from development."
+    override fun logMessage(player: Player) = "$player passes from development."
 
-    override fun Game.applyMove() {
-        currentPlayer.passed = true
+    override fun Game.applyMove(player: Player) {
+        player.passed = true
     }
 
     override fun toString(player: Player) = "Pass from development"
@@ -47,8 +45,8 @@ abstract class DevelopmentAddProperty<P : AnimalProperty<P, T>, T : PropertyTarg
         val property: P,
         val target: T
 ) : DevelopmentMove() {
-    override fun Game.applyMove() {
-        currentPlayer.hand.remove(card)
+    override fun Game.applyMove(player: Player) {
+        player.hand.remove(card)
         seenCards += card
         property.applyTo(target, this)
     }
@@ -60,8 +58,7 @@ class DevelopmentAddIndividualProperty(card: ECard, property: IndividualProperty
     override fun clone(c: GameCopier) =
             DevelopmentAddIndividualProperty(card, property, SingleTarget(c[target.animal]))
 
-    override val logMessage: String
-        get() = "${target.animal.owner} adds $property to ${target.animal}."
+    override fun logMessage(player: Player) = "$player adds $property to ${target.animal.fullName}."
 
     override fun toString(player: Player) =
             "$property ⇨ ${player.targetAnimalToString(target.animal)}"
@@ -74,8 +71,7 @@ class DevelopmentAddPairedProperty(card: ECard, property: PairedProperty, target
     override fun clone(c: GameCopier) =
             DevelopmentAddPairedProperty(card, property, PairedTarget(c[target.firstAnimal], c[target.secondAnimal]))
 
-    override val logMessage: String
-        get() = "${target.firstAnimal.owner} adds $property from ${target.firstAnimal} to ${target.secondAnimal}."
+    override fun logMessage(player: Player) = "$player adds $property from ${target.firstAnimal} to ${target.secondAnimal}."
 
     override fun toString(player: Player): String {
         val first = player.targetAnimalToString(target.firstAnimal)

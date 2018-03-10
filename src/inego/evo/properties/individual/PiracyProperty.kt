@@ -14,7 +14,7 @@ object PiracyProperty : IndividualProperty("Piracy"), FeedingAction {
             if (animal.usedPiracy) emptyList()
             else game.players
                     .flatMap { it.animals }
-                    .filter { !it.isFed && it.hasFood > 0 }
+                    .filter { it != animal && !it.isFed && it.hasFood > 0 }
                     .map { StealFoodMove(animal, it) }
 }
 
@@ -22,10 +22,9 @@ object PiracyProperty : IndividualProperty("Piracy"), FeedingAction {
 class StealFoodMove(animal: Animal, private val victim: Animal) : FeedingAnimalMove(animal) {
     override fun clone(c: GameCopier) = StealFoodMove(c[animal], c[victim])
 
-    override val logMessage: String
-        get() = "${animal.fullName} pirated 1 food from ${victim.fullName}"
+    override fun logMessage(player: Player) = "${animal.fullName} pirated 1 food from ${victim.fullName}"
 
-    override fun doFeeding(game: Game): GamePhase {
+    override fun doFeeding(game: Game, player: Player): GamePhase {
         victim.hasFood--
         animal.gainBlueTokens(1)
 

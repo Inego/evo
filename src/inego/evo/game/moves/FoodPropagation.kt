@@ -5,7 +5,7 @@ import inego.evo.game.*
 abstract class FoodPropagationMove(
         protected val connectionMembership: ConnectionMembership
 ) : Move() {
-    final override fun Game.applyMove() {
+    final override fun Game.applyMove(player: Player) {
         connectionMembership.isUsed = true
         onPropagation(connectionMembership.other, this)
     }

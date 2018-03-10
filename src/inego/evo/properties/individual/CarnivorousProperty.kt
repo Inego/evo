@@ -43,12 +43,11 @@ object CarnivorousProperty : IndividualProperty("Carnivorous"), FeedingAction, S
 class AttackMove(animal: Animal, val victim: Animal) : FeedingAnimalMove(animal) {
     override fun clone(c: GameCopier) = AttackMove(c[animal], c[victim])
 
-    override val logMessage: String
-        get() = "${animal.fullName} attacks ${victim.fullName}."
+    override fun logMessage(player: Player)= "${animal.fullName} attacks ${victim.fullName}."
 
     override fun toString(player: Player) = "$animal attacks ${player.targetAnimalToString(victim)}"
 
-    override fun doFeeding(game: Game): GamePhase {
+    override fun doFeeding(game: Game, player: Player): GamePhase {
         animal.usedAttack = true
         game.attackingAnimal = animal
         game.defendingAnimal = victim

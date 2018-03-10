@@ -23,7 +23,7 @@ class Player private constructor(
     val cardsToHandOut
         inline get() = if (hand.isEmpty() and animals.isEmpty()) 6 else animals.size + 1
 
-    val score
+    private val score
         get() = animals.sumBy { 2 + it.individualProperties.sumBy { it.individualProperty.score } + it.fatCapacity } +
                 connections.size
 

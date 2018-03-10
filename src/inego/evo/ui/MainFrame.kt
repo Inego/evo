@@ -1,7 +1,7 @@
 package inego.evo.ui
 
-import inego.evo.GameManager
-import inego.evo.RandomEngine
+import inego.evo.*
+import inego.evo.engines.PlayoutStatsEngine
 import inego.evo.game.Game
 import inego.evo.game.MoveSelection
 import inego.evo.game.moves.GameStartMove
@@ -10,24 +10,54 @@ import java.awt.*
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.*
+import javax.swing.plaf.metal.MetalLookAndFeel
 
 
-object MainFrame {
+object MainFrame : GameFlowSubscriber {
 
-    private val nextButton = JButton("Next").apply {
+    private val playoutManager: PlayoutManager = PlayoutManager(RandomSyncEngine)
 
-        addActionListener {
-            handleNextMove(choicesList.selectedValue)
+    private val statRefreshTimer = Timer(1000) {
+        val newMoveStats = playoutManager.getCurrentMoveStats()
+
+        val best = newMoveStats.values.map { it.playouts }.max() ?: throw AssertionError()
+
+        var bestAssigned = false
+
+        for (i in 0 until choicesListModel.size()) {
+            val row = choicesListModel[i]
+            val move = row.move
+            val stats = row.stats
+
+            val newRowStats = newMoveStats.getValue(move)
+
+            stats.playouts = newRowStats.playouts
+            stats.wins = newRowStats.wins
+            row.isBest = best == newRowStats.playouts
+            if (row.isBest) {
+                bestAssigned = true
+            }
         }
 
+        if (!bestAssigned) {
+            throw AssertionError()
+        }
+
+        choicesList.repaint()
     }
 
-    private val game = Game.new(2, true)
+    private val nextButton = JButton("Next").apply {
+        addActionListener {
+            handleNextMove(choicesList.selectedValue.move)
+        }
+    }
+
+    private val game = Game.new(3, true)
 
     private val gameManager = GameManager(game).apply {
-        setEngine(0, RandomEngine)
+        setEngine(0, PlayoutStatsEngine(4000))
+        setEngine(1, PlayoutStatsEngine(4000))
     }
-
 
     private val gameBoard = GameBoardComponent(gameManager).apply {
         preferredSize = Dimension(0, 0)
@@ -44,9 +74,9 @@ object MainFrame {
 
     private var moveSelection: MoveSelection<*>? = null
 
-    private val choicesListModel = DefaultListModel<Move>()
+    private val choicesListModel = DefaultListModel<MoveWithStats>()
 
-    private val choicesList = JList<Move>(choicesListModel).apply {
+    private val choicesList = JList<MoveWithStats>(choicesListModel).apply {
         selectionMode = ListSelectionModel.SINGLE_SELECTION
 
     }
@@ -56,38 +86,71 @@ object MainFrame {
         setViewportView(choicesList)
     }
 
-    private fun setCurrentMoves(newMoveSelection: MoveSelection<*>?) {
-        choicesListModel.clear()
-        if (newMoveSelection == null) {
-            nextButton.text = "Next"
-        }
-        else {
-            newMoveSelection.forEach { choicesListModel.addElement(it) }
-            nextButton.text = "${newMoveSelection.decidingPlayer}: Next"
-        }
+    private fun setCurrentMoves(newMoveSelection: MoveSelection<*>) {
+
+        newMoveSelection.forEach { choicesListModel.addElement(MoveWithStats(
+                it,
+                PlayoutStats(0, 0), false)
+        ) }
+
         moveSelection = newMoveSelection
         choicesList.selectedIndex = 0
-        gameBoard.repaint()
+
+        playoutManager.start(game, moveSelection!!)
+        statRefreshTimer.start()
+
     }
 
     private fun handleNextMove(move: Move) {
-        val nextMoves = gameManager.next(move)
-        val newLogMessages = game.takeFromLog()
-        for (newLogMessage in newLogMessages) {
+        playoutManager.stop()
+        statRefreshTimer.stop()
+
+        gameManager.next(moveSelection!!.decidingPlayer, move)
+    }
+
+    override fun onChoicePoint(moveSelection: MoveSelection<*>, forAI: Boolean) {
+
+        refreshGameBoard()
+
+        val nextButtonCaption = if (forAI) "Force!" else "Next"
+
+        nextButton.text = "${moveSelection.decidingPlayer}: $nextButtonCaption"
+
+        if (forAI) {
+            // TODO Next button to "Force Move"
+
+        }
+        else {
+            setCurrentMoves(moveSelection)
+        }
+    }
+
+    private fun refreshGameBoard() {
+        gameBoard.repaint()
+
+        for (newLogMessage in game.takeFromLog()) {
             logListModel.addElement(newLogMessage)
         }
 
         SwingUtilities.invokeLater {
             // Scroll to the bottom
-            with (logListScrollPane.verticalScrollBar) {
+            with(logListScrollPane.verticalScrollBar) {
                 value = maximum
             }
         }
 
-        setCurrentMoves(nextMoves)
+        choicesListModel.clear()
+    }
+
+    override fun onGameOver() {
+        refreshGameBoard()
+        TODO("not implemented")
     }
 
     init {
+
+        gameManager.subscribe(this)
+
         choicesList.cellRenderer = MoveListCellRenderer {
             it.toString(moveSelection!!.decidingPlayer)
         }
@@ -144,11 +207,11 @@ object MainFrame {
             gridwidth = 2
             fill = GridBagConstraints.BOTH
         }
-
     }
 
     private fun createAndShowGUI() {
         with(JFrame("Evolution")) {
+
             extendedState = extendedState or JFrame.MAXIMIZED_BOTH
 
             defaultCloseOperation = JFrame.EXIT_ON_CLOSE
@@ -160,6 +223,13 @@ object MainFrame {
 
     @JvmStatic
     fun main(args: Array<String>) {
+
+        // turn off bold fonts
+        UIManager.put("swing.boldMetal", java.lang.Boolean.FALSE)
+
+        // re-install the Metal Look and Feel
+        UIManager.setLookAndFeel(MetalLookAndFeel())
+
         SwingUtilities.invokeLater { createAndShowGUI() }
     }
 }

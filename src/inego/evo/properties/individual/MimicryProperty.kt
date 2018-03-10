@@ -24,10 +24,9 @@ class RedirectAttack(defender: Animal, attacker: Animal, private val anotherVict
 
     override fun clone(c: GameCopier) = RedirectAttack(c[defender], c[attacker], c[anotherVictim])
 
-    override val logMessage: String
-        get() = "${defender.fullName} redirects attack to $anotherVictim"
+    override fun logMessage(player: Player) = "${defender.fullName} redirects attack to $anotherVictim"
 
-    override fun Game.applyMove() {
+    override fun Game.applyMove(player: Player) {
         defender.usedMimicry = true
         defendingAnimal = anotherVictim
         // ...and the attack goes on...

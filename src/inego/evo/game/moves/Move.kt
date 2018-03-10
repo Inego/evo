@@ -7,14 +7,14 @@ import inego.evo.removeLast
 
 abstract class Move {
 
-    abstract val logMessage: String
+    abstract fun logMessage(player: Player): String
 
-    fun applyTo(game: Game) {
-        game.log { logMessage }
-        game.applyMove()
+    fun applyTo(game: Game, player: Player) {
+        game.log { logMessage(player) }
+        game.applyMove(player)
     }
 
-    protected abstract fun Game.applyMove()
+    protected abstract fun Game.applyMove(player: Player)
 
     abstract fun toString(player: Player): String
 
@@ -24,12 +24,11 @@ abstract class Move {
 object GameStartMove : Move() {
     override fun clone(c: GameCopier) = this
 
-    override val logMessage: String
-        get() = "The game has started."
+    override fun logMessage(player: Player) = "The game has started."
 
     override fun toString(player: Player) = "Start game"
 
-    override fun Game.applyMove() {
+    override fun Game.applyMove(player: Player) {
         // Hand out 6 cards for each player
         for (player in players) {
             repeat(6) {
@@ -45,10 +44,9 @@ object EmptyMove : Move() {
 
     override fun clone(c: GameCopier) = this
 
-    override val logMessage: String
-        get() = "An empty move did nothing."
+    override fun logMessage(player: Player) = "..."
 
-    override fun Game.applyMove() {
+    override fun Game.applyMove(player: Player) {
         // Do nothing
     }
 

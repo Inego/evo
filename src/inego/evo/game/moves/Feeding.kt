@@ -3,11 +3,11 @@ package inego.evo.game.moves
 import inego.evo.game.*
 
 abstract class FeedingMove : Move() {
-    override fun Game.applyMove() {
-        phase = doFeeding(this)
+    override fun Game.applyMove(player: Player) {
+        phase = doFeeding(this, player)
     }
 
-    abstract fun doFeeding(game: Game): GamePhase
+    abstract fun doFeeding(game: Game, player: Player): GamePhase
 }
 
 
@@ -18,11 +18,10 @@ class GetRedTokenMove(animal: Animal) : FeedingAnimalMove(animal) {
 
     override fun clone(c: GameCopier) = GetRedTokenMove(c[animal])
 
-    override val logMessage: String
-        get() = "${animal.fullName} feeds from the base."
+    override fun logMessage(player: Player) = "${animal.fullName} feeds from the base."
 
     override fun toString(player: Player) = "$animal: take 1 food from base"
-    override fun doFeeding(game: Game): GamePhase {
+    override fun doFeeding(game: Game, player: Player): GamePhase {
         animal.gainRedToken(game)
         return GamePhase.FOOD_PROPAGATION
     }
@@ -32,10 +31,9 @@ class BurnFatMove(animal: Animal, private val fatToBurn: Int) : FeedingAnimalMov
 
     override fun clone(c: GameCopier) = BurnFatMove(c[animal], fatToBurn)
 
-    override val logMessage: String
-        get() = "${animal.fullName} converts $fatToBurn fat to food."
+    override fun logMessage(player: Player) = "${animal.fullName} converts $fatToBurn fat to food."
 
-    override fun doFeeding(game: Game): GamePhase {
+    override fun doFeeding(game: Game, player: Player): GamePhase {
         animal.fat -= fatToBurn
         // Fat burning is a special action and as such does not lead to food propagation.
         animal.hasFood += fatToBurn
@@ -46,17 +44,16 @@ class BurnFatMove(animal: Animal, private val fatToBurn: Int) : FeedingAnimalMov
 }
 
 
-data class FeedingPassMove(val player: Player) : FeedingMove() {
+object FeedingPassMove : FeedingMove() {
 
-    override fun clone(c: GameCopier) = FeedingPassMove(c[player])
+    override fun clone(c: GameCopier) = this
 
-    override fun doFeeding(game: Game): GamePhase {
+    override fun doFeeding(game: Game, player: Player): GamePhase {
         player.passed = true
         return GamePhase.FEEDING
     }
 
-    override val logMessage: String
-        get() = "$player passed from feeding."
+    override fun logMessage(player: Player) = "$player passed from feeding."
 
     override fun toString(player: Player) = "Pass from feeding"
 }

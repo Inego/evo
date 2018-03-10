@@ -41,11 +41,11 @@ class FeedingTest {
         assertTrue(next is FeedingMoveSelection)
         assertEquals(3, next.size)
 
-        val pass = FeedingPassMove(p1)
+        val pass = FeedingPassMove
 
         assertTrue(next.contains(pass))
 
-        next = game.next(pass)!!
+        next = game.next(p1, pass)!!
 
         assertTrue(next is DevelopmentMoveSelection)
         assertFalse(p1.passed)

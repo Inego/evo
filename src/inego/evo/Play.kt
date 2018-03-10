@@ -5,38 +5,67 @@ import inego.evo.game.MoveSelection
 import inego.evo.game.Player
 import inego.evo.game.moves.GameStartMove
 import inego.evo.game.moves.Move
+import java.util.concurrent.CompletableFuture
 import kotlin.system.measureTimeMillis
+
+
+interface GameFlowSubscriber {
+
+    fun onChoicePoint(moveSelection: MoveSelection<*>, forAI: Boolean)
+
+    fun onGameOver()
+
+}
 
 
 class GameManager(val game: Game) {
 
-    private val engines: MutableMap<Player, Engine> = mutableMapOf()
+    private val engines: MutableMap<Player, AsyncEngine> = mutableMapOf()
 
-    fun setEngine(idx: Int, engine: Engine) {
+    private var subscriber: GameFlowSubscriber? = null
+
+    fun setEngine(idx: Int, engine: AsyncEngine) {
         engines[game.players[idx]] = engine
     }
 
-    fun next(move: Move): MoveSelection<*>? {
+    fun next(player: Player, moveToMake: Move) {
 
-        var moveToMake = move
+        val nextMoveSelection = game.next(player, moveToMake)
 
-        while (true) {
-            val nextMoveSelection = game.next(moveToMake) ?: return null
+        if (nextMoveSelection == null) {
+            subscriber?.onGameOver()
+        } else {
             val decidingPlayer = nextMoveSelection.decidingPlayer
-            val engine = engines[decidingPlayer] ?: return nextMoveSelection
-            moveToMake = engine.selectMove(game, nextMoveSelection)
+            val engine = engines[decidingPlayer]
+
+            subscriber?.onChoicePoint(nextMoveSelection, engine != null)
+
+            engine?.let {
+                it.selectMove(game, nextMoveSelection).thenAccept {
+                    next(decidingPlayer, it)
+                }
+            }
         }
     }
 
     fun isAI(player: Player) = engines.containsKey(player)
+
+    fun subscribe(subscriber: GameFlowSubscriber) {
+        this.subscriber = subscriber
+    }
 }
 
-interface Engine {
+interface SyncEngine {
     fun selectMove(game: Game, moveSelection: MoveSelection<*>): Move
-
 }
 
-object RandomEngine : Engine {
+interface AsyncEngine {
+    fun selectMove(game: Game, moveSelection: MoveSelection<*>): CompletableFuture<Move>
+    fun forceMove()
+}
+
+
+object RandomSyncEngine : SyncEngine {
     override fun selectMove(game: Game, moveSelection: MoveSelection<*>): Move {
         return moveSelection.randomElement
     }
@@ -58,9 +87,11 @@ fun main(args: Array<String>) {
             val game = Game.new(3, false)
 
             var nextMove: Move = GameStartMove
+            var nextPlayer: Player = game.currentPlayer
 
             do {
-                val moveSelection = game.next(nextMove) ?: break
+                val moveSelection = game.next(nextPlayer, nextMove) ?: break
+                nextPlayer = moveSelection.decidingPlayer
                 nextMove = moveSelection.randomElement
             } while (true)
 

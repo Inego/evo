@@ -13,17 +13,19 @@ object GrazingProperty : IndividualProperty("Grazing") {
 }
 
 
-class GrazeFood(private val player: Player, private val foodToGraze: Int) : Move() {
-    override fun clone(c: GameCopier) = GrazeFood(c[player], foodToGraze)
+class GrazeFood(private val foodToGraze: Int) : Move() {
+    override fun clone(c: GameCopier) = GrazeFood(foodToGraze)
 
-    override val logMessage: String
-        get() = "$player grazed $foodToGraze food."
+    override fun logMessage(player: Player) =
+            if (foodToGraze > 0) "$player grazed $foodToGraze food." else "$player decided not to graze."
 
     override fun toString(player: Player) = "Graze $foodToGraze food"
 
-    override fun Game.applyMove() {
-        foodBase -= foodToGraze
-        log { "Food left: $foodBase." }
+    override fun Game.applyMove(player: Player) {
+        if (foodToGraze > 0) {
+            foodBase -= foodToGraze
+            log { "Food left: $foodBase." }
+        }
     }
 }
 

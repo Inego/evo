@@ -106,7 +106,7 @@ class GameBoardComponent(private val gameManager: GameManager) : JPanel() {
                 drawCard(handRow, index) {
                     if (!isAI) {
                         if (card.secondProperty == null) {
-                            g2.drawString(card.name, textStartX, textStartY)
+                            g2.drawString(card.firstProperty.name, textStartX, textStartY)
                         } else {
                             val middleBase = yStart + rowHeight / 2
                             g2.drawString(card.firstProperty.name, textStartX, (middleBase - metrics.descent).toInt())

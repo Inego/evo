@@ -1,18 +1,13 @@
 package inego.evo.test.copying
 
 import inego.evo.cards.ECard
-import inego.evo.from
 import inego.evo.game.Game
 import inego.evo.game.GameCopier
 import inego.evo.game.GamePhase
-import inego.evo.game.MoveSelection
-import inego.evo.game.moves.GameStartMove
-import inego.evo.game.moves.Move
 import inego.evo.properties.individual.CarnivorousProperty
 import inego.evo.properties.paired.asymmetric.SymbiosisProperty
 import inego.evo.test.newAnimal
 import org.junit.jupiter.api.Test
-import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals

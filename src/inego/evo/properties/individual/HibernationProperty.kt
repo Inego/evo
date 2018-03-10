@@ -21,10 +21,9 @@ object HibernationProperty : IndividualProperty("Hibernation"), FeedingAction {
 class HibernationMove(animal: Animal) : FeedingAnimalMove(animal) {
     override fun clone(c: GameCopier) = HibernationMove(c[animal])
 
-    override val logMessage: String
-        get() = "${animal.fullName} falls asleep"
+    override fun logMessage(player: Player) = "${animal.fullName} falls asleep"
 
-    override fun doFeeding(game: Game): GamePhase {
+    override fun doFeeding(game: Game, player: Player): GamePhase {
         animal.isHibernating = true
 
         // There is no food propagation, so go directly to grazing

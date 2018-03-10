@@ -84,9 +84,9 @@ class Game private constructor(
      *
      * @return The next move selection or `null` if the game has been played to the end.
      */
-    fun next(move: Move): MoveSelection<*>? {
+    fun next(player: Player, move: Move): MoveSelection<*>? {
 
-        move.applyTo(this)
+        move.applyTo(this, player)
         // After a move was applied, other move selections may arise
         var selection: MoveSelection<*>? = getNextNonTrivialMoveSelection()
         if (selection != null) {
@@ -127,7 +127,7 @@ class Game private constructor(
         val maxToGraze = min(grazingAnimals, foodBase)
 
         if (maxToGraze > 0) {
-            val grazeFoodMoves = (0..maxToGraze).map { GrazeFood(player, it) }
+            val grazeFoodMoves = (0..maxToGraze).map { GrazeFood(it) }
             moveSelections.add(GrazeFoodSelection(player, grazeFoodMoves))
         }
 
@@ -152,7 +152,7 @@ class Game private constructor(
                     break
                 } else {
                     if (foodPropagationMoves.size == 1) {
-                        foodPropagationMoves[0].applyTo(this)
+                        foodPropagationMoves[0].applyTo(this, player)
                     } else {
                         moveSelections.add(FoodPropagationMoveSelection(player, foodPropagationMoves))
                         return
@@ -186,7 +186,7 @@ class Game private constructor(
                 }
 
                 if (moveSelection.size == 1) {
-                    moveSelection[0].applyTo(this)
+                    moveSelection[0].applyTo(this, moveSelection.decidingPlayer)
                 } else {
                     return moveSelection
                 }
@@ -204,7 +204,7 @@ class Game private constructor(
                 eat(attackingAnimal!!, defendingAnimal!!)
                 phase = GamePhase.FOOD_PROPAGATION
             }
-            defenseMoves.size == 1 -> defenseMoves[0].applyTo(this)
+            defenseMoves.size == 1 -> defenseMoves[0].applyTo(this, defendingAnimal!!.owner)
             else -> {
                 // Several moves - let the defending animal's owner select
                 moveSelections.add(DefenseMoveSelection(defendingAnimal!!.owner, defenseMoves))
@@ -232,10 +232,10 @@ class Game private constructor(
         val moves: MutableList<DevelopmentMove> = mutableListOf()
 
         // Gather development moves (pass is always an option)
-        moves.add(DevelopmentPass(player))
+        moves.add(DevelopmentPass)
 
         for (card in player.hand.toSet()) {
-            moves.add(CreateAnimal(player, card))
+            moves.add(CreateAnimal(card))
             card.firstProperty.getDevelopmentMoves(this, card).toCollection(moves)
             if (card.secondProperty != null)
                 card.secondProperty.getDevelopmentMoves(this, card).toCollection(moves)
@@ -309,7 +309,7 @@ class Game private constructor(
                     // At this stage, the player may pass out from feeding.
 
                     val extendedMoves = moves.toMutableList()
-                    extendedMoves.add(FeedingPassMove(player))
+                    extendedMoves.add(FeedingPassMove)
 
                     moves = extendedMoves
                 }
@@ -436,12 +436,12 @@ class Game private constructor(
 
     private fun eat(predator: Animal, victim: Animal) {
         log { "${predator.fullName} kills and eats ${victim.fullName}." }
-        predator.gainBlueTokens(2)
         if (victim.has(PoisonousProperty)) {
             log { "${predator.fullName} is POISONED!" }
             predator.isPoisoned = true
         }
         victim.owner.removeAnimal(victim)
+        predator.gainBlueTokens(2)
 
         // Feed the scavengers
         for (scavengerCandidate in fromPlayer(predator.owner)) {

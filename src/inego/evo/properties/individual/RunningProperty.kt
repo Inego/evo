@@ -16,10 +16,9 @@ object RunningProperty : IndividualProperty("Running"), DefenseAction {
 class RunawayAttempt(defender: Animal, attacker: Animal) : DefenseMove(defender, attacker) {
     override fun clone(c: GameCopier) = RunawayAttempt(c[defender], c[attacker])
 
-    override val logMessage: String
-        get() = "${defender.fullName} is trying to run away from ${attacker.fullName}."
+    override fun logMessage(player: Player) = "${defender.fullName} is trying to run away from ${attacker.fullName}."
 
-    override fun Game.applyMove() {
+    override fun Game.applyMove(player: Player) {
         val outcome = dice()
         log { "Dice = $outcome" }
         if (outcome >= 4) {
