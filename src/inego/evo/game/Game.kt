@@ -311,7 +311,12 @@ class Game private constructor(
 
             var moves = player.animals.flatMap { it.gatherFeedingMoves(this) }
 
-            if (!moves.isEmpty()) {
+            if (moves.isEmpty()) {
+
+                phase = GamePhase.GRAZING
+                return
+
+            } else {
 
                 if (player.animals.all { it.isFed } && foodBase == 0) {
                     // All available moves are connected with killing other animals for fat.
@@ -326,8 +331,6 @@ class Game private constructor(
                 moveSelections.add(FeedingMoveSelection(player, moves))
                 return
             }
-
-            incCurrentPlayer()
         }
 
 
