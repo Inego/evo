@@ -30,7 +30,6 @@ class PlayoutManager(val syncEngine: SyncEngine) {
 //    private val numberOfWorkers = max(Runtime.getRuntime().availableProcessors() - 1, 1)
 //    private val numberOfWorkers = 1
 
-
     private val threadPool = Executors.newFixedThreadPool(numberOfWorkers)
 
     private var lock = Object()
@@ -136,7 +135,7 @@ class PlayoutWorker(private val manager: PlayoutManager) : Runnable {
             val copiedPlayer = copier[player]
 
             val winner = playout(copiedGame, copiedPlayer, copiedMove, manager.syncEngine)
-            if (winner == copier[player]) {
+            if (winner == copiedPlayer) {
                 manager.registerWin(game, move)
             }
         } while (true)
@@ -148,7 +147,7 @@ fun playout(game: Game, initialPlayer: Player, initialMove: Move, syncEngine: Sy
     var nextMove: Move = initialMove
     var player = initialPlayer
     do {
-        val moveSelection = game.next(initialPlayer, nextMove) ?: break
+        val moveSelection = game.next(player, nextMove) ?: break
         nextMove = syncEngine.selectMove(game, moveSelection)
         player = moveSelection.decidingPlayer
     } while (true)

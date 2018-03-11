@@ -43,7 +43,6 @@ class GameCopyingTest {
         a1.usedMimicry = true
         a1.usedAttack = true
         a1.usedRunningAway = true
-        a1.usedRunningAway = true
         a1.isHibernating = true
         a1.hibernatedLastTurn = true
         a1.isPoisoned = true
@@ -53,7 +52,7 @@ class GameCopyingTest {
         g.attackingAnimal = a1
         g.defendingAnimal = a2
 
-        g.deck.remove(ECard.SYMBIOSIS)
+        g.seenCards += ECard.SYMBIOSIS.from(g)
         p.addConnection(SymbiosisProperty, a1, a2, true)
 
         p.foodPropagationSet.add(a1.connections[0])

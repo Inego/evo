@@ -52,11 +52,11 @@ object MainFrame : GameFlowSubscriber {
         }
     }
 
-    private val game = Game.new(3, true)
+    private val game = Game.new(2, true)
 
     private val gameManager = GameManager(game).apply {
         setEngine(0, PlayoutStatsEngine(4000))
-        setEngine(1, PlayoutStatsEngine(4000))
+//        setEngine(1, PlayoutStatsEngine(4000))
     }
 
     private val gameBoard = GameBoardComponent(gameManager).apply {
@@ -105,7 +105,7 @@ object MainFrame : GameFlowSubscriber {
         playoutManager.stop()
         statRefreshTimer.stop()
 
-        gameManager.next(moveSelection!!.decidingPlayer, move)
+        gameManager.next(moveSelection?.decidingPlayer ?: game[0], move)
     }
 
     override fun onChoicePoint(moveSelection: MoveSelection<*>, forAI: Boolean) {
