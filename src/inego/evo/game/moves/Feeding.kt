@@ -50,7 +50,7 @@ object FeedingPassMove : FeedingMove() {
 
     override fun doFeeding(game: Game, player: Player): GamePhase {
         player.passed = true
-        return GamePhase.FEEDING
+        return GamePhase.GRAZING
     }
 
     override fun logMessage(player: Player) = "$player passed from feeding."

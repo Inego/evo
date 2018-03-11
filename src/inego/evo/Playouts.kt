@@ -5,7 +5,6 @@ import inego.evo.game.GameCopier
 import inego.evo.game.MoveSelection
 import inego.evo.game.Player
 import inego.evo.game.moves.Move
-import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadLocalRandom
 import kotlin.math.ln
@@ -65,12 +64,9 @@ class PlayoutManager(private val syncEngineFactory: (Int) -> SyncEngine) {
 
             playoutCount = 0
 
-            // Use a thread-local random to seed RNG that will be used in the workers
-            val random = ThreadLocalRandom.current()
-
             for (i in 0 until numberOfWorkers) {
                 val syncEngine = syncEngineFactory(i)
-                threadPool.execute(PlayoutWorker(this, syncEngine, Random(random.nextLong())))
+                threadPool.execute(PlayoutWorker(this, syncEngine))
             }
         }
     }
@@ -135,7 +131,7 @@ class PlayoutManager(private val syncEngineFactory: (Int) -> SyncEngine) {
 }
 
 
-class PlayoutWorker(private val manager: PlayoutManager, private val syncEngine: SyncEngine, private val random: Random) : Runnable {
+class PlayoutWorker(private val manager: PlayoutManager, private val syncEngine: SyncEngine) : Runnable {
     override fun run() {
 
         do {

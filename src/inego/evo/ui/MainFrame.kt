@@ -59,9 +59,9 @@ object MainFrame : GameFlowSubscriber {
     private val game = Game.new(3, true, Random())
 
     private val gameManager = GameManager(game).apply {
-        setEngine(0, PlayoutStatsEngine(300))
-        setEngine(1, PlayoutStatsEngine(300))
-        setEngine(2, PlayoutStatsEngine(300))
+        setEngine(0, PlayoutStatsEngine(4000))
+        setEngine(1, PlayoutStatsEngine(4000))
+//        setEngine(2, PlayoutStatsEngine(300))
     }
 
     private val gameBoard = GameBoardComponent(gameManager).apply {

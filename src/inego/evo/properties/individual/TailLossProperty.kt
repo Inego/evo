@@ -58,6 +58,10 @@ class LosePairedProperty(defender: Animal, attacker: Animal, private val connect
 
     override fun Game.applyMove(player: Player) {
         defender.owner.removeConnection(connectionMembership.connection)
+
+        // Attack fails, but the attacker has "the tail" (1 blue token)
+        attacker.gainBlueTokens(1)
+        phase = GamePhase.FOOD_PROPAGATION
     }
 
     override fun toString(player: Player): String {
