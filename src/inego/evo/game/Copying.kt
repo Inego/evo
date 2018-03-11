@@ -1,15 +1,16 @@
 package inego.evo.game
 
 import inego.evo.cards.ECard
+import java.util.*
 
 
-class GameCopier(private val src: Game, val forPlayer: Player) {
+class GameCopier(private val src: Game, val forPlayer: Player, private val random: Random) {
 
     val unseenCards = ECard.createInitialQuantities().let {
         it -= src.seenCards
         it -= forPlayer.cardsPlayedAsAnimals
         it -= forPlayer.hand
-        it.toListOfCards().iterator()
+        it.toListOfCards(random).iterator()
     }
 
     fun takeUnseenCards(size: Int): MutableList<ECard> = ArrayList<ECard>(size).apply {
@@ -23,7 +24,7 @@ class GameCopier(private val src: Game, val forPlayer: Player) {
 
     private val players = src.players.associateBy({ it }) { it.clone(this) }
 
-    val copiedGame = Game(this, src)
+    val copiedGame = Game(this, src, Random())
 
     init {
         if (unseenCards.hasNext()) {

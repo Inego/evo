@@ -52,6 +52,12 @@ class GameBoardComponent(private val gameManager: GameManager) : JPanel() {
 
             val playerSpaceStart = height.toDouble() * playerIndex / numberOfPlayers
 
+            if (player == gameManager.decidingPlayer) {
+                g2.color = Color.BLUE
+                g2.drawRect(1, playerSpaceStart.toInt(), width - 4, playerHeight.toInt() - 4)
+                g2.color = defaultColor
+            }
+
             val maxAnimalHeight = player.animals.map { it.propertyCount }.max() ?: 0
             val playerRows = 2 * SPACER_HEIGHT + 3 + maxAnimalHeight
             val rowHeight = Math.min(playerHeight / playerRows, PREFERRED_ROW_HEIGHT)
@@ -78,7 +84,7 @@ class GameBoardComponent(private val gameManager: GameManager) : JPanel() {
 
             val topRowBase = (playerSpaceStart + rowTextBase).toInt()
 
-            g2.drawString(player.name, HORIZONTAL_MARGIN, topRowBase)
+            g2.drawString("${player.name} - ${player.score}  (discard: ${player.discardSize})", HORIZONTAL_MARGIN, topRowBase)
 
             // Common logic to draw a card
             fun drawCard(row: Int, col: Int, bgColor: Color? = null, insideDrawer: CardDrawingInfo.() -> Unit) {

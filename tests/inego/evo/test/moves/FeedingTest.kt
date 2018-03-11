@@ -9,6 +9,7 @@ import inego.evo.properties.individual.CarnivorousProperty
 import inego.evo.test.newAnimal
 import inego.evo.test.next
 import org.junit.jupiter.api.Test
+import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -18,7 +19,7 @@ class FeedingTest {
     @Test
     fun passingOutOfFeeding() {
 
-        val game = Game.new(2, false)
+        val game = Game.new(2, false, Random())
         game.phase = GamePhase.FEEDING
 
         // P1 has two fed carnivorous animals with unfilled fat capacity.

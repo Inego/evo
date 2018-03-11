@@ -12,7 +12,13 @@ import kotlin.concurrent.schedule
 
 class PlayoutStatsEngine(private val timeToThink: Long) : AsyncEngine {
 
-    private var playoutManager = PlayoutManager(RandomSyncEngine)
+    private val random = Random()
+
+    private var playoutManager = PlayoutManager {
+        val seed = random.nextLong()
+        val engineRandom = Random(seed)
+        RandomSyncEngine(engineRandom)
+    }
 
     private var result: CompletableFuture<Move>? = null
 

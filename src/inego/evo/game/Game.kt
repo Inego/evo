@@ -7,7 +7,6 @@ import inego.evo.game.moves.*
 import inego.evo.properties.individual.*
 import inego.evo.removeLast
 import java.util.*
-import java.util.concurrent.ThreadLocalRandom
 import kotlin.math.min
 
 class Game private constructor(
@@ -16,7 +15,7 @@ class Game private constructor(
         val deck: MutableList<ECard>,
         val seenCards: CardQuantities,
         val players: List<Player>,
-        private val random: Random = ThreadLocalRandom.current()
+        private val random: Random
 ) {
 
     var turnNumber = 1
@@ -51,13 +50,13 @@ class Game private constructor(
     var foodBase = 0
 
 
-    constructor(c: GameCopier, src: Game) : this(
+    constructor(c: GameCopier, src: Game, random: Random) : this(
             src.numberOfPlayers,
             false,
             c.takeUnseenCards(src.deck.size),
             src.seenCards.clone(),
             c.copiedPlayers,
-            src.random
+            random
     ) {
         turnNumber = src.turnNumber
 
@@ -267,7 +266,11 @@ class Game private constructor(
     private fun performFeedingBaseDetermination() {
         foodBase = when (players.size) {
             2 -> dice() + 2
-            3 -> dice() + dice()
+            3 -> {
+                val d1 = dice()
+                val d2 = dice()
+                d1 + d2
+            }
             4 -> dice() + dice() + 2
             else -> throw IllegalStateException()
         }
@@ -477,11 +480,11 @@ class Game private constructor(
         fun new(
                 numberOfPlayers: Int,
                 logging: Boolean = false,
-                random: Random = ThreadLocalRandom.current()
+                random: Random
         ): Game = Game(
                 numberOfPlayers,
                 logging,
-                ECard.readOnlyInitialQuantities.toListOfCards(),
+                ECard.readOnlyInitialQuantities.toListOfCards(random),
                 CardQuantities.new(),
                 List(numberOfPlayers) { index -> Player.new(DEFAULT_PLAYER_NAMES[index]) },
                 random

@@ -2,7 +2,6 @@ package inego.evo.cards
 
 import java.util.*
 import java.util.Collections.shuffle
-import java.util.concurrent.ThreadLocalRandom
 import kotlin.collections.ArrayList
 
 data class CardQuantities(private val quantities: IntArray) {
@@ -48,7 +47,7 @@ data class CardQuantities(private val quantities: IntArray) {
         }
     }
 
-    fun toListOfCards(random: Random = ThreadLocalRandom.current()): MutableList<ECard> {
+    fun toListOfCards(random: Random): MutableList<ECard> {
         val result = ArrayList<ECard>(quantities.sum())
         for (i in 0 until ECard.array.size) {
             val quantity = quantities[i]

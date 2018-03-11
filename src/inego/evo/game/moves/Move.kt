@@ -30,9 +30,9 @@ object GameStartMove : Move() {
 
     override fun Game.applyMove(player: Player) {
         // Hand out 6 cards for each player
-        for (player in players) {
+        for (p in players) {
             repeat(6) {
-                player.hand.add(deck.removeLast())
+                p.hand.add(deck.removeLast())
             }
         }
         logTurnStart()

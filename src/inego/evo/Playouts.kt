@@ -5,7 +5,9 @@ import inego.evo.game.GameCopier
 import inego.evo.game.MoveSelection
 import inego.evo.game.Player
 import inego.evo.game.moves.Move
+import java.util.*
 import java.util.concurrent.Executors
+import java.util.concurrent.ThreadLocalRandom
 import kotlin.math.ln
 import kotlin.math.sqrt
 
@@ -13,7 +15,7 @@ import kotlin.math.sqrt
 val EXPLORATION_COEFFICIENT = sqrt(2.0)
 
 
-data class PlayoutTask(val game: Game, val player: Player, val move: Move)
+data class PlayoutTask(val game: Game, val player: Player, val moveSelection: MoveSelection<*>, val move: Move)
 
 
 class PlayoutStats(var wins: Int, var playouts: Int) {
@@ -24,7 +26,7 @@ class PlayoutStats(var wins: Int, var playouts: Int) {
 class MoveWithStats(val move: Move, val stats: PlayoutStats, var isBest: Boolean)
 
 
-class PlayoutManager(val syncEngine: SyncEngine) {
+class PlayoutManager(private val syncEngineFactory: (Int) -> SyncEngine) {
 
     private val numberOfWorkers = Runtime.getRuntime().availableProcessors()
 //    private val numberOfWorkers = max(Runtime.getRuntime().availableProcessors() - 1, 1)
@@ -35,6 +37,8 @@ class PlayoutManager(val syncEngine: SyncEngine) {
     private var lock = Object()
 
     private var game: Game? = null
+    private var currentMoveSelection: MoveSelection<*>? = null
+
     private var decidingPlayer: Player? = null
     private val moves: MutableMap<Move, PlayoutStats> = mutableMapOf()
 
@@ -53,12 +57,18 @@ class PlayoutManager(val syncEngine: SyncEngine) {
             moves.clear()
             moveSelection.moves.associateByTo(moves, {it}) { PlayoutStats(0, 0) }
 
+            currentMoveSelection = moveSelection
+
             decidingPlayer = moveSelection.decidingPlayer
 
             playoutCount = 0
 
-            repeat(numberOfWorkers) {
-                threadPool.execute(PlayoutWorker(this))
+            // Use a thread-local random to seed RNG that will be used in the workers
+            val random = ThreadLocalRandom.current()
+
+            for (i in 0 until numberOfWorkers) {
+                val syncEngine = syncEngineFactory(i)
+                threadPool.execute(PlayoutWorker(this, syncEngine, Random(random.nextLong())))
             }
         }
     }
@@ -107,36 +117,36 @@ class PlayoutManager(val syncEngine: SyncEngine) {
             bestStats!!.playouts++
             playoutCount++
 
-            return PlayoutTask(game!!, decidingPlayer!!, bestMove!!)
+            return PlayoutTask(game!!, decidingPlayer!!, currentMoveSelection!!, bestMove!!)
         }
     }
 
-    fun registerWin(game: Game, move: Move) {
+    fun registerWin(moveSelection: MoveSelection<*>, move: Move) {
         synchronized(lock) {
             // TODO handle when current playouts were stopped
-            if (game == this.game)
+            if (moveSelection == currentMoveSelection)
                 moves.getValue(move).wins++
         }
     }
 }
 
 
-class PlayoutWorker(private val manager: PlayoutManager) : Runnable {
+class PlayoutWorker(private val manager: PlayoutManager, private val syncEngine: SyncEngine, private val random: Random) : Runnable {
     override fun run() {
 
         do {
             val task = manager.getNextPlayoutTask() ?: break
 
-            val (game, player, move) = task
+            val (game, player, moveSelection, move) = task
 
-            val copier = GameCopier(game, player)
+            val copier = GameCopier(game, player, random)
             val copiedGame = copier.copiedGame
             val copiedMove = move.clone(copier)
             val copiedPlayer = copier[player]
 
-            val winner = playout(copiedGame, copiedPlayer, copiedMove, manager.syncEngine)
+            val winner = playout(copiedGame, copiedPlayer, copiedMove, syncEngine)
             if (winner == copiedPlayer) {
-                manager.registerWin(game, move)
+                manager.registerWin(moveSelection, move)
             }
         } while (true)
     }

@@ -9,13 +9,17 @@ import inego.evo.game.moves.Move
 import java.awt.*
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
+import java.util.*
 import javax.swing.*
+import javax.swing.Timer
 import javax.swing.plaf.metal.MetalLookAndFeel
 
 
 object MainFrame : GameFlowSubscriber {
 
-    private val playoutManager: PlayoutManager = PlayoutManager(RandomSyncEngine)
+    private val random = Random()
+
+    private val playoutManager: PlayoutManager = PlayoutManager { RandomSyncEngine(Random(random.nextLong())) }
 
     private val statRefreshTimer = Timer(1000) {
         val newMoveStats = playoutManager.getCurrentMoveStats()
@@ -52,11 +56,12 @@ object MainFrame : GameFlowSubscriber {
         }
     }
 
-    private val game = Game.new(2, true)
+    private val game = Game.new(3, true, Random())
 
     private val gameManager = GameManager(game).apply {
-        setEngine(0, PlayoutStatsEngine(4000))
-//        setEngine(1, PlayoutStatsEngine(4000))
+        setEngine(0, PlayoutStatsEngine(300))
+        setEngine(1, PlayoutStatsEngine(300))
+        setEngine(2, PlayoutStatsEngine(300))
     }
 
     private val gameBoard = GameBoardComponent(gameManager).apply {

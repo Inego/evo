@@ -5,6 +5,7 @@ import inego.evo.game.MoveSelection
 import inego.evo.game.Player
 import inego.evo.game.moves.GameStartMove
 import inego.evo.game.moves.Move
+import java.util.*
 import java.util.concurrent.CompletableFuture
 import kotlin.system.measureTimeMillis
 
@@ -24,6 +25,8 @@ class GameManager(val game: Game) {
 
     private var subscriber: GameFlowSubscriber? = null
 
+    var decidingPlayer = game[0]
+
     fun setEngine(idx: Int, engine: AsyncEngine) {
         engines[game.players[idx]] = engine
     }
@@ -35,7 +38,7 @@ class GameManager(val game: Game) {
         if (nextMoveSelection == null) {
             subscriber?.onGameOver()
         } else {
-            val decidingPlayer = nextMoveSelection.decidingPlayer
+            decidingPlayer = nextMoveSelection.decidingPlayer
             val engine = engines[decidingPlayer]
 
             subscriber?.onChoicePoint(nextMoveSelection, engine != null)
@@ -65,9 +68,9 @@ interface AsyncEngine {
 }
 
 
-object RandomSyncEngine : SyncEngine {
+class RandomSyncEngine(private val random: Random) : SyncEngine {
     override fun selectMove(game: Game, moveSelection: MoveSelection<*>): Move {
-        return moveSelection.randomElement
+        return random.from(moveSelection)
     }
 }
 
@@ -77,6 +80,8 @@ fun main(args: Array<String>) {
     var p1Wins = 0
     var ties = 0
 
+    val random = Random()
+
     val elapsed = measureTimeMillis {
         for (i in 0..100000) {
 
@@ -84,7 +89,7 @@ fun main(args: Array<String>) {
                 println(i)
             }
 
-            val game = Game.new(3, false)
+            val game = Game.new(3, false, random)
 
             var nextMove: Move = GameStartMove
             var nextPlayer: Player = game.currentPlayer
@@ -92,7 +97,7 @@ fun main(args: Array<String>) {
             do {
                 val moveSelection = game.next(nextPlayer, nextMove) ?: break
                 nextPlayer = moveSelection.decidingPlayer
-                nextMove = moveSelection.randomElement
+                nextMove = random.from(moveSelection)
             } while (true)
 
             val winner = game.winner

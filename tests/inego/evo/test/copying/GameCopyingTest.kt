@@ -8,6 +8,7 @@ import inego.evo.properties.individual.CarnivorousProperty
 import inego.evo.properties.paired.asymmetric.SymbiosisProperty
 import inego.evo.test.newAnimal
 import org.junit.jupiter.api.Test
+import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
@@ -17,7 +18,8 @@ class GameCopyingTest {
 
     @Test
     fun complexGameCopy() {
-        val g = Game.new(2)
+        val random = Random()
+        val g = Game.new(2, false, random)
         g.phase = GamePhase.DEFENSE
         g.seenCards += ECard.HIBERNATION.from(g)
         g.turnNumber = 10
@@ -59,7 +61,7 @@ class GameCopyingTest {
 
         // COPY
 
-        val copier = GameCopier(g, p)
+        val copier = GameCopier(g, p, random)
         val cg = copier.copiedGame
 
         g.phase = GamePhase.FEEDING

@@ -10,6 +10,7 @@ import inego.evo.properties.individual.RunningProperty
 import inego.evo.test.newAnimal
 import inego.evo.test.next
 import org.junit.jupiter.api.Test
+import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -18,7 +19,7 @@ class DefenseTest {
     @Test
     fun killOwnAnimalsForFat() {
 
-        val game = Game.new(2, false)
+        val game = Game.new(2, false, Random())
 
         val p1 = game.players[0]
 
@@ -60,7 +61,7 @@ class DefenseTest {
                 throw AssertionError()
             }
 
-            val game = Game.new(2, false)
+            val game = Game.new(2, false, Random())
             game.phase = GamePhase.FEEDING
 
 
