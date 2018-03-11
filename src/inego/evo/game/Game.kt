@@ -103,7 +103,7 @@ class Game private constructor(
                 GamePhase.GRAZING -> this.performGrazing()
                 GamePhase.EXTINCTION -> this.processExtinction()
                 GamePhase.END -> {
-                    // Do nothing
+                    // May even not get here actually.
                 }
             }
 
@@ -113,6 +113,12 @@ class Game private constructor(
             }
 
         } while (phase != GamePhase.END)
+
+        log {
+            val computedWinner = winner
+            if (computedWinner == null) "A draw! No one won the game."
+            else "The winner is: $computedWinner"
+        }
 
         return null
     }

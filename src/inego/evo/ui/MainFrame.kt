@@ -149,7 +149,6 @@ object MainFrame : GameFlowSubscriber {
 
     override fun onGameOver() {
         refreshGameBoard()
-        TODO("not implemented")
     }
 
     init {

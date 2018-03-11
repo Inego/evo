@@ -43,5 +43,4 @@ class GameCopier(private val src: Game, val forPlayer: Player, private val rando
     operator fun get(membership: ConnectionMembership) = memberships.getValue(membership)
     operator fun set(srcMembership: ConnectionMembership, copiedMembership: ConnectionMembership) =
             memberships.put(srcMembership, copiedMembership)
-
 }

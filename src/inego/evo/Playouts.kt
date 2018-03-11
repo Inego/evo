@@ -15,7 +15,7 @@ import kotlin.math.sqrt
 val EXPLORATION_COEFFICIENT = sqrt(2.0)
 
 
-data class PlayoutTask(val game: Game, val player: Player, val moveSelection: MoveSelection<*>, val move: Move)
+data class PlayoutTask(val gameCopier: GameCopier, val moveSelection: MoveSelection<*>, val move: Move)
 
 
 class PlayoutStats(var wins: Int, var playouts: Int) {
@@ -45,7 +45,9 @@ class PlayoutManager(private val syncEngineFactory: (Int) -> SyncEngine) {
     private var playoutCount: Int = 0
 
     fun stop() {
-        game = null
+        synchronized(lock) {
+            game = null
+        }
     }
 
     fun start(game: Game, moveSelection: MoveSelection<*>) {
@@ -117,7 +119,9 @@ class PlayoutManager(private val syncEngineFactory: (Int) -> SyncEngine) {
             bestStats!!.playouts++
             playoutCount++
 
-            return PlayoutTask(game!!, decidingPlayer!!, currentMoveSelection!!, bestMove!!)
+            val copier = GameCopier(game!!, decidingPlayer!!, ThreadLocalRandom.current())
+
+            return PlayoutTask(copier, currentMoveSelection!!, bestMove!!)
         }
     }
 
@@ -137,12 +141,11 @@ class PlayoutWorker(private val manager: PlayoutManager, private val syncEngine:
         do {
             val task = manager.getNextPlayoutTask() ?: break
 
-            val (game, player, moveSelection, move) = task
+            val (copier, moveSelection, move) = task
 
-            val copier = GameCopier(game, player, random)
             val copiedGame = copier.copiedGame
             val copiedMove = move.clone(copier)
-            val copiedPlayer = copier[player]
+            val copiedPlayer = copier[moveSelection.decidingPlayer]
 
             val winner = playout(copiedGame, copiedPlayer, copiedMove, syncEngine)
             if (winner == copiedPlayer) {
