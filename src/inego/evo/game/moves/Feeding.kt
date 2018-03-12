@@ -23,6 +23,7 @@ class GetRedTokenMove(animal: Animal) : FeedingAnimalMove(animal) {
     override fun toString(player: Player) = "$animal: take 1 food from base"
     override fun doFeeding(game: Game, player: Player): GamePhase {
         animal.gainRedToken(game)
+        game.inactivePlayers = 0
         return GamePhase.FOOD_PROPAGATION
     }
 }
@@ -37,6 +38,7 @@ class BurnFatMove(animal: Animal, private val fatToBurn: Int) : FeedingAnimalMov
         animal.fat -= fatToBurn
         // Fat burning is a special action and as such does not lead to food propagation.
         animal.hasFood += fatToBurn
+        game.inactivePlayers = 0
         return GamePhase.GRAZING
     }
 
@@ -49,7 +51,7 @@ object FeedingPassMove : FeedingMove() {
     override fun clone(c: GameCopier) = this
 
     override fun doFeeding(game: Game, player: Player): GamePhase {
-        player.passed = true
+        // Note that this is the only feeding move that does not reset inactivePlayers
         return GamePhase.GRAZING
     }
 

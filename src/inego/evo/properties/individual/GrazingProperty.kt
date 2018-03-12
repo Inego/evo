@@ -24,8 +24,11 @@ class GrazeFood(private val foodToGraze: Int) : Move() {
     override fun Game.applyMove(player: Player) {
         if (foodToGraze > 0) {
             foodBase -= foodToGraze
+            inactivePlayers = 0
             log { "Food left: $foodBase." }
         }
+        // Otherwise food is not grazed and this does not reset the inactive player count
+        // (since this is a form of pass)
     }
 }
 

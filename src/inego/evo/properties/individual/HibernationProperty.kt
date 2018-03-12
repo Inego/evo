@@ -26,6 +26,8 @@ class HibernationMove(animal: Animal) : FeedingAnimalMove(animal) {
     override fun doFeeding(game: Game, player: Player): GamePhase {
         animal.isHibernating = true
 
+        game.inactivePlayers = 0
+
         // There is no food propagation, so go directly to grazing
         return GamePhase.GRAZING
     }

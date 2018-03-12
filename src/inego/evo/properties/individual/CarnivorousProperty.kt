@@ -51,6 +51,7 @@ class AttackMove(animal: Animal, val victim: Animal) : FeedingAnimalMove(animal)
         animal.usedAttack = true
         game.attackingAnimal = animal
         game.defendingAnimal = victim
+        game.inactivePlayers = 0
         return GamePhase.DEFENSE
     }
 

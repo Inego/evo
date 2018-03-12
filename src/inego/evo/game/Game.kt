@@ -15,6 +15,7 @@ class Game private constructor(
         val deck: MutableList<ECard>,
         val seenCards: CardQuantities,
         val players: List<Player>,
+        var inactivePlayers: Int,
         private val random: Random
 ) {
 
@@ -56,6 +57,7 @@ class Game private constructor(
             c.takeUnseenCards(src.deck.size),
             src.seenCards.clone(),
             c.copiedPlayers,
+            src.inactivePlayers,
             random
     ) {
         turnNumber = src.turnNumber
@@ -127,6 +129,7 @@ class Game private constructor(
 
     private fun performGrazing() {
         val player = currentPlayer
+
         val grazingAnimals = player.animals.count { it.has(GrazingProperty) }
 
         val maxToGraze = min(grazingAnimals, foodBase)
@@ -292,32 +295,26 @@ class Game private constructor(
 
     private fun performFeeding() {
 
-        var entryPlayerIdx = -1
-
         while (true) {
 
-            if (entryPlayerIdx == -1) {
-                entryPlayerIdx = currentPlayerIdx
-            } else {
-                if (entryPlayerIdx == currentPlayerIdx)
-                    break
+            if (inactivePlayers == players.size) {
+                break
             }
+
+            inactivePlayers++
 
             // Collect feeding moves
 
             val player = currentPlayer
 
-            if (player.passed) {
-                incCurrentPlayer()
-                continue
-            }
-
             var moves = player.animals.flatMap { it.gatherFeedingMoves(this) }
 
             if (moves.isEmpty()) {
 
-                phase = GamePhase.GRAZING
-                return
+                performGrazing()
+
+                if (moveSelections.isNotEmpty())
+                    return
 
             } else {
 
@@ -335,7 +332,6 @@ class Game private constructor(
                 return
             }
         }
-
 
         phase = GamePhase.EXTINCTION
     }
@@ -402,6 +398,8 @@ class Game private constructor(
             }
 
             turnNumber++
+
+            inactivePlayers = 0
 
             firstPlayerIdx++
 
@@ -499,6 +497,7 @@ class Game private constructor(
                 ECard.readOnlyInitialQuantities.toListOfCards(random),
                 CardQuantities.new(),
                 List(numberOfPlayers) { index -> Player.new(DEFAULT_PLAYER_NAMES[index]) },
+                0,
                 random
         )
     }

@@ -29,6 +29,7 @@ class StealFoodMove(animal: Animal, private val victim: Animal) : FeedingAnimalM
         animal.gainBlueTokens(1)
 
         animal.usedPiracy = true
+        game.inactivePlayers = 0
         return GamePhase.FOOD_PROPAGATION
     }
 

@@ -53,8 +53,9 @@ class LosePairedProperty(defender: Animal, attacker: Animal, private val connect
             c[connectionMembership]
     )
 
-    override fun logMessage(player: Player) = "${defender.fullName} loses ${connectionMembership.sideProperty} " +
-                "to ${connectionMembership.other.fullName} as a tail."
+    override fun logMessage(player: Player) =
+            "${defender.fullName} loses ${connectionMembership.sideProperty.name} to " +
+                    "${connectionMembership.other.fullName} as a tail."
 
     override fun Game.applyMove(player: Player) {
         defender.owner.removeConnection(connectionMembership.connection)
