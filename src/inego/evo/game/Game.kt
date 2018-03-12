@@ -307,7 +307,10 @@ class Game private constructor(
 
             val player = currentPlayer
 
-            if (player.passed) continue
+            if (player.passed) {
+                incCurrentPlayer()
+                continue
+            }
 
             var moves = player.animals.flatMap { it.gatherFeedingMoves(this) }
 
