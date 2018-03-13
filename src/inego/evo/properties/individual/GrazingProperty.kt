@@ -1,13 +1,19 @@
 package inego.evo.properties.individual
 
-import inego.evo.game.Game
-import inego.evo.game.GameCopier
-import inego.evo.game.MoveSelection
-import inego.evo.game.Player
+import inego.evo.game.*
 import inego.evo.game.moves.Move
 import inego.evo.properties.IndividualProperty
+import inego.evo.properties.StatModifier
 
-object GrazingProperty : IndividualProperty("Grazing") {
+object GrazingProperty : IndividualProperty("Grazing"), StatModifier {
+    override fun onAttach(animal: Animal) {
+        animal.owner.grazingPower++
+    }
+
+    override fun onDetach(animal: Animal) {
+        animal.owner.grazingPower--
+    }
+
     override val enumValue: IndividualPropertyEnum
         get() = IndividualPropertyEnum.GRAZING
 }

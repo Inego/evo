@@ -4,6 +4,7 @@ import inego.evo.cards.CardQuantities
 import inego.evo.cards.ECard
 import inego.evo.game.moves.FoodPropagationMove
 import inego.evo.properties.PairedProperty
+import inego.evo.properties.individual.GrazingProperty
 import inego.evo.properties.paired.FoodPropagator
 
 class Player private constructor(
@@ -11,7 +12,8 @@ class Player private constructor(
         var passed: Boolean,
         var discardSize: Int,
         val hand: MutableList<ECard>,
-        val cardsPlayedAsAnimals: CardQuantities
+        val cardsPlayedAsAnimals: CardQuantities,
+        var grazingPower: Int
 ) {
     val animals: MutableList<Animal> = mutableListOf()
     val connections: MutableList<Connection> = mutableListOf()
@@ -54,7 +56,8 @@ class Player private constructor(
                 passed,
                 discardSize,
                 copiedHand,
-                copiedCardsPlayedAsAnimals
+                copiedCardsPlayedAsAnimals,
+                grazingPower
         )
 
         for (srcAnimal in animals) {
@@ -139,6 +142,11 @@ class Player private constructor(
         discardSize += 1 + animal.individualProperties.size + animal.fatCapacity
 
         animal.connections.map { it.connection }.forEach { removeConnection(it) }
+
+        if (animal.has(GrazingProperty)) {
+            grazingPower--
+        }
+
         animals.remove(animal)
     }
 
@@ -172,7 +180,8 @@ class Player private constructor(
                 false,
                 0,
                 mutableListOf(),
-                CardQuantities.new()
+                CardQuantities.new(),
+                0
         )
     }
 }

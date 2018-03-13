@@ -127,16 +127,24 @@ class Game private constructor(
 
     fun dice() = random.nextInt(6) + 1
 
+    private val totalFoodRequirement
+        inline get() = players.flatMap { it.animals }.sumBy { it.lackingFood }
+
     private fun performGrazing() {
         val player = currentPlayer
 
-        val grazingAnimals = player.animals.count { it.has(GrazingProperty) }
+        val grazingPower = player.grazingPower
 
-        val maxToGraze = min(grazingAnimals, foodBase)
+        var maxToGraze = min(grazingPower, foodBase)
 
         if (maxToGraze > 0) {
-            val grazeFoodMoves = (0..maxToGraze).map { GrazeFood(it) }
-            moveSelections.add(GrazeFoodSelection(player, grazeFoodMoves))
+
+            maxToGraze = min(maxToGraze, totalFoodRequirement)
+
+            if (maxToGraze > 0) {
+                val grazeFoodMoves = (0..maxToGraze).map { GrazeFood(it) }
+                moveSelections.add(GrazeFoodSelection(player, grazeFoodMoves))
+            }
         }
 
         // Go to next player

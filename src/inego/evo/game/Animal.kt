@@ -77,6 +77,9 @@ class Animal private constructor(
     val isFull: Boolean
         inline get() = isHibernating || isFed && fatCapacity == fat
 
+    val lackingFood: Int
+        inline get() = if (isHibernating) 0 else foodRequirement - hasFood + fatCapacity - fat
+
     fun gatherFeedingMoves(game: Game): List<FeedingMove> {
 
         if (!mayEat)
