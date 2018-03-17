@@ -1,16 +1,16 @@
 package inego.evo.test
 
 import inego.evo.game.Game
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.Test
+import org.junit.Test
 import java.util.*
+import kotlin.test.assertEquals
 
 class GameTests {
 
     @Test
     fun newGameDeckSize() {
         val g = Game.new(0, false, Random())
-        Assertions.assertEquals(84, g.deck.size)
+        assertEquals(84, g.deck.size)
     }
 
     @Test

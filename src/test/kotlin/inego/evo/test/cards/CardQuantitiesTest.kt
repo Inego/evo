@@ -2,7 +2,7 @@ package inego.evo.test.cards
 
 import inego.evo.cards.CardQuantities
 import inego.evo.cards.ECard
-import org.junit.jupiter.api.Test
+import org.junit.Test
 import kotlin.test.assertEquals
 
 class CardQuantitiesTest {

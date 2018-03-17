@@ -3,10 +3,10 @@ package inego.evo.test.properties
 import inego.evo.game.Game
 import inego.evo.properties.paired.asymmetric.SymbiosisProperty
 import inego.evo.properties.paired.symmetric.CooperationProperty
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.Test
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
 import java.util.*
+import kotlin.test.assertEquals
 
 internal class PairedPropertyTest {
 

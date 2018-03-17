@@ -10,7 +10,7 @@ import inego.evo.properties.individual.ScavengerProperty
 import inego.evo.properties.paired.symmetric.CooperationProperty
 import inego.evo.test.newAnimal
 import inego.evo.test.next
-import org.junit.jupiter.api.Test
+import org.junit.Test
 import java.util.*
 import kotlin.test.assertEquals
 

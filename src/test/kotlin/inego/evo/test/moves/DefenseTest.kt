@@ -9,7 +9,7 @@ import inego.evo.properties.individual.CarnivorousProperty
 import inego.evo.properties.individual.RunningProperty
 import inego.evo.test.newAnimal
 import inego.evo.test.next
-import org.junit.jupiter.api.Test
+import org.junit.Test
 import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

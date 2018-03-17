@@ -6,7 +6,9 @@ import inego.evo.game.MoveSelection
 import inego.evo.game.Player
 import inego.evo.game.moves.EmptyMove
 import inego.evo.properties.IndividualProperty
-import org.junit.jupiter.api.Assertions.*
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 
 fun <T> Iterator<T>.assertNext(nextValue: T?) {

@@ -7,7 +7,7 @@ import inego.evo.game.GamePhase
 import inego.evo.properties.individual.CarnivorousProperty
 import inego.evo.properties.paired.asymmetric.SymbiosisProperty
 import inego.evo.test.newAnimal
-import org.junit.jupiter.api.Test
+import org.junit.Test
 import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse

@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="Spellchecking" pattern="file[evo_main]:*/||file[evo_test]:*/" />
+</component>
