@@ -33,5 +33,8 @@ fun Game.next(): MoveSelection<*>? = next(currentPlayer, EmptyMove)
 /**
  * Creates an animal with the specified individual property.
  */
-fun Player.newAnimal(individualProperty: IndividualProperty): Animal =
-        newAnimal().apply { addProperty(individualProperty) }
+fun Player.newAnimal(individualProperty: IndividualProperty, fatCapacity: Int = 0): Animal =
+        newAnimal().apply {
+            addProperty(individualProperty)
+            this.fatCapacity = fatCapacity
+        }

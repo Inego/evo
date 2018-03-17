@@ -127,6 +127,7 @@ class Player private constructor(
     fun removeConnection(connection: Connection) {
         connection.animal1.connections.removeIf { it.connection == connection }
         connection.animal2.connections.removeIf { it.connection == connection }
+        foodPropagationSet.removeIf { it.connection == connection }
         connections.remove(connection)
         discardSize++
     }

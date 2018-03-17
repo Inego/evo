@@ -347,6 +347,7 @@ class Game private constructor(
     private fun processExtinction() {
         for (player in players) {
             player.passed = false
+            player.foodPropagationSet.clear()
 
             // Remove dead animals
             val dyingAnimals = player.animals.filter { !it.isFed || it.isPoisoned }
