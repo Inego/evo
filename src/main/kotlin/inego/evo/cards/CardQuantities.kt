@@ -4,7 +4,7 @@ import java.util.*
 import java.util.Collections.shuffle
 import kotlin.collections.ArrayList
 
-data class CardQuantities(private val quantities: IntArray) {
+data class CardQuantities(val quantities: IntArray) {
     val totalCount: Int
         get() = quantities.sum()
 

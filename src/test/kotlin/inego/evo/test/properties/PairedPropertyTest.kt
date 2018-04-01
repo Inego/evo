@@ -10,7 +10,7 @@ import kotlin.test.assertEquals
 
 internal class PairedPropertyTest {
 
-    private val game = Game.new(1, false, Random())
+    private val game = Game.new(1, Random(), false)
 
     private val p = game.players[0]
 

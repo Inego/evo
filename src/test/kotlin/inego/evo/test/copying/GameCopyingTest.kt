@@ -19,7 +19,7 @@ class GameCopyingTest {
     @Test
     fun complexGameCopy() {
         val random = Random()
-        val g = Game.new(2, false, random)
+        val g = Game.new(2, random, false)
         g.phase = GamePhase.DEFENSE
         g.seenCards += ECard.HIBERNATION.from(g)
         g.turnNumber = 10

@@ -19,7 +19,7 @@ class FoodPropagationTest {
     @Test
     fun testTwoPlayerFoodPropagation() {
 
-        val g = Game.new(2, true, Random())
+        val g = Game.new(2, Random(), true)
 
         val p1 = g[0]
         val p2 = g[1]

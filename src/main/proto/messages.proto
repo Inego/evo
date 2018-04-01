@@ -1,0 +1,128 @@
+syntax = "proto2";
+
+package game;
+
+option java_package = "inego.evo.proto";
+option java_outer_classname = "GameProtos";
+
+
+enum IndividualProperty {
+    IP_BIG = 1;
+    IP_BURROWING = 2;
+    IP_CAMOUFLAGE = 3;
+    IP_CARNIVOROUS = 4;
+    IP_GRAZING = 5;
+    IP_HIBERNATION = 6;
+    IP_MIMICRY = 7;
+    IP_PARASITE = 8;
+    IP_PIRACY = 9;
+    IP_POISONOUS = 10;
+    IP_RUNNING = 11;
+    IP_SCAVENGER = 12;
+    IP_SHARP_VISION = 13;
+    IP_SWIMMING = 14;
+    IP_TAIL_LOSS = 15;
+    IP_FAT_TISSUE = 16; // Only for compatibility with the main enum
+}
+
+enum Card {
+    CAMOUFLAGE = 1;
+    BURROWING = 2;
+    SHARP_VISION = 3;
+    SYMBIOSIS = 4;
+    PIRACY = 5;
+    GRAZING = 6;
+    TAIL_LOSS = 7;
+    HIBERNATION = 8;
+    POISONOUS = 9;
+    COMMUNICATION = 10;
+    SCAVENGER = 11;
+    RUNNING = 12;
+    MIMICRY = 13;
+    SWIMMING = 14;
+    PARASITE__CARNIVOROUS = 15;
+    PARASITE__FAT_TISSUE = 16;
+    COOPERATION__CARNIVOROUS = 17;
+    COOPERATION__FAT_TISSUE = 18;
+    BIG__CARNIVOROUS = 19;
+    BIG__FAT_TISSUE = 20;
+}
+
+message CardQuantity {
+    required Card card = 1;
+    required int32 quantity = 2;
+}
+
+message Animal {
+    repeated IndividualProperty individual_properties = 1;
+    optional int32 has_food = 2;
+    required int32 food_requirement = 3;
+    optional int32 fat_capacity = 4;
+    optional int32 fat = 5;
+    optional bool used_piracy = 6;
+    optional bool used_mimicry = 7;
+    optional bool used_attack = 8;
+    optional bool used_running_away = 9;
+    optional bool is_hibernating = 10;
+    optional bool hibernated_last_turn = 11;
+    optional bool is_poisoned = 12;
+}
+
+message AnimalReference {
+    required int32 owner = 1;
+    required int32 animal = 2;
+}
+
+enum PairedProperty {
+    PP_COOPERATION = 0;
+    PP_COMMUNICATION = 1;
+    PP_SYMBIOSIS = 2;
+}
+
+message Connection {
+    required int32 first_animal = 1;
+    required int32 second_animal = 2;
+    required PairedProperty property = 3;
+    optional bool is_used = 4;
+}
+
+message ConnectionMembership {
+    required int32 connection = 1;
+    required bool host = 2;
+}
+
+message Player {
+    // TODO grazing power on read
+    repeated Animal animals = 1;
+    repeated Connection connections = 2;
+    repeated Card hand = 3;
+    repeated CardQuantity cards_played_as_animals = 4;
+    repeated ConnectionMembership food_propagation_set = 5;
+    optional bool passed = 6;
+    required int32 discard_size = 7;
+}
+
+enum GamePhase {
+    PH_DEVELOPMENT = 1;
+    PH_FEEDING_BASE_DETERMINATION = 2;
+    PH_FEEDING = 3;
+    PH_DEFENSE = 4;
+    PH_FOOD_PROPAGATION = 5;
+    PH_GRAZING = 6;
+    PH_EXTINCTION = 7;
+    PH_END = 8;
+}
+
+message Game {
+    repeated Player players = 1;
+    repeated CardQuantity seen_cards = 2;
+    optional int32 inactive_players = 3;
+    required int32 turn_number = 4;
+    required int32 first_player_idx = 5;
+    required int32 current_player_idx = 6;
+    required bool compute_next_player = 7;
+    required GamePhase phase = 8;
+    optional AnimalReference attacking_animal = 9;
+    optional AnimalReference defending_animal = 10;
+    optional int32 food_base = 11;
+}

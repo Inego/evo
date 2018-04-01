@@ -89,7 +89,7 @@ fun main(args: Array<String>) {
                 println(i)
             }
 
-            val game = Game.new(3, false, random)
+            val game = Game.new(3, random, false)
 
             var nextMove: Move = GameStartMove
             var nextPlayer: Player = game.currentPlayer

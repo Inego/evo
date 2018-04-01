@@ -19,7 +19,7 @@ class DefenseTest {
     @Test
     fun killOwnAnimalsForFat() {
 
-        val game = Game.new(2, false, Random())
+        val game = Game.new(2, Random(), false)
 
         val p1 = game.players[0]
 
@@ -61,7 +61,7 @@ class DefenseTest {
                 throw AssertionError()
             }
 
-            val game = Game.new(2, false, Random())
+            val game = Game.new(2, Random(), false)
             game.phase = GamePhase.FEEDING
 
 

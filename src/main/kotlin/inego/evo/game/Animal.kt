@@ -4,7 +4,10 @@ import inego.evo.game.moves.BurnFatMove
 import inego.evo.game.moves.DefenseMove
 import inego.evo.game.moves.FeedingMove
 import inego.evo.game.moves.GetRedTokenMove
-import inego.evo.properties.*
+import inego.evo.properties.DefenseAction
+import inego.evo.properties.FeedingAction
+import inego.evo.properties.IndividualProperty
+import inego.evo.properties.StatModifier
 import inego.evo.properties.individual.FatTissueProperty
 import inego.evo.properties.individual.IndividualPropertyEnum
 import inego.evo.properties.paired.asymmetric.SymbiosisGuest

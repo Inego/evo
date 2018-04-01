@@ -29,7 +29,7 @@ class Game private constructor(
 
     var currentPlayerIdx = 0
 
-    private var computeNextPlayer = false
+    var computeNextPlayer = false
 
     inline val currentPlayer
         get() = players[currentPlayerIdx]
@@ -498,8 +498,8 @@ class Game private constructor(
 
         fun new(
                 numberOfPlayers: Int,
-                logging: Boolean = false,
-                random: Random
+                random: Random,
+                logging: Boolean = false
         ): Game = Game(
                 numberOfPlayers,
                 logging,
