@@ -45,6 +45,9 @@ abstract class IndividualProperty(name: String) : AnimalProperty<IndividualPrope
 
     open fun mayBeAttackedBy(victim: Animal, attacker: Animal) = true
 
+    /**
+     * Number of points rewarded to having this property in play.
+     */
     open val score = 1
 }
 

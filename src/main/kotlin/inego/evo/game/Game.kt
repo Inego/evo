@@ -9,6 +9,12 @@ import inego.evo.removeLast
 import java.util.*
 import kotlin.math.min
 
+
+/**
+ * Full game state representation providing game logic (also contained in "child" classes [Player] and [Animal]).
+ *
+ * Also Games provide copying logic (are capable of producing their copies with a given copier).
+ */
 class Game private constructor(
         val numberOfPlayers: Int,
         val logging: Boolean,
@@ -18,9 +24,9 @@ class Game private constructor(
         var inactivePlayers: Int,
         private val random: Random
 ) {
-
     var turnNumber = 1
 
+    // TODO make logging external to the game state
     val logMessages: MutableList<String> = mutableListOf()
 
     private val moveSelections: Deque<MoveSelection<*>> = LinkedList()

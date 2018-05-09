@@ -11,6 +11,7 @@ import kotlin.math.ln
 import kotlin.math.sqrt
 
 
+/** Manually tuned exploration coefficient used to pick another move for playing out */
 val EXPLORATION_COEFFICIENT = sqrt(2.0)
 
 
@@ -25,6 +26,12 @@ class PlayoutStats(var wins: Int, var playouts: Int) {
 class MoveWithStats(val move: Move, val stats: PlayoutStats, var isBest: Boolean)
 
 
+/**
+ * An instance managing random playouts for a move selection of a specified game state
+ * carried out by sync engines.
+ *
+ * @param syncEngineFactory A sync engine factory providing engines to be used during playouts.
+ */
 class PlayoutManager(private val syncEngineFactory: (Int) -> SyncEngine) {
 
     private val numberOfWorkers = Runtime.getRuntime().availableProcessors()
@@ -56,7 +63,7 @@ class PlayoutManager(private val syncEngineFactory: (Int) -> SyncEngine) {
             this.game = game
 
             moves.clear()
-            moveSelection.moves.associateByTo(moves, {it}) { PlayoutStats(0, 0) }
+            moveSelection.moves.associateByTo(moves, { it }) { PlayoutStats(0, 0) }
 
             currentMoveSelection = moveSelection
 
@@ -73,7 +80,7 @@ class PlayoutManager(private val syncEngineFactory: (Int) -> SyncEngine) {
 
     fun getCurrentMoveStats(): Map<Move, PlayoutStats> {
         synchronized(lock) {
-            return moves.entries.associateBy({ it.key }) {it.value.clone()}
+            return moves.entries.associateBy({ it.key }) { it.value.clone() }
         }
     }
 

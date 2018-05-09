@@ -4,6 +4,9 @@ import java.util.*
 import java.util.Collections.shuffle
 import kotlin.collections.ArrayList
 
+/**
+ * A wrapper around an `IntArray` representing counts of game cards in some context with useful helper methods.
+ */
 data class CardQuantities(val quantities: IntArray) {
     val totalCount: Int
         get() = quantities.sum()

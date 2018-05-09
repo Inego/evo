@@ -10,6 +10,10 @@ import java.util.*
 import java.util.concurrent.CompletableFuture
 import kotlin.concurrent.schedule
 
+
+/**
+ * An async engine based on purely random playouts for the specified amount of time.
+ */
 class PlayoutStatsEngine(private val timeToThink: Long) : AsyncEngine {
 
     private val random = Random()

@@ -7,6 +7,10 @@ import inego.evo.properties.PairedProperty
 import inego.evo.properties.individual.GrazingProperty
 import inego.evo.properties.paired.FoodPropagator
 
+
+/**
+ * An active model of player state providing some of the game logic.
+ */
 class Player private constructor(
         val name: String,
         var passed: Boolean,
@@ -25,6 +29,9 @@ class Player private constructor(
     val cardsToHandOut
         inline get() = if (hand.isEmpty() and animals.isEmpty()) 6 else animals.size + 1
 
+    /**
+     * Returns the current game score of the player.
+     */
     val score
         get() = animals.sumBy { 2 + it.individualProperties.sumBy { it.individualProperty.score } + it.fatCapacity } +
                 connections.size
@@ -32,6 +39,9 @@ class Player private constructor(
     val result
         get() = PlayerResult(this, score, discardSize)
 
+    /**
+     * Creates a clone of this player using the provided copier.
+     */
     fun clone(gameCopier: GameCopier): Player {
 
         val exactCopy = this == gameCopier.forPlayer
@@ -176,6 +186,9 @@ class Player private constructor(
     }
 
     companion object {
+        /**
+         * Factory method to create player instances.
+         */
         fun new(name: String): Player = Player(
                 name,
                 false,
@@ -187,6 +200,9 @@ class Player private constructor(
     }
 }
 
+/**
+ * Data of a given player sufficient to determine game winners by comparing it other players' results.
+ */
 class PlayerResult(val player: Player, private val score: Int, private val discard: Int) : Comparable<PlayerResult> {
     override fun compareTo(other: PlayerResult) = compareValuesBy(this, other, { it.score }, { it.discard })
 }

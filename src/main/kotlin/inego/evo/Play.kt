@@ -10,15 +10,31 @@ import java.util.concurrent.CompletableFuture
 import kotlin.system.measureTimeMillis
 
 
+/**
+ * An entity reacting to changes in a game state.
+ */
 interface GameFlowSubscriber {
-
+    /**
+     * Notified when a game choice has to be made by a player.
+     *
+     * @param moveSelection Move selection.
+     * @param forAI If `true`, the move selection has to be handled by an AI / engine.
+     */
     fun onChoicePoint(moveSelection: MoveSelection<*>, forAI: Boolean)
 
+    /**
+     * Notified when the game is over.
+     */
     fun onGameOver()
-
 }
 
 
+/**
+ * An instance handling the process of game flow.
+ * It supports attaching engines to player sides to make moves. Other players will have to rely
+ * on an external subscriber which will be notified of game events and asked for choices
+ * at appropriate times.
+ */
 class GameManager(val game: Game) {
 
     private val engines: MutableMap<Player, AsyncEngine> = mutableMapOf()
@@ -27,10 +43,16 @@ class GameManager(val game: Game) {
 
     var decidingPlayer = game[0]
 
+    /**
+     * Sets an async engine to a specified player index.
+     */
     fun setEngine(idx: Int, engine: AsyncEngine) {
         engines[game.players[idx]] = engine
     }
 
+    /**
+     * Proceeds the game state by a specified move made by a player.
+     */
     fun next(player: Player, moveToMake: Move) {
 
         val nextMoveSelection = game.next(player, moveToMake)
@@ -51,23 +73,47 @@ class GameManager(val game: Game) {
         }
     }
 
+    /**
+     * Checks if the specified player is controlled by AI.
+     */
     fun isAI(player: Player) = engines.containsKey(player)
 
+    /**
+     * Sets the game flow subscriber.
+     */
     fun subscribe(subscriber: GameFlowSubscriber) {
         this.subscriber = subscriber
     }
 }
 
+
+/**
+ * An engine making synchronous moves.
+ */
 interface SyncEngine {
     fun selectMove(game: Game, moveSelection: MoveSelection<*>): Move
 }
 
+/**
+ * An engine making asynchronous moves with force-move support.
+ */
 interface AsyncEngine {
+    /**
+     * Returns a completable future with a move selected by the engine from the specified move selection.
+     */
     fun selectMove(game: Game, moveSelection: MoveSelection<*>): CompletableFuture<Move>
+
+    /**
+     * Forces the engine to make the move instantly. Currently available results will have to be used
+     * to choose the best move.
+     */
     fun forceMove()
 }
 
 
+/**
+ * A purely random engine.
+ */
 class RandomSyncEngine(private val random: Random) : SyncEngine {
     override fun selectMove(game: Game, moveSelection: MoveSelection<*>): Move {
         return random.from(moveSelection)
@@ -75,6 +121,7 @@ class RandomSyncEngine(private val random: Random) : SyncEngine {
 }
 
 
+// Used for crude benchmarking purposes
 fun main(args: Array<String>) {
 
     var p1Wins = 0

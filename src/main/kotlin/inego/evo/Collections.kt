@@ -1,3 +1,7 @@
+/**
+ * Utility methods for working with collections.
+ */
+
 package inego.evo
 
 import java.util.*
