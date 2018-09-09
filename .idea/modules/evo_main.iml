@@ -30,9 +30,7 @@
     <content url="file://$MODULE_DIR$/../../build/extracted-include-protos/main">
       <sourceFolder url="file://$MODULE_DIR$/../../build/extracted-include-protos/main" isTestSource="false" />
     </content>
-    <content url="file://$MODULE_DIR$/../../build/extracted-protos/main">
-      <sourceFolder url="file://$MODULE_DIR$/../../build/extracted-protos/main" isTestSource="false" />
-    </content>
+    <content url="file://$MODULE_DIR$/../../build/extracted-protos/main" />
     <content url="file://$MODULE_DIR$/../../gen/main">
       <sourceFolder url="file://$MODULE_DIR$/../../gen/main/java" isTestSource="false" />
     </content>
@@ -44,10 +42,11 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.41" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.61" level="project" />
     <orderEntry type="library" name="Gradle: com.google.protobuf:protobuf-java:3.0.0" level="project" />
-    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.2.41" level="project" />
-    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.2.41" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.2.61" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.2.61" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-common:1.2.61" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains:annotations:13.0" level="project" />
   </component>
 </module>
