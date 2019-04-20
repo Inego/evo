@@ -24,8 +24,7 @@ data class ConnectionMembership(val connection: Connection, val host: Boolean) {
 
     inline val sideProperty: PairedPropertySide
         get() {
-            val p = connection.property
-            return when (p) {
+            return when (val p = connection.property) {
                 is SymmetricProperty -> p.side
                 is AsymmetricProperty -> if (host) p.host else p.guest
             }

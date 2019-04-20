@@ -8,7 +8,6 @@ import java.awt.Color
 import java.awt.Graphics
 import java.awt.Graphics2D
 import javax.swing.JPanel
-import kotlin.coroutines.experimental.buildSequence
 
 class GameBoardComponent(private val gameManager: GameManager) : JPanel() {
 
@@ -140,8 +139,7 @@ class GameBoardComponent(private val gameManager: GameManager) : JPanel() {
                                 g2.drawString(drawableProperty.individualProperty.name, textStartX, textStartY)
                             is ConnectionMembershipDrawableProperty -> {
                                 val membership = drawableProperty.connectionMembership
-                                val property = membership.property
-                                val side = when (property) {
+                                val side = when (val property = membership.property) {
                                     is SymmetricProperty -> property.side
                                     is AsymmetricProperty -> if (membership.host) property.host else property.guest
                                 }
@@ -166,7 +164,7 @@ class CardDrawingInfo(
     val textStartY = (yStart + rowTextBase).toInt()
 }
 
-fun Animal.drawableProperties() = buildSequence {
+fun Animal.drawableProperties() = sequence {
     if (fatCapacity > 0) {
         yield(FatTissueDrawableProperty(fatCapacity))
     }

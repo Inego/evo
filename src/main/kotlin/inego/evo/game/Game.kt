@@ -476,7 +476,7 @@ class Game private constructor(
             val scavengers = scavengerCandidate.animals
                     .filter { it.has(ScavengerProperty) && !it.isFull }
 
-            if (!scavengers.isEmpty()) {
+            if (scavengers.isNotEmpty()) {
                 val feedScavengerMoves = scavengers.map(::FeedTheScavengerMove)
                 moveSelections.add(ScavengerSelection(scavengerCandidate, feedScavengerMoves))
                 break

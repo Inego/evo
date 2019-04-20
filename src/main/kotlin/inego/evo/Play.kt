@@ -122,7 +122,7 @@ class RandomSyncEngine(private val random: Random) : SyncEngine {
 
 
 // Used for crude benchmarking purposes
-fun main(args: Array<String>) {
+fun main() {
 
     var p1Wins = 0
     var ties = 0
@@ -147,8 +147,7 @@ fun main(args: Array<String>) {
                 nextMove = random.from(moveSelection)
             } while (true)
 
-            val winner = game.winner
-            when (winner) {
+            when (game.winner) {
                 game.players[0] -> p1Wins++
                 null -> ties++
             }

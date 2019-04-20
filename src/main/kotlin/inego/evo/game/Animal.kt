@@ -186,13 +186,13 @@ class Animal private constructor(
                 0,
                 1,
                 0,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false
+                usedPiracy = false,
+                usedMimicry = false,
+                usedAttack = false,
+                usedRunningAway = false,
+                isHibernating = false,
+                hibernatedLastTurn = false,
+                isPoisoned = false
         )
     }
 }
