@@ -16,7 +16,7 @@ object ParasiteProperty : IndividualProperty("Parasite"), StatModifier {
 
         return game.players
                 .filter { it != currentPlayer }
-                .flatMap { it.animals.filter { mayAttachTo(it) } }
+                .flatMap { player -> player.animals.filter { mayAttachTo(it) } }
                 .map { SingleTarget(it) }
     }
 

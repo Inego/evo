@@ -17,13 +17,13 @@ data class CardQuantities(val quantities: IntArray) {
 
         other as CardQuantities
 
-        if (!Arrays.equals(quantities, other.quantities)) return false
+        if (!quantities.contentEquals(other.quantities)) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        return Arrays.hashCode(quantities)
+        return quantities.contentHashCode()
     }
 
     operator fun plusAssign(eCard: ECard) {
@@ -52,7 +52,7 @@ data class CardQuantities(val quantities: IntArray) {
 
     fun toListOfCards(random: Random): MutableList<ECard> {
         val result = ArrayList<ECard>(quantities.sum())
-        for (i in 0 until ECard.array.size) {
+        for (i in ECard.array.indices) {
             val quantity = quantities[i]
             if (quantity > 0) {
                 val eCard = ECard.array[i]

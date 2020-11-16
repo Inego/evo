@@ -1,2 +1,6 @@
 out
 lib
+/build/
+/.gradle/
+/.idea/workspace.xml
+/.idea/libraries/

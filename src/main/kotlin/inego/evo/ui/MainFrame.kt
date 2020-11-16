@@ -24,7 +24,7 @@ object MainFrame : GameFlowSubscriber {
     private val statRefreshTimer = Timer(1000) {
         val newMoveStats = playoutManager.getCurrentMoveStats()
 
-        val best = newMoveStats.values.map { it.playouts }.max() ?: throw AssertionError()
+        val best = newMoveStats.values.map { it.playouts }.maxOrNull() ?: throw AssertionError()
 
         var bestAssigned = false
 
@@ -70,7 +70,7 @@ object MainFrame : GameFlowSubscriber {
 
     private val logListModel = DefaultListModel<String>()
 
-    private val logList = JList<String>(logListModel)
+    private val logList = JList(logListModel)
 
     private val logListScrollPane = JScrollPane().apply {
         preferredSize = Dimension(0, 0)
@@ -81,7 +81,7 @@ object MainFrame : GameFlowSubscriber {
 
     private val choicesListModel = DefaultListModel<MoveWithStats>()
 
-    private val choicesList = JList<MoveWithStats>(choicesListModel).apply {
+    private val choicesList = JList(choicesListModel).apply {
         selectionMode = ListSelectionModel.SINGLE_SELECTION
 
     }

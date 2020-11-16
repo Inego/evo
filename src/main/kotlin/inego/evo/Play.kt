@@ -65,10 +65,8 @@ class GameManager(val game: Game) {
 
             subscriber?.onChoicePoint(nextMoveSelection, engine != null)
 
-            engine?.let {
-                it.selectMove(game, nextMoveSelection).thenAccept {
-                    next(decidingPlayer, it)
-                }
+            engine?.selectMove(game, nextMoveSelection)?.thenAccept {
+                next(decidingPlayer, it)
             }
         }
     }

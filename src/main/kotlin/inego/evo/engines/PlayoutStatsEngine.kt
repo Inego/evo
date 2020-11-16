@@ -47,12 +47,12 @@ class PlayoutStatsEngine(private val timeToThink: Long) : AsyncEngine {
     }
 
     private fun complete() {
-        result?.let {
+        result?.let { moveFuture ->
             val currentMoveStats = playoutManager.getCurrentMoveStats()
             playoutManager.stop()
-            val bestMove = currentMoveStats.maxBy { it.value.playouts }!!.key
+            val bestMove = currentMoveStats.maxByOrNull { it.value.playouts }!!.key
 
-            it.complete(bestMove)
+            moveFuture.complete(bestMove)
         }
     }
 

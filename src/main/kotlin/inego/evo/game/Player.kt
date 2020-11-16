@@ -33,8 +33,11 @@ class Player private constructor(
      * Returns the current game score of the player.
      */
     val score
-        get() = animals.sumBy { 2 + it.individualProperties.sumBy { it.individualProperty.score } + it.fatCapacity } +
-                connections.size
+        get() = animals.sumBy { animal ->
+            2 + animal.individualProperties.sumBy {
+                it.individualProperty.score
+            } + animal.fatCapacity
+        } + connections.size
 
     val result
         get() = PlayerResult(this, score, discardSize)

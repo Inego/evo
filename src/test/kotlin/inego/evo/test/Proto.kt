@@ -4,6 +4,7 @@ import inego.evo.cards.CardQuantities
 import inego.evo.cards.ECard
 import inego.evo.game.Game
 import inego.evo.getProtoReference
+import inego.evo.proto.Card
 import inego.evo.proto.GameProtos
 import inego.evo.toProto
 import org.junit.Test
@@ -21,7 +22,7 @@ class ProtoTests {
         val p = cq.toProto()
 
         assertEquals(p.size, 1)
-        assertEquals(GameProtos.Card.GRAZING, p[0].card)
+        assertEquals(Card.GRAZING, p[0].card)
         assertEquals(2, p[0].quantity)
     }
 

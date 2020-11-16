@@ -11,53 +11,58 @@ import inego.evo.properties.individual.IndividualPropertyEnum
 import inego.evo.properties.paired.asymmetric.SymbiosisProperty
 import inego.evo.properties.paired.symmetric.CommunicationProperty
 import inego.evo.properties.paired.symmetric.CooperationProperty
-import inego.evo.proto.GameProtos
+import inego.evo.proto.*
+import inego.evo.proto.Animal as ProtoAnimal
+import inego.evo.proto.Game as ProtoGame
+import inego.evo.proto.GamePhase as ProtoGamePhase
+import inego.evo.proto.PairedProperty as ProtoPairedProperty
+import inego.evo.proto.Player as ProtoPlayer
 
-fun ECard.toProto(): GameProtos.Card = when (this) {
-    ECard.CAMOUFLAGE -> GameProtos.Card.CAMOUFLAGE
-    ECard.BURROWING -> GameProtos.Card.BURROWING
-    ECard.SHARP_VISION -> GameProtos.Card.SHARP_VISION
-    ECard.SYMBIOSIS -> GameProtos.Card.SYMBIOSIS
-    ECard.PIRACY -> GameProtos.Card.PIRACY
-    ECard.GRAZING -> GameProtos.Card.GRAZING
-    ECard.TAIL_LOSS -> GameProtos.Card.TAIL_LOSS
-    ECard.HIBERNATION -> GameProtos.Card.HIBERNATION
-    ECard.POISONOUS -> GameProtos.Card.POISONOUS
-    ECard.COMMUNICATION -> GameProtos.Card.COMMUNICATION
-    ECard.SCAVENGER -> GameProtos.Card.SCAVENGER
-    ECard.RUNNING -> GameProtos.Card.RUNNING
-    ECard.MIMICRY -> GameProtos.Card.MIMICRY
-    ECard.SWIMMING -> GameProtos.Card.SWIMMING
-    ECard.PARASITE__CARNIVOROUS -> GameProtos.Card.PARASITE__CARNIVOROUS
-    ECard.PARASITE__FAT_TISSUE -> GameProtos.Card.PARASITE__FAT_TISSUE
-    ECard.COOPERATION__CARNIVOROUS -> GameProtos.Card.COOPERATION__CARNIVOROUS
-    ECard.COOPERATION__FAT_TISSUE -> GameProtos.Card.COOPERATION__FAT_TISSUE
-    ECard.BIG__CARNIVOROUS -> GameProtos.Card.BIG__CARNIVOROUS
-    ECard.BIG__FAT_TISSUE -> GameProtos.Card.BIG__FAT_TISSUE
+fun ECard.toProto(): Card = when (this) {
+    ECard.CAMOUFLAGE -> Card.CAMOUFLAGE
+    ECard.BURROWING -> Card.BURROWING
+    ECard.SHARP_VISION -> Card.SHARP_VISION
+    ECard.SYMBIOSIS -> Card.SYMBIOSIS
+    ECard.PIRACY -> Card.PIRACY
+    ECard.GRAZING -> Card.GRAZING
+    ECard.TAIL_LOSS -> Card.TAIL_LOSS
+    ECard.HIBERNATION -> Card.HIBERNATION
+    ECard.POISONOUS -> Card.POISONOUS
+    ECard.COMMUNICATION -> Card.COMMUNICATION
+    ECard.SCAVENGER -> Card.SCAVENGER
+    ECard.RUNNING -> Card.RUNNING
+    ECard.MIMICRY -> Card.MIMICRY
+    ECard.SWIMMING -> Card.SWIMMING
+    ECard.PARASITE__CARNIVOROUS -> Card.PARASITE__CARNIVOROUS
+    ECard.PARASITE__FAT_TISSUE -> Card.PARASITE__FAT_TISSUE
+    ECard.COOPERATION__CARNIVOROUS -> Card.COOPERATION__CARNIVOROUS
+    ECard.COOPERATION__FAT_TISSUE -> Card.COOPERATION__FAT_TISSUE
+    ECard.BIG__CARNIVOROUS -> Card.BIG__CARNIVOROUS
+    ECard.BIG__FAT_TISSUE -> Card.BIG__FAT_TISSUE
 }
 
-fun IndividualPropertyEnum.toProto(): GameProtos.IndividualProperty = when (this) {
-    IndividualPropertyEnum.BIG -> GameProtos.IndividualProperty.IP_BIG
-    IndividualPropertyEnum.BURROWING -> GameProtos.IndividualProperty.IP_BURROWING
-    IndividualPropertyEnum.CAMOUFLAGE -> GameProtos.IndividualProperty.IP_CAMOUFLAGE
-    IndividualPropertyEnum.CARNIVOROUS -> GameProtos.IndividualProperty.IP_CARNIVOROUS
-    IndividualPropertyEnum.FAT_TISSUE -> GameProtos.IndividualProperty.IP_FAT_TISSUE
-    IndividualPropertyEnum.GRAZING -> GameProtos.IndividualProperty.IP_GRAZING
-    IndividualPropertyEnum.HIBERNATION -> GameProtos.IndividualProperty.IP_HIBERNATION
-    IndividualPropertyEnum.MIMICRY -> GameProtos.IndividualProperty.IP_MIMICRY
-    IndividualPropertyEnum.PARASITE -> GameProtos.IndividualProperty.IP_PARASITE
-    IndividualPropertyEnum.PIRACY -> GameProtos.IndividualProperty.IP_PIRACY
-    IndividualPropertyEnum.POISONOUS -> GameProtos.IndividualProperty.IP_POISONOUS
-    IndividualPropertyEnum.RUNNING -> GameProtos.IndividualProperty.IP_RUNNING
-    IndividualPropertyEnum.SCAVENGER -> GameProtos.IndividualProperty.IP_SCAVENGER
-    IndividualPropertyEnum.SHARP_VISION -> GameProtos.IndividualProperty.IP_SHARP_VISION
-    IndividualPropertyEnum.SWIMMING -> GameProtos.IndividualProperty.IP_SWIMMING
-    IndividualPropertyEnum.TAIL_LOSS -> GameProtos.IndividualProperty.IP_TAIL_LOSS
+fun IndividualPropertyEnum.toProto(): IndividualProperty = when (this) {
+    IndividualPropertyEnum.BIG -> IndividualProperty.IP_BIG
+    IndividualPropertyEnum.BURROWING -> IndividualProperty.IP_BURROWING
+    IndividualPropertyEnum.CAMOUFLAGE -> IndividualProperty.IP_CAMOUFLAGE
+    IndividualPropertyEnum.CARNIVOROUS -> IndividualProperty.IP_CARNIVOROUS
+    IndividualPropertyEnum.FAT_TISSUE -> IndividualProperty.IP_FAT_TISSUE
+    IndividualPropertyEnum.GRAZING -> IndividualProperty.IP_GRAZING
+    IndividualPropertyEnum.HIBERNATION -> IndividualProperty.IP_HIBERNATION
+    IndividualPropertyEnum.MIMICRY -> IndividualProperty.IP_MIMICRY
+    IndividualPropertyEnum.PARASITE -> IndividualProperty.IP_PARASITE
+    IndividualPropertyEnum.PIRACY -> IndividualProperty.IP_PIRACY
+    IndividualPropertyEnum.POISONOUS -> IndividualProperty.IP_POISONOUS
+    IndividualPropertyEnum.RUNNING -> IndividualProperty.IP_RUNNING
+    IndividualPropertyEnum.SCAVENGER -> IndividualProperty.IP_SCAVENGER
+    IndividualPropertyEnum.SHARP_VISION -> IndividualProperty.IP_SHARP_VISION
+    IndividualPropertyEnum.SWIMMING -> IndividualProperty.IP_SWIMMING
+    IndividualPropertyEnum.TAIL_LOSS -> IndividualProperty.IP_TAIL_LOSS
 }
 
 
-fun Animal.toProto(): GameProtos.Animal {
-    val b = GameProtos.Animal.newBuilder()
+fun Animal.toProto(): ProtoAnimal {
+    val b = ProtoAnimal.newBuilder()
 
     b.addAllIndividualProperties(individualProperties.map { it.toProto() })
     if (fatCapacity > 0)
@@ -93,20 +98,20 @@ fun Animal.toProto(): GameProtos.Animal {
 }
 
 
-fun CardQuantities.toProto(): List<GameProtos.CardQuantity> {
+fun CardQuantities.toProto(): List<CardQuantity> {
 
     return quantities.withIndex()
             .filter { it.value > 0 }
             .map {
-                GameProtos.CardQuantity.newBuilder()
+                CardQuantity.newBuilder()
                         .setCard(ECard.array[it.index].toProto())
                         .setQuantity(it.value)
                         .build()
             }
 }
 
-fun Player.toProto(): GameProtos.Player {
-    val b = GameProtos.Player.newBuilder()
+fun Player.toProto(): ProtoPlayer {
+    val b = ProtoPlayer.newBuilder()
 
     b.passed = passed
     b.discardSize = discardSize
@@ -119,7 +124,7 @@ fun Player.toProto(): GameProtos.Player {
     b.addAllAnimals(protoAnimals)
 
     val protoConnections = connections.map {
-        val cb = GameProtos.Connection.newBuilder()
+        val cb = Connection.newBuilder()
                 .setFirstAnimal(animals.indexOf(it.animal1))
                 .setSecondAnimal(animals.indexOf(it.animal2))
                 .setProperty(it.property.toProto())
@@ -131,7 +136,7 @@ fun Player.toProto(): GameProtos.Player {
     b.addAllConnections(protoConnections)
 
     val protoFoodPropagation = foodPropagationSet.map {
-        GameProtos.ConnectionMembership.newBuilder()
+        ConnectionMembership.newBuilder()
                 .setConnection(connections.indexOf(it.connection))
                 .setHost(it.host).build()
     }
@@ -141,15 +146,15 @@ fun Player.toProto(): GameProtos.Player {
     return b.build()
 }
 
-private fun PairedProperty.toProto(): GameProtos.PairedProperty = when (this) {
-    CommunicationProperty -> GameProtos.PairedProperty.PP_COMMUNICATION
-    CooperationProperty -> GameProtos.PairedProperty.PP_COOPERATION
-    SymbiosisProperty -> GameProtos.PairedProperty.PP_SYMBIOSIS
+private fun PairedProperty.toProto(): ProtoPairedProperty = when (this) {
+    CommunicationProperty -> ProtoPairedProperty.PP_COMMUNICATION
+    CooperationProperty -> ProtoPairedProperty.PP_COOPERATION
+    SymbiosisProperty -> ProtoPairedProperty.PP_SYMBIOSIS
     else -> throw AssertionError()
 }
 
-fun Game.toProto(): GameProtos.Game {
-    val b = GameProtos.Game.newBuilder()
+fun Game.toProto(): ProtoGame {
+    val b = ProtoGame.newBuilder()
 
     val protoPlayers = players.map { it.toProto() }
     b.addAllPlayers(protoPlayers)
@@ -177,19 +182,19 @@ fun Game.toProto(): GameProtos.Game {
     return b.build()
 }
 
-private fun GamePhase.toProto(): GameProtos.GamePhase = when (this) {
-    GamePhase.DEVELOPMENT -> GameProtos.GamePhase.PH_DEVELOPMENT
-    GamePhase.FEEDING_BASE_DETERMINATION -> GameProtos.GamePhase.PH_FEEDING_BASE_DETERMINATION
-    GamePhase.FEEDING -> GameProtos.GamePhase.PH_FEEDING
-    GamePhase.DEFENSE -> GameProtos.GamePhase.PH_DEFENSE
-    GamePhase.FOOD_PROPAGATION -> GameProtos.GamePhase.PH_FOOD_PROPAGATION
-    GamePhase.GRAZING -> GameProtos.GamePhase.PH_GRAZING
-    GamePhase.EXTINCTION -> GameProtos.GamePhase.PH_EXTINCTION
-    GamePhase.END -> GameProtos.GamePhase.PH_END
+private fun GamePhase.toProto(): ProtoGamePhase = when (this) {
+    GamePhase.DEVELOPMENT -> ProtoGamePhase.PH_DEVELOPMENT
+    GamePhase.FEEDING_BASE_DETERMINATION -> ProtoGamePhase.PH_FEEDING_BASE_DETERMINATION
+    GamePhase.FEEDING -> ProtoGamePhase.PH_FEEDING
+    GamePhase.DEFENSE -> ProtoGamePhase.PH_DEFENSE
+    GamePhase.FOOD_PROPAGATION -> ProtoGamePhase.PH_FOOD_PROPAGATION
+    GamePhase.GRAZING -> ProtoGamePhase.PH_GRAZING
+    GamePhase.EXTINCTION -> ProtoGamePhase.PH_EXTINCTION
+    GamePhase.END -> ProtoGamePhase.PH_END
 }
 
-fun Game.getProtoReference(animal: Animal): GameProtos.AnimalReference =
-        GameProtos.AnimalReference.newBuilder()
+fun Game.getProtoReference(animal: Animal): AnimalReference =
+        AnimalReference.newBuilder()
                 .setOwner(players.indexOf(animal.owner))
                 .setAnimal(animal.owner.animals.indexOf(animal))
                 .build()

@@ -8,6 +8,8 @@ import java.awt.Color
 import java.awt.Graphics
 import java.awt.Graphics2D
 import javax.swing.JPanel
+import kotlin.math.max
+import kotlin.math.min
 
 class GameBoardComponent(private val gameManager: GameManager) : JPanel() {
 
@@ -57,20 +59,20 @@ class GameBoardComponent(private val gameManager: GameManager) : JPanel() {
                 g2.color = defaultColor
             }
 
-            val maxAnimalHeight = player.animals.map { it.propertyCount }.max() ?: 0
+            val maxAnimalHeight = player.animals.map { it.propertyCount }.maxOrNull() ?: 0
             val playerRows = 2 * SPACER_HEIGHT + 3 + maxAnimalHeight
-            val rowHeight = Math.min(playerHeight / playerRows, PREFERRED_ROW_HEIGHT)
+            val rowHeight = min(playerHeight / playerRows, PREFERRED_ROW_HEIGHT)
 
             // Count card width (incl. spacing)
 
-            val cardColumns = Math.max(player.hand.size, player.animals.size)
+            val cardColumns = max(player.hand.size, player.animals.size)
 
             val columnWidth = (width - 2 * HORIZONTAL_MARGIN).toDouble() / cardColumns
 
-            val cardWidth = Math.min((columnWidth * (1.0 - CARD_SPACER_RATIO)), PREFERRED_CARD_WIDTH)
+            val cardWidth = min((columnWidth * (1.0 - CARD_SPACER_RATIO)), PREFERRED_CARD_WIDTH)
             val cardWidthInt = cardWidth.toInt()
 
-            val cardSpacer = Math.min(columnWidth * CARD_SPACER_RATIO, PREFERRED_CARD_SPACER)
+            val cardSpacer = (columnWidth * CARD_SPACER_RATIO).coerceAtMost(PREFERRED_CARD_SPACER)
 
             val cardColumn = cardWidth + cardSpacer
 
